@@ -373,9 +373,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="fc bfc" id="L373" title="All 2 branches covered.">                if (verifyReady()) {</span>
 <span class="fc" id="L374">                    return true;</span>
                 }
-<span class="nc" id="L376">            } catch (final SQLException e) {</span>
-<span class="nc" id="L377">                lastCause = e;</span>
-<span class="nc" id="L378">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
+<span class="fc" id="L376">            } catch (final SQLException e) {</span>
+<span class="fc" id="L377">                lastCause = e;</span>
+<span class="fc" id="L378">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
 <span class="fc" id="L379">            }</span>
 
             try {

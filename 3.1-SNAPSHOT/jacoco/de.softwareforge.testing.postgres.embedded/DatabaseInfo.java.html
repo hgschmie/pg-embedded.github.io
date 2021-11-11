@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseInfo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pg-embedded</a> &gt; <a href="index.source.html" class="el_package">de.softwareforge.testing.postgres.embedded</a> &gt; <span class="el_source">DatabaseInfo.java</span></div><h1>DatabaseInfo.java</h1><pre class="source lang-java linenums">/*
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.softwareforge.testing.postgres.embedded;
+
+import static com.google.common.base.Preconditions.checkState;
+
+import java.sql.SQLException;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.sql.DataSource;
+
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+
+@AutoValue
+<span class="fc" id="L27">public abstract class DatabaseInfo {</span>
+
+    public static final String JDBC_FORMAT = &quot;jdbc:postgresql://localhost:%d/%s?user=%s&quot;;
+
+    // default user used for databases
+    public static final String PG_DEFAULT_USER = &quot;postgres&quot;;
+    public static final String PG_DEFAULT_DB = &quot;postgres&quot;;
+
+
+    public abstract String dbName();
+
+    public abstract int port();
+
+    public abstract String user();
+
+    public abstract ImmutableMap&lt;String, String&gt; properties();
+
+    public abstract Optional&lt;SQLException&gt; exception();
+
+    public static Builder builder() {
+<span class="fc" id="L47">        return new AutoValue_DatabaseInfo.Builder()</span>
+<span class="fc" id="L48">                .dbName(PG_DEFAULT_DB)</span>
+<span class="fc" id="L49">                .user(PG_DEFAULT_USER);</span>
+    }
+
+    public static DatabaseInfo forException(SQLException e) {
+<span class="fc" id="L53">        return builder().exception(e).port(-1).build();</span>
+    }
+
+    public String asJdbcUrl() {
+<span class="fc" id="L57">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
+
+<span class="fc" id="L59">        String additionalParameters = properties().entrySet().stream()</span>
+<span class="fc" id="L60">                .map(e -&gt; String.format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
+<span class="fc" id="L61">                .collect(Collectors.joining());</span>
+<span class="fc" id="L62">        return String.format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
+    }
+
+    public DataSource asDataSource() throws SQLException {
+<span class="fc" id="L66">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
+
+<span class="fc" id="L68">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), properties());</span>
+    }
+
+    public String asString() {
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (exception().isPresent()) {</span>
+<span class="nc" id="L73">            return &quot;&lt;no connection&gt;: &quot; + exception().toString();</span>
+        } else {
+<span class="nc" id="L75">            return asJdbcUrl();</span>
+        }
+    }
+
+
+    @AutoValue.Builder
+<span class="fc" id="L81">    public abstract static class Builder {</span>
+
+        public abstract Builder dbName(String dbName);
+
+        public abstract Builder port(int port);
+
+        public abstract Builder user(String user);
+
+        abstract Builder exception(SQLException exception);
+
+        abstract ImmutableMap.Builder&lt;String, String&gt; propertiesBuilder();
+
+        public final Builder addProperty(String key, String value) {
+<span class="fc" id="L94">            propertiesBuilder().put(key, value);</span>
+<span class="fc" id="L95">            return this;</span>
+        }
+
+        public abstract Builder properties(ImmutableMap&lt;String, String&gt; properties);
+
+        public abstract DatabaseInfo build();
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

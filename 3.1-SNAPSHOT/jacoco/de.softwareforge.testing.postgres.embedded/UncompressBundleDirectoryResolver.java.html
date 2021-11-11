@@ -102,29 +102,29 @@ public class UncompressBundleDirectoryResolver implements PgDirectoryResolver {
 
 <span class="pc bpc" id="L103" title="1 of 2 branches missed.">            if (pgDir.getName().startsWith(INSTALL_DIRECTORY_PREFIX)) {</span>
 <span class="fc" id="L104">                final File pgDirExists = new File(pgDir, &quot;.exists&quot;);</span>
-<span class="fc bfc" id="L105" title="All 2 branches covered.">                if (!pgDirExists.exists()) {</span>
-<span class="fc" id="L106">                    try (FileOutputStream lockStream = new FileOutputStream(unpackLockFile);</span>
-<span class="fc" id="L107">                            FileLock unpackLock = lockStream.getChannel().tryLock()) {</span>
-<span class="fc bfc" id="L108" title="All 2 branches covered.">                        if (unpackLock != null) {</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                if (!pgDirExists.exists()) {</span>
+<span class="nc" id="L106">                    try (FileOutputStream lockStream = new FileOutputStream(unpackLockFile);</span>
+<span class="nc" id="L107">                            FileLock unpackLock = lockStream.getChannel().tryLock()) {</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">                        if (unpackLock != null) {</span>
                             try {
-<span class="pc bpc" id="L110" title="1 of 2 branches missed.">                                checkState(!pgDirExists.exists(), &quot;unpack lock acquired but .exists file is present &quot; + pgDirExists);</span>
-<span class="fc" id="L111">                                LOG.info(&quot;extracting archive...&quot;);</span>
-<span class="fc" id="L112">                                InputStream x = pgArchiveResolver.locatePgArchive(system, machineHardware);</span>
-<span class="fc" id="L113">                                EmbeddedUtil.extractTxz(x, pgDir.getPath());</span>
-<span class="fc" id="L114">                                checkState(pgDirExists.createNewFile(), &quot;couldn't make .exists file &quot; + pgDirExists);</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">                                checkState(!pgDirExists.exists(), &quot;unpack lock acquired but .exists file is present &quot; + pgDirExists);</span>
+<span class="nc" id="L111">                                LOG.info(&quot;extracting archive...&quot;);</span>
+<span class="nc" id="L112">                                InputStream x = pgArchiveResolver.locatePgArchive(system, machineHardware);</span>
+<span class="nc" id="L113">                                EmbeddedUtil.extractTxz(x, pgDir.getPath());</span>
+<span class="nc" id="L114">                                checkState(pgDirExists.createNewFile(), &quot;couldn't make .exists file &quot; + pgDirExists);</span>
 <span class="nc" id="L115">                            } catch (Exception e) {</span>
 <span class="nc" id="L116">                                LOG.error(&quot;while unpacking archive:&quot;, e);</span>
-<span class="pc" id="L117">                            }</span>
+<span class="nc" id="L117">                            }</span>
                         } else {
                             // the other guy is unpacking for us.
-<span class="fc" id="L120">                            int maxAttempts = 60;</span>
-<span class="pc bpc" id="L121" title="1 of 4 branches missed.">                            while (!pgDirExists.exists() &amp;&amp; --maxAttempts &gt; 0) { // NOPMD</span>
-<span class="fc" id="L122">                                Thread.sleep(1000L);</span>
+<span class="nc" id="L120">                            int maxAttempts = 60;</span>
+<span class="nc bnc" id="L121" title="All 4 branches missed.">                            while (!pgDirExists.exists() &amp;&amp; --maxAttempts &gt; 0) { // NOPMD</span>
+<span class="nc" id="L122">                                Thread.sleep(1000L);</span>
                             }
-<span class="fc" id="L124">                            checkState(pgDirExists.exists(), &quot;Waited 60 seconds for postgres to be unpacked but it never finished!&quot;);</span>
+<span class="nc" id="L124">                            checkState(pgDirExists.exists(), &quot;Waited 60 seconds for postgres to be unpacked but it never finished!&quot;);</span>
                         }
                     } finally {
-<span class="pc bpc" id="L127" title="1 of 4 branches missed.">                        if (unpackLockFile.exists() &amp;&amp; !unpackLockFile.delete()) {</span>
+<span class="nc bnc" id="L127" title="All 4 branches missed.">                        if (unpackLockFile.exists() &amp;&amp; !unpackLockFile.delete()) {</span>
 <span class="nc" id="L128">                            LOG.error(format(&quot;could not remove lock file %s&quot;, unpackLockFile.getAbsolutePath()));</span>
                         }
                     }

@@ -154,40 +154,40 @@ final class EmbeddedUtil {
      * @param targetDir The directory to extract the content to.
      */
     static void extractTxz(InputStream stream, String targetDir) throws IOException {
-<span class="fc" id="L157">        try (XZInputStream xzIn = new XZInputStream(stream);</span>
-<span class="fc" id="L158">                TarArchiveInputStream tarIn = new TarArchiveInputStream(xzIn)) {</span>
-<span class="fc" id="L159">            final Phaser phaser = new Phaser(1);</span>
+<span class="nc" id="L157">        try (XZInputStream xzIn = new XZInputStream(stream);</span>
+<span class="nc" id="L158">                TarArchiveInputStream tarIn = new TarArchiveInputStream(xzIn)) {</span>
+<span class="nc" id="L159">            final Phaser phaser = new Phaser(1);</span>
             TarArchiveEntry entry;
 
-<span class="fc bfc" id="L162" title="All 2 branches covered.">            while ((entry = tarIn.getNextTarEntry()) != null) { //NOPMD</span>
-<span class="fc" id="L163">                final String individualFile = entry.getName();</span>
-<span class="fc" id="L164">                final File fsObject = new File(targetDir, individualFile);</span>
-<span class="fc" id="L165">                final Path fsPath = fsObject.toPath();</span>
-<span class="pc bpc" id="L166" title="3 of 4 branches missed.">                if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS) &amp;&amp; !Files.isDirectory(fsPath, LinkOption.NOFOLLOW_LINKS)) {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">            while ((entry = tarIn.getNextTarEntry()) != null) { //NOPMD</span>
+<span class="nc" id="L163">                final String individualFile = entry.getName();</span>
+<span class="nc" id="L164">                final File fsObject = new File(targetDir, individualFile);</span>
+<span class="nc" id="L165">                final Path fsPath = fsObject.toPath();</span>
+<span class="nc bnc" id="L166" title="All 4 branches missed.">                if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS) &amp;&amp; !Files.isDirectory(fsPath, LinkOption.NOFOLLOW_LINKS)) {</span>
 <span class="nc" id="L167">                    Files.delete(fsPath);</span>
 <span class="nc" id="L168">                    LOG.debug(&quot;Deleting existing entry %s&quot;, fsPath);</span>
                 }
 
-<span class="pc bpc" id="L171" title="1 of 4 branches missed.">                if (entry.isSymbolicLink() || entry.isLink()) {</span>
-<span class="fc" id="L172">                    Path target = FileSystems.getDefault().getPath(entry.getLinkName());</span>
-<span class="fc" id="L173">                    Files.createSymbolicLink(fsPath, target);</span>
-<span class="fc bfc" id="L174" title="All 2 branches covered.">                } else if (entry.isFile()) {</span>
+<span class="nc bnc" id="L171" title="All 4 branches missed.">                if (entry.isSymbolicLink() || entry.isLink()) {</span>
+<span class="nc" id="L172">                    Path target = FileSystems.getDefault().getPath(entry.getLinkName());</span>
+<span class="nc" id="L173">                    Files.createSymbolicLink(fsPath, target);</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                } else if (entry.isFile()) {</span>
 
 
-<span class="fc" id="L177">                    byte[] content = new byte[(int) entry.getSize()];</span>
-<span class="fc" id="L178">                    int read = tarIn.read(content, 0, content.length);</span>
-<span class="pc bpc" id="L179" title="1 of 2 branches missed.">                    checkState(read != -1, &quot;could not read %s&quot;, individualFile);</span>
-<span class="fc" id="L180">                    mkdirs(fsObject.getParentFile());</span>
+<span class="nc" id="L177">                    byte[] content = new byte[(int) entry.getSize()];</span>
+<span class="nc" id="L178">                    int read = tarIn.read(content, 0, content.length);</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">                    checkState(read != -1, &quot;could not read %s&quot;, individualFile);</span>
+<span class="nc" id="L180">                    mkdirs(fsObject.getParentFile());</span>
 
-<span class="fc" id="L182">                    final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(fsPath, CREATE, WRITE); //NOPMD</span>
-<span class="fc" id="L183">                    final ByteBuffer buffer = ByteBuffer.wrap(content); //NOPMD</span>
+<span class="nc" id="L182">                    final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(fsPath, CREATE, WRITE); //NOPMD</span>
+<span class="nc" id="L183">                    final ByteBuffer buffer = ByteBuffer.wrap(content); //NOPMD</span>
 
-<span class="fc" id="L185">                    phaser.register();</span>
-<span class="fc" id="L186">                    fileChannel.write(buffer, 0, fileChannel, new CompletionHandler&lt;Integer, Channel&gt;() {</span>
+<span class="nc" id="L185">                    phaser.register();</span>
+<span class="nc" id="L186">                    fileChannel.write(buffer, 0, fileChannel, new CompletionHandler&lt;Integer, Channel&gt;() {</span>
                         @Override
                         public void completed(Integer written, Channel channel) {
-<span class="fc" id="L189">                            closeChannel(channel);</span>
-<span class="fc" id="L190">                        }</span>
+<span class="nc" id="L189">                            closeChannel(channel);</span>
+<span class="nc" id="L190">                        }</span>
 
                         @Override
                         public void failed(Throwable error, Channel channel) {
@@ -197,28 +197,28 @@ final class EmbeddedUtil {
 
                         private void closeChannel(Channel channel) {
                             try {
-<span class="fc" id="L200">                                channel.close();</span>
+<span class="nc" id="L200">                                channel.close();</span>
 <span class="nc" id="L201">                            } catch (IOException e) {</span>
 <span class="nc" id="L202">                                LOG.error(&quot;While closing channel:&quot;, e);</span>
                             } finally {
-<span class="fc" id="L204">                                phaser.arriveAndDeregister();</span>
+<span class="nc" id="L204">                                phaser.arriveAndDeregister();</span>
                             }
-<span class="fc" id="L206">                        }</span>
+<span class="nc" id="L206">                        }</span>
                     });
-<span class="pc bpc" id="L208" title="1 of 2 branches missed.">                } else if (entry.isDirectory()) {</span>
-<span class="fc" id="L209">                    mkdirs(fsObject);</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">                } else if (entry.isDirectory()) {</span>
+<span class="nc" id="L209">                    mkdirs(fsObject);</span>
                 } else {
 <span class="nc" id="L211">                    throw new UnsupportedOperationException(format(&quot;unsupported entry found: %s&quot;, individualFile)</span>
                     );
                 }
 
-<span class="pc bpc" id="L215" title="1 of 4 branches missed.">                if (individualFile.startsWith(&quot;bin/&quot;) || individualFile.startsWith(&quot;./bin/&quot;)) {</span>
-<span class="fc" id="L216">                    fsObject.setExecutable(true, false);</span>
+<span class="nc bnc" id="L215" title="All 4 branches missed.">                if (individualFile.startsWith(&quot;bin/&quot;) || individualFile.startsWith(&quot;./bin/&quot;)) {</span>
+<span class="nc" id="L216">                    fsObject.setExecutable(true, false);</span>
                 }
-<span class="fc" id="L218">            }</span>
+<span class="nc" id="L218">            }</span>
 
-<span class="fc" id="L220">            phaser.arriveAndAwaitAdvance();</span>
+<span class="nc" id="L220">            phaser.arriveAndAwaitAdvance();</span>
         }
-<span class="fc" id="L222">    }</span>
+<span class="nc" id="L222">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

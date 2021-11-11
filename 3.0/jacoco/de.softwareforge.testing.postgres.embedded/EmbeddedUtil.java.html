@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmbeddedUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pg-embedded</a> &gt; <a href="index.source.html" class="el_package">de.softwareforge.testing.postgres.embedded</a> &gt; <span class="el_source">EmbeddedUtil.java</span></div><h1>EmbeddedUtil.java</h1><pre class="source lang-java linenums">/*
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.softwareforge.testing.postgres.embedded;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.ServerSocket;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.Channel;
+import java.nio.channels.CompletionHandler;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Comparator;
+import java.util.concurrent.Phaser;
+import java.util.stream.Stream;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tukaani.xz.XZInputStream;
+
+final class EmbeddedUtil {
+
+<span class="fc" id="L50">    static final Logger LOG = LoggerFactory.getLogger(EmbeddedUtil.class);</span>
+
+<span class="nc" id="L52">    private EmbeddedUtil() {</span>
+<span class="nc" id="L53">        throw new AssertionError(&quot;EmbeddedUtil can not be instantiated&quot;);</span>
+    }
+
+    static File getWorkingDirectory() {
+<span class="fc" id="L57">        return new File(SystemUtils.getJavaIoTmpDir(), &quot;embedded-pg&quot;);</span>
+    }
+
+    //
+    // taken from apache commons io
+    //
+    static String getFileBaseName(final String fileName) {
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (fileName == null) {</span>
+<span class="nc" id="L65">            return null;</span>
+        }
+<span class="fc" id="L67">        failIfNullBytePresent(fileName);</span>
+<span class="fc" id="L68">        final int index = indexOfLastSeparator(fileName);</span>
+<span class="fc" id="L69">        return fileName.substring(index + 1);</span>
+    }
+
+    private static void failIfNullBytePresent(final String path) {
+<span class="fc" id="L73">        final int len = path.length();</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        for (int i = 0; i &lt; len; i++) {</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">            checkArgument(path.charAt(i) != 0,</span>
+                    &quot;Null byte present in file/path name.&quot;);
+        }
+<span class="fc" id="L78">    }</span>
+
+    private static int indexOfLastSeparator(final String fileName) {
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (fileName == null) {</span>
+<span class="nc" id="L82">            return -1;</span>
+        }
+<span class="fc" id="L84">        final int lastUnixPos = fileName.lastIndexOf('/'); // unix</span>
+<span class="fc" id="L85">        final int lastWindowsPos = fileName.lastIndexOf('\\'); // windows</span>
+<span class="fc" id="L86">        return Math.max(lastUnixPos, lastWindowsPos);</span>
+    }
+
+    //
+    // taken from apache commons io
+    //
+
+    static void mkdirs(File dir) {
+<span class="pc bpc" id="L94" title="2 of 6 branches missed.">        if (!dir.mkdirs() &amp;&amp; !(dir.isDirectory() &amp;&amp; dir.exists())) {</span>
+<span class="nc" id="L95">            throw new IllegalStateException(&quot;could not create &quot; + dir);</span>
+        }
+<span class="fc" id="L97">    }</span>
+
+    @SuppressFBWarnings(&quot;RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE&quot;)
+    static void rmdirs(File dir) throws IOException {
+<span class="fc" id="L101">        try (Stream&lt;Path&gt; walk = Files.walk(dir.toPath())) {</span>
+<span class="fc" id="L102">            walk.sorted(Comparator.reverseOrder())</span>
+<span class="fc" id="L103">                    .map(Path::toFile)</span>
+<span class="fc" id="L104">                    .forEach(File::delete);</span>
+        }
+<span class="fc" id="L106">    }</span>
+
+    static String formatDuration(Duration duration) {
+<span class="fc" id="L109">        return DurationFormatUtils.formatDuration(duration.toMillis(), &quot;s' seconds 'S' ms'&quot;);</span>
+    }
+
+    static int allocatePort() throws IOException {
+<span class="fc" id="L113">        try (ServerSocket socket = new ServerSocket(0)) {</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">            while (!socket.isBound()) {</span>
+<span class="nc" id="L115">                Thread.sleep(50);</span>
+            }
+<span class="fc" id="L117">            return socket.getLocalPort();</span>
+<span class="nc" id="L118">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L119">            Thread.currentThread().interrupt();</span>
+<span class="nc" id="L120">            throw new IOException(&quot;Thread interrupted!&quot;, e);</span>
+        }
+    }
+
+    /**
+     * Get current operating system string. The string is used in the appropriate postgres archive name.
+     *
+     * @return Current operating system string.
+     */
+    static String getOS() {
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if (SystemUtils.IS_OS_WINDOWS) {</span>
+<span class="nc" id="L131">            return &quot;windows&quot;;</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        } else if (SystemUtils.IS_OS_MAC_OSX) {</span>
+<span class="fc" id="L133">            return &quot;darwin&quot;;</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        } else if (SystemUtils.IS_OS_LINUX) {</span>
+<span class="nc" id="L135">            return &quot;linux&quot;;</span>
+        } else {
+<span class="nc" id="L137">            throw new UnsupportedOperationException(&quot;Unknown OS &quot; + SystemUtils.OS_NAME);</span>
+        }
+    }
+
+    /**
+     * Get the machine architecture string. The string is used in the appropriate postgres archive name.
+     *
+     * @return Current machine architecture string.
+     */
+    static String getArchitecture() {
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        return &quot;amd64&quot;.equals(SystemUtils.OS_ARCH) ? &quot;x86_64&quot; : SystemUtils.OS_ARCH;</span>
+    }
+
+    /**
+     * Unpack archive compressed by tar with xz compression. By default system tar is used (faster). If not found, then the java implementation takes place.
+     *
+     * @param stream    A stream with the postgres binaries.
+     * @param targetDir The directory to extract the content to.
+     */
+    static void extractTxz(InputStream stream, String targetDir) throws IOException {
+<span class="fc" id="L157">        try (XZInputStream xzIn = new XZInputStream(stream);</span>
+<span class="fc" id="L158">                TarArchiveInputStream tarIn = new TarArchiveInputStream(xzIn)) {</span>
+<span class="fc" id="L159">            final Phaser phaser = new Phaser(1);</span>
+            TarArchiveEntry entry;
+
+<span class="fc bfc" id="L162" title="All 2 branches covered.">            while ((entry = tarIn.getNextTarEntry()) != null) { //NOPMD</span>
+<span class="fc" id="L163">                final String individualFile = entry.getName();</span>
+<span class="fc" id="L164">                final File fsObject = new File(targetDir, individualFile);</span>
+<span class="fc" id="L165">                final Path fsPath = fsObject.toPath();</span>
+<span class="pc bpc" id="L166" title="3 of 4 branches missed.">                if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS) &amp;&amp; !Files.isDirectory(fsPath, LinkOption.NOFOLLOW_LINKS)) {</span>
+<span class="nc" id="L167">                    Files.delete(fsPath);</span>
+<span class="nc" id="L168">                    LOG.debug(&quot;Deleting existing entry %s&quot;, fsPath);</span>
+                }
+
+<span class="pc bpc" id="L171" title="1 of 4 branches missed.">                if (entry.isSymbolicLink() || entry.isLink()) {</span>
+<span class="fc" id="L172">                    Path target = FileSystems.getDefault().getPath(entry.getLinkName());</span>
+<span class="fc" id="L173">                    Files.createSymbolicLink(fsPath, target);</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">                } else if (entry.isFile()) {</span>
+
+
+<span class="fc" id="L177">                    byte[] content = new byte[(int) entry.getSize()];</span>
+<span class="fc" id="L178">                    int read = tarIn.read(content, 0, content.length);</span>
+<span class="pc bpc" id="L179" title="1 of 2 branches missed.">                    checkState(read != -1, &quot;could not read %s&quot;, individualFile);</span>
+<span class="fc" id="L180">                    mkdirs(fsObject.getParentFile());</span>
+
+<span class="fc" id="L182">                    final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(fsPath, CREATE, WRITE); //NOPMD</span>
+<span class="fc" id="L183">                    final ByteBuffer buffer = ByteBuffer.wrap(content); //NOPMD</span>
+
+<span class="fc" id="L185">                    phaser.register();</span>
+<span class="fc" id="L186">                    fileChannel.write(buffer, 0, fileChannel, new CompletionHandler&lt;Integer, Channel&gt;() {</span>
+                        @Override
+                        public void completed(Integer written, Channel channel) {
+<span class="fc" id="L189">                            closeChannel(channel);</span>
+<span class="fc" id="L190">                        }</span>
+
+                        @Override
+                        public void failed(Throwable error, Channel channel) {
+<span class="nc" id="L194">                            LOG.error(&quot;could not write file &quot; + fsObject.getAbsolutePath(), error);</span>
+<span class="nc" id="L195">                            closeChannel(channel);</span>
+<span class="nc" id="L196">                        }</span>
+
+                        private void closeChannel(Channel channel) {
+                            try {
+<span class="fc" id="L200">                                channel.close();</span>
+<span class="nc" id="L201">                            } catch (IOException e) {</span>
+<span class="nc" id="L202">                                LOG.error(&quot;While closing channel:&quot;, e);</span>
+                            } finally {
+<span class="fc" id="L204">                                phaser.arriveAndDeregister();</span>
+                            }
+<span class="fc" id="L206">                        }</span>
+                    });
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">                } else if (entry.isDirectory()) {</span>
+<span class="fc" id="L209">                    mkdirs(fsObject);</span>
+                } else {
+<span class="nc" id="L211">                    throw new UnsupportedOperationException(format(&quot;unsupported entry found: %s&quot;, individualFile)</span>
+                    );
+                }
+
+<span class="pc bpc" id="L215" title="1 of 4 branches missed.">                if (individualFile.startsWith(&quot;bin/&quot;) || individualFile.startsWith(&quot;./bin/&quot;)) {</span>
+<span class="fc" id="L216">                    fsObject.setExecutable(true, false);</span>
+                }
+<span class="fc" id="L218">            }</span>
+
+<span class="fc" id="L220">            phaser.arriveAndAwaitAdvance();</span>
+        }
+<span class="fc" id="L222">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -20,7 +20,7 @@ under the License.
 <rss version="0.91">
   <channel>
     <title>pg-embedded - Checkstyle report</title>
-    <link>${project.url}</link>
+    <link>https://pg-embedded.softwareforge.de/</link>
     <description>pg-embedded - Checkstyle report</description>
     <language>en-us</language>
     <copyright>&#169;2021</copyright>
@@ -30,9 +30,9 @@ under the License.
              Warnings: 0,
              Infos: 0
       </title>
-            <link>${project.url}/checkstyle.html</link>
+            <link>https://pg-embedded.softwareforge.de//checkstyle.html</link>
       <description>
-        <p>Click <a href="${project.url}/checkstyle.html">here</a> for the full Checkstyle report.</p>
+        <p>Click <a href="https://pg-embedded.softwareforge.de//checkstyle.html">here</a> for the full Checkstyle report.</p>
 
         <table summary="Files" boder="1">
           <thead>

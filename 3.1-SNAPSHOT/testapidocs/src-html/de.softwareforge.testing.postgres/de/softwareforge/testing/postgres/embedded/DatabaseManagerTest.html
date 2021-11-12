@@ -36,7 +36,7 @@
 <span class="source-line-no">023</span><span id="line-23">    @Test</span>
 <span class="source-line-no">024</span><span id="line-24">    public void testSingleDatabase() throws Exception {</span>
 <span class="source-line-no">025</span><span id="line-25">        try (DatabaseManager manager = DatabaseManager.singleDatabase()</span>
-<span class="source-line-no">026</span><span id="line-26">                .withCustomizer(EmbeddedPostgres.Builder::withDefaults)</span>
+<span class="source-line-no">026</span><span id="line-26">                .withInstancePreparer(EmbeddedPostgres.Builder::withDefaults)</span>
 <span class="source-line-no">027</span><span id="line-27">                .build()</span>
 <span class="source-line-no">028</span><span id="line-28">                .start()) {</span>
 <span class="source-line-no">029</span><span id="line-29"></span>
@@ -51,7 +51,7 @@
 <span class="source-line-no">038</span><span id="line-38">    @Test</span>
 <span class="source-line-no">039</span><span id="line-39">    public void testMultiDatabase() throws Exception {</span>
 <span class="source-line-no">040</span><span id="line-40">        try (DatabaseManager manager = DatabaseManager.multiDatabases()</span>
-<span class="source-line-no">041</span><span id="line-41">                .withCustomizer(EmbeddedPostgres.Builder::withDefaults)</span>
+<span class="source-line-no">041</span><span id="line-41">                .withInstancePreparer(EmbeddedPostgres.Builder::withDefaults)</span>
 <span class="source-line-no">042</span><span id="line-42">                .build()</span>
 <span class="source-line-no">043</span><span id="line-43">                .start()) {</span>
 <span class="source-line-no">044</span><span id="line-44"></span>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1636742227307">
+<licensePluginReport goal="CHECK" timestamp="1636747031474">
     <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="3.1-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -8,6 +8,7 @@
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabaseManager.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabasePreparer.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/EmbeddedPostgresPreparer.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/EmbeddedUtil.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/FlywayPreparer.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/PgArchiveResolver.java" result="PRESENT"/>

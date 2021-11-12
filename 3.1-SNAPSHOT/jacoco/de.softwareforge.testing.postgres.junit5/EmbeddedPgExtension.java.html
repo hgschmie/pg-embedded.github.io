@@ -143,39 +143,40 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
         @Override
         public EmbeddedPgExtension build() {
 <span class="fc" id="L145">            DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder = new DatabaseManagerBuilder(multiMode)</span>
-<span class="fc" id="L146">                    .withPreparer(databasePreparer);</span>
-<span class="fc" id="L147">            customizers.build().forEach(databaseManagerBuilder::withCustomizer);</span>
-<span class="fc" id="L148">            return new EmbeddedPgExtension(databaseManagerBuilder);</span>
+<span class="fc" id="L146">                    .withDataSourcePreparer(dataSourcePreparer);</span>
+
+<span class="fc" id="L148">            instancePreparers.build().forEach(databaseManagerBuilder::withInstancePreparer);</span>
+<span class="fc" id="L149">            return new EmbeddedPgExtension(databaseManagerBuilder);</span>
         }
     }
 
     static final class TestMode {
 
-<span class="fc" id="L154">        static final Object TESTMODE_KEY = new Object();</span>
+<span class="fc" id="L155">        static final Object TESTMODE_KEY = new Object();</span>
 
         private final String id;
         private final DatabaseManager databaseManager;
 
-<span class="fc" id="L159">        private TestMode(String id, DatabaseManager databaseManager) {</span>
-<span class="fc" id="L160">            this.id = id;</span>
-<span class="fc" id="L161">            this.databaseManager = databaseManager;</span>
-<span class="fc" id="L162">        }</span>
+<span class="fc" id="L160">        private TestMode(String id, DatabaseManager databaseManager) {</span>
+<span class="fc" id="L161">            this.id = id;</span>
+<span class="fc" id="L162">            this.databaseManager = databaseManager;</span>
+<span class="fc" id="L163">        }</span>
 
         public DatabaseManager start(String id) throws Exception {
-<span class="fc bfc" id="L165" title="All 2 branches covered.">            if (this.id.equals(id)) {</span>
-<span class="fc" id="L166">                databaseManager.start();</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">            if (this.id.equals(id)) {</span>
+<span class="fc" id="L167">                databaseManager.start();</span>
             }
 
-<span class="fc" id="L169">            return databaseManager;</span>
+<span class="fc" id="L170">            return databaseManager;</span>
         }
 
         public DatabaseManager stop(String id) throws Exception {
-<span class="fc bfc" id="L173" title="All 2 branches covered.">            if (this.id.equals(id)) {</span>
-<span class="fc" id="L174">                databaseManager.close();</span>
-<span class="fc" id="L175">                return null;</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (this.id.equals(id)) {</span>
+<span class="fc" id="L175">                databaseManager.close();</span>
+<span class="fc" id="L176">                return null;</span>
             }
 
-<span class="fc" id="L178">            return databaseManager;</span>
+<span class="fc" id="L179">            return databaseManager;</span>
         }
     }
 }

@@ -41,7 +41,7 @@
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>  
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>      @RegisterExtension
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>      <strong class="jxr_keyword">public</strong> EmbeddedPgExtension db = SingleDatabaseBuilder.preparedInstanceWithDefaults(preparer)
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>              .withCustomizer(builder -&gt; builder.addConnectionProperty(<span class="jxr_string">"connectTimeout"</span>, <span class="jxr_string">"20"</span>))
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>              .withInstancePreparer(builder -&gt; builder.addConnectionProperty(<span class="jxr_string">"connectTimeout"</span>, <span class="jxr_string">"20"</span>))
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>              .build();
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>      @Test
@@ -59,7 +59,7 @@
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>          assertEquals(<span class="jxr_string">"20"</span>, preparerDataSource.getProperty(<span class="jxr_string">"connectTimeout"</span>));
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>      }
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>  
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> CapturingDatabasePreparer <strong class="jxr_keyword">implements</strong> DatabasePreparer {
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> CapturingDatabasePreparer <strong class="jxr_keyword">implements</strong> EmbeddedPostgresPreparer&lt;DataSource&gt; {
 <a class="jxr_linenumber" name="L55" href="#L55">55</a>  
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>          <strong class="jxr_keyword">private</strong> DataSource dataSource;
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>  

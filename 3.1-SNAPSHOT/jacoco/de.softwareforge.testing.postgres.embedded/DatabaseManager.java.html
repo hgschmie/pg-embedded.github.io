@@ -18,13 +18,10 @@ import static com.google.common.base.Preconditions.checkState;
 import static de.softwareforge.testing.postgres.embedded.DatabaseInfo.PG_DEFAULT_USER;
 import static java.lang.String.format;
 
-import de.softwareforge.testing.postgres.embedded.EmbeddedPostgres.BuilderCustomizer;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,87 +41,87 @@ import org.slf4j.LoggerFactory;
  */
 public class DatabaseManager implements AutoCloseable {
 
-<span class="fc" id="L47">    public static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);</span>
+<span class="fc" id="L44">    public static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);</span>
 
-<span class="fc" id="L49">    private final AtomicBoolean closed = new AtomicBoolean();</span>
-<span class="fc" id="L50">    private final AtomicBoolean started = new AtomicBoolean();</span>
+<span class="fc" id="L46">    private final AtomicBoolean closed = new AtomicBoolean();</span>
+<span class="fc" id="L47">    private final AtomicBoolean started = new AtomicBoolean();</span>
 
-    private final DatabasePreparer databasePreparer;
-    private final Set&lt;EmbeddedPostgres.BuilderCustomizer&gt; customizers;
+    private final EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer;
+    private final Set&lt;EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;&gt; instancePreparers;
     private final boolean multiMode;
 
-<span class="fc" id="L56">    private volatile InstanceProvider instanceProvider = null;</span>
-<span class="fc" id="L57">    private volatile EmbeddedPostgres pg = null;</span>
+<span class="fc" id="L53">    private volatile InstanceProvider instanceProvider = null;</span>
+<span class="fc" id="L54">    private volatile EmbeddedPostgres pg = null;</span>
 
-    private DatabaseManager(DatabasePreparer databasePreparer,
-            Set&lt;EmbeddedPostgres.BuilderCustomizer&gt; customizers,
-<span class="fc" id="L61">            boolean multiMode) {</span>
-<span class="fc" id="L62">        this.databasePreparer = checkNotNull(databasePreparer, &quot;databasePreparer is null&quot;);</span>
-<span class="fc" id="L63">        this.customizers = checkNotNull(customizers, &quot;customizers is null&quot;);</span>
-<span class="fc" id="L64">        this.multiMode = multiMode;</span>
-<span class="fc" id="L65">    }</span>
+    private DatabaseManager(EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer,
+            Set&lt;EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;&gt; instancePreparers,
+<span class="fc" id="L58">            boolean multiMode) {</span>
+<span class="fc" id="L59">        this.dataSourcePreparer = checkNotNull(dataSourcePreparer, &quot;dataSourcePreparer is null&quot;);</span>
+<span class="fc" id="L60">        this.instancePreparers = checkNotNull(instancePreparers, &quot;instancePreparers is null&quot;);</span>
+<span class="fc" id="L61">        this.multiMode = multiMode;</span>
+<span class="fc" id="L62">    }</span>
 
     public static Builder&lt;DatabaseManager&gt; multiDatabases() {
-<span class="fc" id="L68">        return new DatabaseManagerBuilder(true);</span>
+<span class="fc" id="L65">        return new DatabaseManagerBuilder(true);</span>
     }
 
     public static Builder&lt;DatabaseManager&gt; singleDatabase() {
-<span class="fc" id="L72">        return new DatabaseManagerBuilder(false);</span>
+<span class="fc" id="L69">        return new DatabaseManagerBuilder(false);</span>
     }
 
     public DatabaseManager start() throws IOException, SQLException {
-<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if (!started.getAndSet(true)) {</span>
-<span class="fc" id="L77">            EmbeddedPostgres.Builder builder = EmbeddedPostgres.builder();</span>
-<span class="fc bfc" id="L78" title="All 2 branches covered.">            for (BuilderCustomizer customizer : customizers) {</span>
-<span class="fc" id="L79">                customizer.customize(builder);</span>
-<span class="fc" id="L80">            }</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if (!started.getAndSet(true)) {</span>
+<span class="fc" id="L74">            EmbeddedPostgres.Builder builder = EmbeddedPostgres.builder();</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            for (EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt; instancePreparer : instancePreparers) {</span>
+<span class="fc" id="L76">                instancePreparer.prepare(builder);</span>
+<span class="fc" id="L77">            }</span>
 
-<span class="fc" id="L82">            this.pg = builder.build();</span>
+<span class="fc" id="L79">            this.pg = builder.build();</span>
 
-<span class="fc bfc" id="L84" title="All 2 branches covered.">            DataSource dataSourceToPrepare = multiMode ? pg.createTemplateDataSource() : pg.createDefaultDataSource();</span>
-<span class="fc" id="L85">            databasePreparer.prepare(dataSourceToPrepare);</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">            DataSource dataSourceToPrepare = multiMode ? pg.createTemplateDataSource() : pg.createDefaultDataSource();</span>
+<span class="fc" id="L82">            dataSourcePreparer.prepare(dataSourceToPrepare);</span>
 
-<span class="fc bfc" id="L87" title="All 2 branches covered.">            this.instanceProvider = multiMode ? new InstanceProviderPipeline() : () -&gt; pg.createDefaultDatabaseInfo();</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            this.instanceProvider = multiMode ? new InstanceProviderPipeline() : () -&gt; pg.createDefaultDatabaseInfo();</span>
 
-<span class="fc" id="L89">            this.instanceProvider.start();</span>
+<span class="fc" id="L86">            this.instanceProvider.start();</span>
         }
 
-<span class="fc" id="L92">        return this;</span>
+<span class="fc" id="L89">        return this;</span>
     }
 
     @Override
     public void close() throws Exception {
-<span class="fc" id="L97">        checkState(started.get(), &quot;not yet started!&quot;);</span>
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (!closed.getAndSet(true)) {</span>
-<span class="fc" id="L99">            instanceProvider.close();</span>
-<span class="fc" id="L100">            pg.close();</span>
+<span class="fc" id="L94">        checkState(started.get(), &quot;not yet started!&quot;);</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (!closed.getAndSet(true)) {</span>
+<span class="fc" id="L96">            instanceProvider.close();</span>
+<span class="fc" id="L97">            pg.close();</span>
         }
-<span class="fc" id="L102">    }</span>
+<span class="fc" id="L99">    }</span>
 
     public DatabaseInfo getDatabaseInfo() throws SQLException {
-<span class="fc" id="L105">        checkState(started.get(), &quot;not yet started!&quot;);</span>
+<span class="fc" id="L102">        checkState(started.get(), &quot;not yet started!&quot;);</span>
 
-<span class="fc" id="L107">        DatabaseInfo databaseInfo = instanceProvider.get();</span>
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (databaseInfo.exception().isEmpty()) {</span>
-<span class="fc" id="L109">            return databaseInfo;</span>
+<span class="fc" id="L104">        DatabaseInfo databaseInfo = instanceProvider.get();</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if (databaseInfo.exception().isEmpty()) {</span>
+<span class="fc" id="L106">            return databaseInfo;</span>
         } else {
-<span class="nc" id="L111">            throw databaseInfo.exception().get();</span>
+<span class="nc" id="L108">            throw databaseInfo.exception().get();</span>
         }
     }
 
     public EmbeddedPostgres getEmbeddedPostgres() {
-<span class="nc" id="L116">        checkState(started.get(), &quot;not yet started!&quot;);</span>
-<span class="nc" id="L117">        return pg;</span>
+<span class="nc" id="L113">        checkState(started.get(), &quot;not yet started!&quot;);</span>
+<span class="nc" id="L114">        return pg;</span>
     }
 
     private interface InstanceProvider extends Supplier&lt;DatabaseInfo&gt;, AutoCloseable {
 
         default void start() {
-<span class="fc" id="L123">        }</span>
+<span class="fc" id="L120">        }</span>
 
         @Override
         default void close() {
-<span class="fc" id="L127">        }</span>
+<span class="fc" id="L124">        }</span>
 
         DatabaseInfo get();
     }
@@ -132,92 +129,112 @@ public class DatabaseManager implements AutoCloseable {
     private final class InstanceProviderPipeline implements InstanceProvider, Runnable {
 
         private final ExecutorService executor;
-<span class="fc" id="L135">        private final SynchronousQueue&lt;DatabaseInfo&gt; nextDatabase = new SynchronousQueue&lt;&gt;();</span>
+<span class="fc" id="L132">        private final SynchronousQueue&lt;DatabaseInfo&gt; nextDatabase = new SynchronousQueue&lt;&gt;();</span>
 
-<span class="fc" id="L137">        private final AtomicBoolean closed = new AtomicBoolean();</span>
+<span class="fc" id="L134">        private final AtomicBoolean closed = new AtomicBoolean();</span>
 
-<span class="fc" id="L139">        InstanceProviderPipeline() {</span>
-<span class="fc" id="L140">            this.executor = Executors.newSingleThreadExecutor(</span>
+<span class="fc" id="L136">        InstanceProviderPipeline() {</span>
+<span class="fc" id="L137">            this.executor = Executors.newSingleThreadExecutor(</span>
                     new ThreadFactoryBuilder()
-<span class="fc" id="L142">                            .setDaemon(true)</span>
-<span class="fc" id="L143">                            .setNameFormat(&quot;instance-creator-&quot; + pg.instanceId() + &quot;-%d&quot;)</span>
-<span class="fc" id="L144">                            .build());</span>
+<span class="fc" id="L139">                            .setDaemon(true)</span>
+<span class="fc" id="L140">                            .setNameFormat(&quot;instance-creator-&quot; + pg.instanceId() + &quot;-%d&quot;)</span>
+<span class="fc" id="L141">                            .build());</span>
 
-<span class="fc" id="L146">        }</span>
+<span class="fc" id="L143">        }</span>
 
         @Override
         public void start() {
-<span class="fc" id="L150">            this.executor.submit(this);</span>
-<span class="fc" id="L151">        }</span>
+<span class="fc" id="L147">            this.executor.submit(this);</span>
+<span class="fc" id="L148">        }</span>
 
         @Override
         public void close() {
-<span class="pc bpc" id="L155" title="1 of 2 branches missed.">            if (!this.closed.getAndSet(true)) {</span>
-<span class="fc" id="L156">                executor.shutdownNow();</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">            if (!this.closed.getAndSet(true)) {</span>
+<span class="fc" id="L153">                executor.shutdownNow();</span>
             }
-<span class="fc" id="L158">        }</span>
+<span class="fc" id="L155">        }</span>
 
         @Override
         public void run() {
-<span class="fc bfc" id="L162" title="All 2 branches covered.">            while (!closed.get()) {</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">            while (!closed.get()) {</span>
                 try {
-<span class="fc" id="L164">                    final String newDbName = EmbeddedUtil.randomLowercase(12);</span>
+<span class="fc" id="L161">                    final String newDbName = EmbeddedUtil.randomLowercase(12);</span>
                     try {
-<span class="fc" id="L166">                        createDatabase(pg.createDefaultDataSource(), newDbName, PG_DEFAULT_USER);</span>
-<span class="fc" id="L167">                        nextDatabase.put(DatabaseInfo.builder().dbName(newDbName).port(pg.getPort()).properties(pg.getConnectionProperties()).build());</span>
-<span class="fc" id="L168">                    } catch (SQLException e) {</span>
+<span class="fc" id="L163">                        createDatabase(pg.createDefaultDataSource(), newDbName, PG_DEFAULT_USER);</span>
+<span class="fc" id="L164">                        nextDatabase.put(DatabaseInfo.builder().dbName(newDbName).port(pg.getPort()).properties(pg.getConnectionProperties()).build());</span>
+<span class="fc" id="L165">                    } catch (SQLException e) {</span>
                         // https://www.postgresql.org/docs/13/errcodes-appendix.html - 57P01 admin_shutdown
-<span class="pc bpc" id="L170" title="1 of 2 branches missed.">                        if (!e.getSQLState().equals(&quot;57P01&quot;)) {</span>
-<span class="nc" id="L171">                            LOG.warn(&quot;Caught SQL Exception (&quot; + e.getSQLState() + &quot;):&quot;, e);</span>
-<span class="nc" id="L172">                            nextDatabase.put(DatabaseInfo.forException(e));</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">                        if (!e.getSQLState().equals(&quot;57P01&quot;)) {</span>
+<span class="nc" id="L168">                            LOG.warn(&quot;Caught SQL Exception (&quot; + e.getSQLState() + &quot;):&quot;, e);</span>
+<span class="nc" id="L169">                            nextDatabase.put(DatabaseInfo.forException(e));</span>
                         }
-<span class="fc" id="L174">                    }</span>
-<span class="fc" id="L175">                } catch (InterruptedException e) {</span>
-<span class="fc" id="L176">                    Thread.currentThread().interrupt();</span>
-<span class="fc" id="L177">                    return;</span>
-<span class="nc" id="L178">                } catch (Throwable t) {</span>
-<span class="nc" id="L179">                    LOG.warn(&quot;Caught Throwable in loop:&quot;, t);</span>
-<span class="pc" id="L180">                }</span>
+<span class="fc" id="L171">                    }</span>
+<span class="fc" id="L172">                } catch (InterruptedException e) {</span>
+<span class="fc" id="L173">                    Thread.currentThread().interrupt();</span>
+<span class="fc" id="L174">                    return;</span>
+<span class="nc" id="L175">                } catch (Throwable t) {</span>
+<span class="nc" id="L176">                    LOG.warn(&quot;Caught Throwable in loop:&quot;, t);</span>
+<span class="pc" id="L177">                }</span>
             }
-<span class="fc" id="L182">        }</span>
+<span class="fc" id="L179">        }</span>
 
         @Override
         public DatabaseInfo get() {
             try {
-<span class="fc" id="L187">                return nextDatabase.take();</span>
-<span class="nc" id="L188">            } catch (final InterruptedException e) {</span>
-<span class="nc" id="L189">                Thread.currentThread().interrupt();</span>
-<span class="nc" id="L190">                throw new IllegalStateException(e);</span>
+<span class="fc" id="L184">                return nextDatabase.take();</span>
+<span class="nc" id="L185">            } catch (final InterruptedException e) {</span>
+<span class="nc" id="L186">                Thread.currentThread().interrupt();</span>
+<span class="nc" id="L187">                throw new IllegalStateException(e);</span>
             }
         }
     }
 
     @SuppressFBWarnings(&quot;RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE&quot;)
     private static void createDatabase(final DataSource dataSource, final String databaseName, final String user) throws SQLException {
-<span class="fc" id="L197">        try (Connection c = dataSource.getConnection();</span>
-<span class="fc" id="L198">                Statement stmt = c.createStatement()) {</span>
-<span class="fc" id="L199">            stmt.executeUpdate(format(&quot;CREATE DATABASE %s OWNER %s ENCODING = 'utf8'&quot;, databaseName, user));</span>
+<span class="fc" id="L194">        try (Connection c = dataSource.getConnection();</span>
+<span class="fc" id="L195">                Statement stmt = c.createStatement()) {</span>
+<span class="fc" id="L196">            stmt.executeUpdate(format(&quot;CREATE DATABASE %s OWNER %s ENCODING = 'utf8'&quot;, databaseName, user));</span>
         }
-<span class="fc" id="L201">    }</span>
+<span class="fc" id="L198">    }</span>
 
     public abstract static class Builder&lt;T&gt; {
 
-<span class="fc" id="L205">        protected DatabasePreparer databasePreparer = DatabasePreparer.NOOP_PREPARER;</span>
-<span class="fc" id="L206">        protected ImmutableSet.Builder&lt;EmbeddedPostgres.BuilderCustomizer&gt; customizers = ImmutableSet.builder();</span>
+<span class="fc" id="L202">        protected EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer = EmbeddedPostgresPreparer.noOp();</span>
+<span class="fc" id="L203">        protected ImmutableSet.Builder&lt;EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;&gt; instancePreparers = ImmutableSet.builder();</span>
         protected final boolean multiMode;
 
-<span class="fc" id="L209">        protected Builder(boolean multiMode) {</span>
-<span class="fc" id="L210">            this.multiMode = multiMode;</span>
-<span class="fc" id="L211">        }</span>
+<span class="fc" id="L206">        protected Builder(boolean multiMode) {</span>
+<span class="fc" id="L207">            this.multiMode = multiMode;</span>
+<span class="fc" id="L208">        }</span>
 
+        /**
+         * @deprecated Use {@link #withDataSourcePreparer}.
+         */
+        @Deprecated
         public Builder&lt;T&gt; withPreparer(DatabasePreparer databasePreparer) {
-<span class="fc" id="L214">            this.databasePreparer = checkNotNull(databasePreparer, &quot;databasePreparer is null&quot;);</span>
-<span class="fc" id="L215">            return this;</span>
+<span class="nc" id="L215">            checkNotNull(databasePreparer, &quot;databasePreparer is null&quot;);</span>
+<span class="nc" id="L216">            this.dataSourcePreparer = databasePreparer::prepare;</span>
+<span class="nc" id="L217">            return this;</span>
         }
 
+        public Builder&lt;T&gt; withDataSourcePreparer(EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
+<span class="fc" id="L221">            this.dataSourcePreparer = checkNotNull(dataSourcePreparer, &quot;dataSourcePreparer is null&quot;);</span>
+<span class="fc" id="L222">            return this;</span>
+        }
+
+        public Builder&lt;T&gt; withInstancePreparer(EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt; instancePreparer) {
+<span class="fc" id="L226">            this.instancePreparers.add(checkNotNull(instancePreparer, &quot;instancePreparer is null&quot;));</span>
+<span class="fc" id="L227">            return this;</span>
+        }
+
+        /**
+         * @deprecated Use {@link #withInstancePreparer}.
+         */
+        @Deprecated
         public Builder&lt;T&gt; withCustomizer(EmbeddedPostgres.BuilderCustomizer customizer) {
-<span class="fc" id="L219">            this.customizers.add(checkNotNull(customizer, &quot;customizer is null&quot;));</span>
-<span class="fc" id="L220">            return this;</span>
+<span class="nc" id="L235">            checkNotNull(customizer, &quot;customizer is null&quot;);</span>
+<span class="nc" id="L236">            this.instancePreparers.add(customizer::customize);</span>
+<span class="nc" id="L237">            return this;</span>
         }
 
         public abstract T build();
@@ -226,12 +243,12 @@ public class DatabaseManager implements AutoCloseable {
     public static class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {
 
         public DatabaseManagerBuilder(boolean multiMode) {
-<span class="fc" id="L229">            super(multiMode);</span>
-<span class="fc" id="L230">        }</span>
+<span class="fc" id="L246">            super(multiMode);</span>
+<span class="fc" id="L247">        }</span>
 
         @Override
         public DatabaseManager build() {
-<span class="fc" id="L234">            return new DatabaseManager(databasePreparer, customizers.build(), multiMode);</span>
+<span class="fc" id="L251">            return new DatabaseManager(dataSourcePreparer, instancePreparers.build(), multiMode);</span>
         }
     }
 }

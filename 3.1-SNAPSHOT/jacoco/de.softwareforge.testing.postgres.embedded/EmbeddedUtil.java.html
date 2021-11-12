@@ -33,57 +33,84 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.concurrent.Phaser;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tukaani.xz.XZInputStream;
 
 final class EmbeddedUtil {
 
-<span class="fc" id="L50">    static final Logger LOG = LoggerFactory.getLogger(EmbeddedUtil.class);</span>
+<span class="fc" id="L53">    static final Logger LOG = LoggerFactory.getLogger(EmbeddedUtil.class);</span>
 
-<span class="nc" id="L52">    private EmbeddedUtil() {</span>
-<span class="nc" id="L53">        throw new AssertionError(&quot;EmbeddedUtil can not be instantiated&quot;);</span>
+    static final String OS_NAME;
+    static final String OS_ARCH;
+    static final boolean IS_OS_WINDOWS;
+    static final boolean IS_OS_MAC;
+    static final boolean IS_OS_LINUX;
+
+    private static final String ALPHANUM;
+    private static final String LOWERCASE;
+
+    static {
+<span class="fc" id="L65">        OS_NAME = getSystemProperty(&quot;os.name&quot;);</span>
+<span class="fc" id="L66">        OS_ARCH = getSystemProperty(&quot;os.arch&quot;);</span>
+
+<span class="fc" id="L68">        IS_OS_WINDOWS = getOsMatchesName(&quot;Windows&quot;);</span>
+<span class="fc" id="L69">        IS_OS_LINUX = getOsMatchesName(&quot;Linux&quot;);</span>
+<span class="fc" id="L70">        IS_OS_MAC = getOsMatchesName(&quot;Mac&quot;);</span>
+
+<span class="fc" id="L72">        String numbers = sequence('0', 10);</span>
+<span class="fc" id="L73">        LOWERCASE = sequence('a', 26);</span>
+<span class="fc" id="L74">        String uppercase = sequence('A', 26);</span>
+<span class="fc" id="L75">        ALPHANUM = numbers + LOWERCASE + uppercase;</span>
+<span class="fc" id="L76">    }</span>
+
+<span class="nc" id="L78">    private EmbeddedUtil() {</span>
+<span class="nc" id="L79">        throw new AssertionError(&quot;EmbeddedUtil can not be instantiated&quot;);</span>
     }
 
     static File getWorkingDirectory() {
-<span class="fc" id="L57">        return new File(SystemUtils.getJavaIoTmpDir(), &quot;embedded-pg&quot;);</span>
+<span class="fc" id="L83">        File tmpDir = new File(System.getProperty(&quot;java.io.tmpdir&quot;));</span>
+<span class="fc" id="L84">        return new File(tmpDir, &quot;embedded-pg&quot;);</span>
     }
 
     //
     // taken from apache commons io
     //
     static String getFileBaseName(final String fileName) {
-<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (fileName == null) {</span>
-<span class="nc" id="L65">            return null;</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (fileName == null) {</span>
+<span class="nc" id="L92">            return null;</span>
         }
-<span class="fc" id="L67">        failIfNullBytePresent(fileName);</span>
-<span class="fc" id="L68">        final int index = indexOfLastSeparator(fileName);</span>
-<span class="fc" id="L69">        return fileName.substring(index + 1);</span>
+<span class="fc" id="L94">        failIfNullBytePresent(fileName);</span>
+<span class="fc" id="L95">        final int index = indexOfLastSeparator(fileName);</span>
+<span class="fc" id="L96">        return fileName.substring(index + 1);</span>
     }
 
     private static void failIfNullBytePresent(final String path) {
-<span class="fc" id="L73">        final int len = path.length();</span>
-<span class="fc bfc" id="L74" title="All 2 branches covered.">        for (int i = 0; i &lt; len; i++) {</span>
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">            checkArgument(path.charAt(i) != 0,</span>
+<span class="fc" id="L100">        final int len = path.length();</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        for (int i = 0; i &lt; len; i++) {</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">            checkArgument(path.charAt(i) != 0,</span>
                     &quot;Null byte present in file/path name.&quot;);
         }
-<span class="fc" id="L78">    }</span>
+<span class="fc" id="L105">    }</span>
 
     private static int indexOfLastSeparator(final String fileName) {
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (fileName == null) {</span>
-<span class="nc" id="L82">            return -1;</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (fileName == null) {</span>
+<span class="nc" id="L109">            return -1;</span>
         }
-<span class="fc" id="L84">        final int lastUnixPos = fileName.lastIndexOf('/'); // unix</span>
-<span class="fc" id="L85">        final int lastWindowsPos = fileName.lastIndexOf('\\'); // windows</span>
-<span class="fc" id="L86">        return Math.max(lastUnixPos, lastWindowsPos);</span>
+<span class="fc" id="L111">        final int lastUnixPos = fileName.lastIndexOf('/'); // unix</span>
+<span class="fc" id="L112">        final int lastWindowsPos = fileName.lastIndexOf('\\'); // windows</span>
+<span class="fc" id="L113">        return Math.max(lastUnixPos, lastWindowsPos);</span>
     }
 
     //
@@ -91,33 +118,62 @@ final class EmbeddedUtil {
     //
 
     static void mkdirs(File dir) {
-<span class="pc bpc" id="L94" title="2 of 6 branches missed.">        if (!dir.mkdirs() &amp;&amp; !(dir.isDirectory() &amp;&amp; dir.exists())) {</span>
-<span class="nc" id="L95">            throw new IllegalStateException(&quot;could not create &quot; + dir);</span>
+<span class="pc bpc" id="L121" title="2 of 6 branches missed.">        if (!dir.mkdirs() &amp;&amp; !(dir.isDirectory() &amp;&amp; dir.exists())) {</span>
+<span class="nc" id="L122">            throw new IllegalStateException(&quot;could not create &quot; + dir);</span>
         }
-<span class="fc" id="L97">    }</span>
+<span class="fc" id="L124">    }</span>
 
     @SuppressFBWarnings(&quot;RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE&quot;)
     static void rmdirs(File dir) throws IOException {
-<span class="fc" id="L101">        try (Stream&lt;Path&gt; walk = Files.walk(dir.toPath())) {</span>
-<span class="fc" id="L102">            walk.sorted(Comparator.reverseOrder())</span>
-<span class="fc" id="L103">                    .map(Path::toFile)</span>
-<span class="fc" id="L104">                    .forEach(File::delete);</span>
+<span class="fc" id="L128">        try (Stream&lt;Path&gt; walk = Files.walk(dir.toPath())) {</span>
+<span class="fc" id="L129">            walk.sorted(Comparator.reverseOrder())</span>
+<span class="fc" id="L130">                    .map(Path::toFile)</span>
+<span class="fc" id="L131">                    .forEach(File::delete);</span>
         }
-<span class="fc" id="L106">    }</span>
+<span class="fc" id="L133">    }</span>
 
     static String formatDuration(Duration duration) {
-<span class="fc" id="L109">        return DurationFormatUtils.formatDuration(duration.toMillis(), &quot;s' seconds 'S' ms'&quot;);</span>
+<span class="fc" id="L136">        long millis = duration.toMillis();</span>
+<span class="fc" id="L137">        long hours = 0;</span>
+<span class="fc" id="L138">        long minutes = 0;</span>
+<span class="fc" id="L139">        long secs = 0;</span>
+<span class="fc" id="L140">        long ms = 0;</span>
+<span class="fc" id="L141">        ImmutableList.Builder&lt;String&gt; builder = ImmutableList.builder();</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        if (millis == 0) {</span>
+<span class="nc" id="L143">            builder.add(&quot;0 ms&quot;);</span>
+        } else {
+<span class="fc" id="L145">            long seconds = millis / 1000L;</span>
+<span class="fc" id="L146">            hours = seconds / 3600L;</span>
+<span class="fc" id="L147">            minutes = (seconds % 3600L) / 60L;</span>
+<span class="fc" id="L148">            secs = (seconds % 60L);</span>
+<span class="fc" id="L149">            ms = millis % 1000L;</span>
+
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">            if (hours != 0) {</span>
+<span class="nc" id="L152">                builder.add(hours + &quot; hours&quot;);</span>
+            }
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">            if (minutes != 0) {</span>
+<span class="nc" id="L155">                builder.add(minutes + &quot; minutes&quot;);</span>
+            }
+<span class="fc bfc" id="L157" title="All 2 branches covered.">            if (secs != 0) {</span>
+<span class="fc" id="L158">                builder.add(secs + &quot; seconds&quot;);</span>
+            }
+<span class="fc bfc" id="L160" title="All 2 branches covered.">            if (ms != 0) {</span>
+<span class="fc" id="L161">                builder.add(ms + &quot; ms&quot;);</span>
+            }
+        }
+
+<span class="fc" id="L165">        return Joiner.on(' ').join(builder.build());</span>
     }
 
     static int allocatePort() throws IOException {
-<span class="fc" id="L113">        try (ServerSocket socket = new ServerSocket(0)) {</span>
-<span class="pc bpc" id="L114" title="1 of 2 branches missed.">            while (!socket.isBound()) {</span>
-<span class="nc" id="L115">                Thread.sleep(50);</span>
+<span class="fc" id="L169">        try (ServerSocket socket = new ServerSocket(0)) {</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">            while (!socket.isBound()) {</span>
+<span class="nc" id="L171">                Thread.sleep(50);</span>
             }
-<span class="fc" id="L117">            return socket.getLocalPort();</span>
-<span class="nc" id="L118">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L119">            Thread.currentThread().interrupt();</span>
-<span class="nc" id="L120">            throw new IOException(&quot;Thread interrupted!&quot;, e);</span>
+<span class="fc" id="L173">            return socket.getLocalPort();</span>
+<span class="nc" id="L174">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L175">            Thread.currentThread().interrupt();</span>
+<span class="nc" id="L176">            throw new IOException(&quot;Thread interrupted!&quot;, e);</span>
         }
     }
 
@@ -127,14 +183,14 @@ final class EmbeddedUtil {
      * @return Current operating system string.
      */
     static String getOS() {
-<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if (SystemUtils.IS_OS_WINDOWS) {</span>
-<span class="nc" id="L131">            return &quot;windows&quot;;</span>
-<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        } else if (SystemUtils.IS_OS_MAC_OSX) {</span>
-<span class="fc" id="L133">            return &quot;darwin&quot;;</span>
-<span class="nc bnc" id="L134" title="All 2 branches missed.">        } else if (SystemUtils.IS_OS_LINUX) {</span>
-<span class="nc" id="L135">            return &quot;linux&quot;;</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        if (IS_OS_WINDOWS) {</span>
+<span class="nc" id="L187">            return &quot;windows&quot;;</span>
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        } else if (IS_OS_MAC) {</span>
+<span class="fc" id="L189">            return &quot;darwin&quot;;</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">        } else if (IS_OS_LINUX) {</span>
+<span class="nc" id="L191">            return &quot;linux&quot;;</span>
         } else {
-<span class="nc" id="L137">            throw new UnsupportedOperationException(&quot;Unknown OS &quot; + SystemUtils.OS_NAME);</span>
+<span class="nc" id="L193">            throw new UnsupportedOperationException(&quot;Unknown OS: &quot; + OS_NAME);</span>
         }
     }
 
@@ -144,7 +200,7 @@ final class EmbeddedUtil {
      * @return Current machine architecture string.
      */
     static String getArchitecture() {
-<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        return &quot;amd64&quot;.equals(SystemUtils.OS_ARCH) ? &quot;x86_64&quot; : SystemUtils.OS_ARCH;</span>
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">        return &quot;amd64&quot;.equals(OS_ARCH) ? &quot;x86_64&quot; : OS_ARCH;</span>
     }
 
     /**
@@ -154,71 +210,107 @@ final class EmbeddedUtil {
      * @param targetDir The directory to extract the content to.
      */
     static void extractTxz(InputStream stream, String targetDir) throws IOException {
-<span class="nc" id="L157">        try (XZInputStream xzIn = new XZInputStream(stream);</span>
-<span class="nc" id="L158">                TarArchiveInputStream tarIn = new TarArchiveInputStream(xzIn)) {</span>
-<span class="nc" id="L159">            final Phaser phaser = new Phaser(1);</span>
+<span class="nc" id="L213">        try (XZInputStream xzIn = new XZInputStream(stream);</span>
+<span class="nc" id="L214">                TarArchiveInputStream tarIn = new TarArchiveInputStream(xzIn)) {</span>
+<span class="nc" id="L215">            final Phaser phaser = new Phaser(1);</span>
             TarArchiveEntry entry;
 
-<span class="nc bnc" id="L162" title="All 2 branches missed.">            while ((entry = tarIn.getNextTarEntry()) != null) { //NOPMD</span>
-<span class="nc" id="L163">                final String individualFile = entry.getName();</span>
-<span class="nc" id="L164">                final File fsObject = new File(targetDir, individualFile);</span>
-<span class="nc" id="L165">                final Path fsPath = fsObject.toPath();</span>
-<span class="nc bnc" id="L166" title="All 4 branches missed.">                if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS) &amp;&amp; !Files.isDirectory(fsPath, LinkOption.NOFOLLOW_LINKS)) {</span>
-<span class="nc" id="L167">                    Files.delete(fsPath);</span>
-<span class="nc" id="L168">                    LOG.debug(&quot;Deleting existing entry %s&quot;, fsPath);</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">            while ((entry = tarIn.getNextTarEntry()) != null) { //NOPMD</span>
+<span class="nc" id="L219">                final String individualFile = entry.getName();</span>
+<span class="nc" id="L220">                final File fsObject = new File(targetDir, individualFile);</span>
+<span class="nc" id="L221">                final Path fsPath = fsObject.toPath();</span>
+<span class="nc bnc" id="L222" title="All 4 branches missed.">                if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS) &amp;&amp; !Files.isDirectory(fsPath, LinkOption.NOFOLLOW_LINKS)) {</span>
+<span class="nc" id="L223">                    Files.delete(fsPath);</span>
+<span class="nc" id="L224">                    LOG.debug(&quot;Deleting existing entry %s&quot;, fsPath);</span>
                 }
 
-<span class="nc bnc" id="L171" title="All 4 branches missed.">                if (entry.isSymbolicLink() || entry.isLink()) {</span>
-<span class="nc" id="L172">                    Path target = FileSystems.getDefault().getPath(entry.getLinkName());</span>
-<span class="nc" id="L173">                    Files.createSymbolicLink(fsPath, target);</span>
-<span class="nc bnc" id="L174" title="All 2 branches missed.">                } else if (entry.isFile()) {</span>
+<span class="nc bnc" id="L227" title="All 4 branches missed.">                if (entry.isSymbolicLink() || entry.isLink()) {</span>
+<span class="nc" id="L228">                    Path target = FileSystems.getDefault().getPath(entry.getLinkName());</span>
+<span class="nc" id="L229">                    Files.createSymbolicLink(fsPath, target);</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">                } else if (entry.isFile()) {</span>
 
+<span class="nc" id="L232">                    byte[] content = new byte[(int) entry.getSize()];</span>
+<span class="nc" id="L233">                    int read = tarIn.read(content, 0, content.length);</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">                    checkState(read != -1, &quot;could not read %s&quot;, individualFile);</span>
+<span class="nc" id="L235">                    mkdirs(fsObject.getParentFile());</span>
 
-<span class="nc" id="L177">                    byte[] content = new byte[(int) entry.getSize()];</span>
-<span class="nc" id="L178">                    int read = tarIn.read(content, 0, content.length);</span>
-<span class="nc bnc" id="L179" title="All 2 branches missed.">                    checkState(read != -1, &quot;could not read %s&quot;, individualFile);</span>
-<span class="nc" id="L180">                    mkdirs(fsObject.getParentFile());</span>
+<span class="nc" id="L237">                    final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(fsPath, CREATE, WRITE); //NOPMD</span>
+<span class="nc" id="L238">                    final ByteBuffer buffer = ByteBuffer.wrap(content); //NOPMD</span>
 
-<span class="nc" id="L182">                    final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(fsPath, CREATE, WRITE); //NOPMD</span>
-<span class="nc" id="L183">                    final ByteBuffer buffer = ByteBuffer.wrap(content); //NOPMD</span>
-
-<span class="nc" id="L185">                    phaser.register();</span>
-<span class="nc" id="L186">                    fileChannel.write(buffer, 0, fileChannel, new CompletionHandler&lt;Integer, Channel&gt;() {</span>
+<span class="nc" id="L240">                    phaser.register();</span>
+<span class="nc" id="L241">                    fileChannel.write(buffer, 0, fileChannel, new CompletionHandler&lt;Integer, Channel&gt;() {</span>
                         @Override
                         public void completed(Integer written, Channel channel) {
-<span class="nc" id="L189">                            closeChannel(channel);</span>
-<span class="nc" id="L190">                        }</span>
+<span class="nc" id="L244">                            closeChannel(channel);</span>
+<span class="nc" id="L245">                        }</span>
 
                         @Override
                         public void failed(Throwable error, Channel channel) {
-<span class="nc" id="L194">                            LOG.error(&quot;could not write file &quot; + fsObject.getAbsolutePath(), error);</span>
-<span class="nc" id="L195">                            closeChannel(channel);</span>
-<span class="nc" id="L196">                        }</span>
+<span class="nc" id="L249">                            LOG.error(&quot;could not write file &quot; + fsObject.getAbsolutePath(), error);</span>
+<span class="nc" id="L250">                            closeChannel(channel);</span>
+<span class="nc" id="L251">                        }</span>
 
                         private void closeChannel(Channel channel) {
                             try {
-<span class="nc" id="L200">                                channel.close();</span>
-<span class="nc" id="L201">                            } catch (IOException e) {</span>
-<span class="nc" id="L202">                                LOG.error(&quot;While closing channel:&quot;, e);</span>
+<span class="nc" id="L255">                                channel.close();</span>
+<span class="nc" id="L256">                            } catch (IOException e) {</span>
+<span class="nc" id="L257">                                LOG.error(&quot;While closing channel:&quot;, e);</span>
                             } finally {
-<span class="nc" id="L204">                                phaser.arriveAndDeregister();</span>
+<span class="nc" id="L259">                                phaser.arriveAndDeregister();</span>
                             }
-<span class="nc" id="L206">                        }</span>
+<span class="nc" id="L261">                        }</span>
                     });
-<span class="nc bnc" id="L208" title="All 2 branches missed.">                } else if (entry.isDirectory()) {</span>
-<span class="nc" id="L209">                    mkdirs(fsObject);</span>
+<span class="nc bnc" id="L263" title="All 2 branches missed.">                } else if (entry.isDirectory()) {</span>
+<span class="nc" id="L264">                    mkdirs(fsObject);</span>
                 } else {
-<span class="nc" id="L211">                    throw new UnsupportedOperationException(format(&quot;unsupported entry found: %s&quot;, individualFile)</span>
+<span class="nc" id="L266">                    throw new UnsupportedOperationException(format(&quot;unsupported entry found: %s&quot;, individualFile)</span>
                     );
                 }
 
-<span class="nc bnc" id="L215" title="All 4 branches missed.">                if (individualFile.startsWith(&quot;bin/&quot;) || individualFile.startsWith(&quot;./bin/&quot;)) {</span>
-<span class="nc" id="L216">                    fsObject.setExecutable(true, false);</span>
+<span class="nc bnc" id="L270" title="All 4 branches missed.">                if (individualFile.startsWith(&quot;bin/&quot;) || individualFile.startsWith(&quot;./bin/&quot;)) {</span>
+<span class="nc" id="L271">                    fsObject.setExecutable(true, false);</span>
                 }
-<span class="nc" id="L218">            }</span>
+<span class="nc" id="L273">            }</span>
 
-<span class="nc" id="L220">            phaser.arriveAndAwaitAdvance();</span>
+<span class="nc" id="L275">            phaser.arriveAndAwaitAdvance();</span>
         }
-<span class="nc" id="L222">    }</span>
+<span class="nc" id="L277">    }</span>
+
+    private static String sequence(char start, int count) {
+<span class="fc" id="L280">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        for (int i = 0; i &lt; count; i++) {</span>
+<span class="fc" id="L282">            sb.append((char) (start + i));</span>
+        }
+<span class="fc" id="L284">        return sb.toString();</span>
+    }
+
+    static String randomAlphaNumeric(int length) {
+<span class="fc" id="L288">        return randomString(ALPHANUM, length);</span>
+    }
+
+    static String randomLowercase(int length) {
+<span class="fc" id="L292">        return randomString(LOWERCASE, length);</span>
+    }
+
+    private static String randomString(String alphabet, int length) {
+<span class="fc" id="L296">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">        for (int i = 0; i &lt; length; i++) {</span>
+<span class="fc" id="L298">            int random = ThreadLocalRandom.current().nextInt(alphabet.length());</span>
+<span class="fc" id="L299">            sb.append(alphabet.charAt(random));</span>
+        }
+<span class="fc" id="L301">        return sb.toString();</span>
+    }
+
+    private static String getSystemProperty(String propertyName) {
+        try {
+<span class="fc" id="L306">            return Strings.nullToEmpty(System.getProperty(propertyName, &quot;&quot;));</span>
+<span class="nc" id="L307">        } catch (SecurityException e) {</span>
+<span class="nc" id="L308">            return &quot;&lt;unknown&gt;&quot;;</span>
+        }
+    }
+
+    private static boolean getOsMatchesName(final String osNamePrefix) {
+<span class="fc" id="L313">        return OS_NAME.toLowerCase(Locale.ROOT).startsWith(osNamePrefix.toLowerCase(Locale.ROOT));</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

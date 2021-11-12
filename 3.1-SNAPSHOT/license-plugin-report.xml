@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="CHECK" timestamp="1636698701125">
+    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="3.1-SNAPSHOT"/>
+    <files>
+        <file path="pom.xml" result="PRESENT"/>
+        <file path="src/build/repack-postgres.sh" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabaseInfo.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabaseManager.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabasePreparer.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/EmbeddedUtil.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/FlywayPreparer.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/PgArchiveResolver.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/PgDirectoryResolver.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/ProcessOutputLogger.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/UncompressBundleDirectoryResolver.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/ZonkyIOPostgresArchiveResolver.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/package-info.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/junit5/MultiDatabaseBuilder.java" result="PRESENT"/>
+        <file path="src/main/java/de/softwareforge/testing/postgres/junit5/SingleDatabaseBuilder.java" result="PRESENT"/>
+        <file path="src/site/site.xml" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/embedded/ConnectConfigTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/embedded/DatabaseInfoTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/embedded/DatabaseManagerTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/embedded/EmbeddedPostgresTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/embedded/LocalDirectoryPostgresTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/junit5/FlywayPreparerTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/junit5/IsolationTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/junit5/Junit5ClassMemberTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/junit5/Junit5InstanceMemberTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/junit5/Junit5NestedTest.java" result="PRESENT"/>
+        <file path="src/test/resources/db/testing/V1__create_foo.sql" result="PRESENT"/>
+        <file path="src/test/resources/db/testing/V2__insert_value.sql" result="PRESENT"/>
+    </files>
+</licensePluginReport>

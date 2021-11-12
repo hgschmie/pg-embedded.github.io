@@ -26,46 +26,40 @@ import org.slf4j.Logger;
  * {@code true} (since only stdout is read).
  *
  * &lt;p&gt;
- * The use of the input stream is threadsafe since it's used only in a single thread&amp;mdash;the one launched by this code.
+ * The use of the input stream is thread safe since it's used only in a single thread&amp;mdash;the one launched by this code.
  */
 final class ProcessOutputLogger implements Runnable {
 
-    private final boolean debug;
     private final Logger logger;
     private final BufferedReader reader;
 
-<span class="fc" id="L37">    private ProcessOutputLogger(boolean debug, final Logger logger, final Process process) {</span>
-<span class="fc" id="L38">        this.debug = debug;</span>
-<span class="fc" id="L39">        this.logger = logger;</span>
-<span class="fc" id="L40">        this.reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));</span>
-<span class="fc" id="L41">    }</span>
+<span class="fc" id="L36">    private ProcessOutputLogger(final Logger logger, final Process process) {</span>
+<span class="fc" id="L37">        this.logger = logger;</span>
+<span class="fc" id="L38">        this.reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));</span>
+<span class="fc" id="L39">    }</span>
 
     @Override
     public void run() {
         try {
             try {
-<span class="pc bpc" id="L47" title="1 of 2 branches missed.">                if (debug) {</span>
-<span class="fc" id="L48">                    reader.lines().forEach(logger::debug);</span>
-                } else {
-<span class="nc" id="L50">                    reader.lines().forEach(logger::info);</span>
-                }
-<span class="nc" id="L52">            } catch (final UncheckedIOException e) {</span>
-<span class="nc" id="L53">                logger.error(&quot;while reading output:&quot;, e);</span>
-<span class="fc" id="L54">            }</span>
+<span class="fc" id="L45">                reader.lines().forEach(logger::debug);</span>
+<span class="nc" id="L46">            } catch (final UncheckedIOException e) {</span>
+<span class="nc" id="L47">                logger.error(&quot;while reading output:&quot;, e);</span>
+<span class="fc" id="L48">            }</span>
         } finally {
             try {
-<span class="fc" id="L57">                reader.close();</span>
-<span class="nc" id="L58">            } catch (final IOException e) {</span>
-<span class="nc" id="L59">                logger.trace(&quot;while closing reader:&quot;, e);</span>
-<span class="fc" id="L60">            }</span>
+<span class="fc" id="L51">                reader.close();</span>
+<span class="nc" id="L52">            } catch (final IOException e) {</span>
+<span class="nc" id="L53">                logger.trace(&quot;while closing reader:&quot;, e);</span>
+<span class="fc" id="L54">            }</span>
         }
-<span class="fc" id="L62">    }</span>
+<span class="fc" id="L56">    }</span>
 
-    static void logOutput(final boolean debug, final Logger logger, final String name, final Process process) {
-<span class="fc" id="L65">        final Thread t = new Thread(new ProcessOutputLogger(debug, logger, process));</span>
-<span class="fc" id="L66">        t.setName(name);</span>
-<span class="fc" id="L67">        t.setDaemon(true);</span>
-<span class="fc" id="L68">        t.start();</span>
-<span class="fc" id="L69">    }</span>
+    static void logOutput(final Logger logger, final String name, final Process process) {
+<span class="fc" id="L59">        final Thread t = new Thread(new ProcessOutputLogger(logger, process));</span>
+<span class="fc" id="L60">        t.setName(name);</span>
+<span class="fc" id="L61">        t.setDaemon(true);</span>
+<span class="fc" id="L62">        t.start();</span>
+<span class="fc" id="L63">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TarXzCompressedBinaryManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pg-embedded</a> &gt; <a href="index.source.html" class="el_package">de.softwareforge.testing.postgres.embedded</a> &gt; <span class="el_source">TarXzCompressedBinaryManager.java</span></div><h1>TarXzCompressedBinaryManager.java</h1><pre class="source lang-java linenums">/*
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.softwareforge.testing.postgres.embedded;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.Channel;
+import java.nio.channels.CompletionHandler;
+import java.nio.channels.FileLock;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
+
+import com.google.common.io.BaseEncoding;
+import com.google.common.io.ByteStreams;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tukaani.xz.XZInputStream;
+
+/**
+ * Loads a native binary installation and returns the location of it.
+ */
+class TarXzCompressedBinaryManager implements NativeBinaryManager {
+
+<span class="fc" id="L58">    private static final Logger LOG = LoggerFactory.getLogger(TarXzCompressedBinaryManager.class);</span>
+
+    private static final String INSTALL_DIRECTORY_PREFIX = &quot;PG-&quot;;
+
+<span class="fc" id="L62">    private static final Map&lt;Supplier&lt;InputStream&gt;, File&gt; KNOWN_INSTALLATIONS = new ConcurrentHashMap&lt;&gt;();</span>
+
+<span class="fc" id="L64">    private final Lock prepareBinariesLock = new ReentrantLock();</span>
+
+    private final File installationBaseDirectory;
+    private final String lockFileName;
+    private final Supplier&lt;InputStream&gt; inputStreamLocator;
+
+    /**
+     * Creates a new binary manager for tar-xz compressed archives. It uses a {@link Supplier&lt;InputStream&gt;} to actually locate the stream that gets unpacked.
+     * &lt;p&gt;
+     * This supplier must satisfy the following criteria:
+     * &lt;ul&gt;
+     *     &lt;li&gt;It must implement {@link #equals(Object)} and {@link #hashCode()}.&lt;/li&gt;
+     *     &lt;li&gt;It should implement {@link #toString()} to return meaningful information about the locator.&lt;/li&gt;
+     *     &lt;li&gt;It must allow multiple calls to {@link Supplier#get()} which all return the same, byte-identical contents.
+     *     The operation should be cheap as it may be called multiple times.&lt;/li&gt;
+     * &lt;/ul&gt;
+     *
+     * @param installationBaseDirectory Base directory in which the binary distribution is unpacked.
+     * @param lockFileName              Name of a lock file to check while unpacking.
+     * @param inputStreamLocator        An implementation of {@link Supplier&lt;InputStream&gt;} that satisfies the conditions above. Must not be null.
+     */
+<span class="fc" id="L85">    public TarXzCompressedBinaryManager(File installationBaseDirectory, String lockFileName, Supplier&lt;InputStream&gt; inputStreamLocator) {</span>
+<span class="fc" id="L86">        this.installationBaseDirectory = checkNotNull(installationBaseDirectory, &quot;installationBaseDirectory is null&quot;);</span>
+<span class="fc" id="L87">        this.lockFileName = checkNotNull(lockFileName, &quot;lockFileName is null&quot;);</span>
+<span class="fc" id="L88">        this.inputStreamLocator = checkNotNull(inputStreamLocator, &quot;inputStreamLocator is null&quot;);</span>
+
+<span class="fc" id="L90">        checkState(this.installationBaseDirectory.setWritable(true, false),</span>
+                &quot;Could not make install base directory %s writable!&quot;, this.installationBaseDirectory);
+<span class="fc" id="L92">    }</span>
+
+    @Override
+    public File getLocation() throws IOException {
+
+<span class="fc" id="L97">        File installationDirectory = KNOWN_INSTALLATIONS.get(inputStreamLocator);</span>
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">        if (installationDirectory != null &amp;&amp; installationDirectory.exists()) {</span>
+<span class="fc" id="L99">            return installationDirectory;</span>
+        }
+
+<span class="fc" id="L102">        prepareBinariesLock.lock();</span>
+        try {
+<span class="fc" id="L104">            try (InputStream installationArchive = inputStreamLocator.get()) {</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                checkState(installationArchive != null, &quot;Locator '%s' did not find a suitable archive to unpack!&quot;, inputStreamLocator);</span>
+<span class="fc" id="L106">                try (DigestInputStream archiveDigestStream = new DigestInputStream(installationArchive, MessageDigest.getInstance(&quot;MD5&quot;))) {</span>
+<span class="fc" id="L107">                    ByteStreams.exhaust(archiveDigestStream);</span>
+<span class="fc" id="L108">                    String installationDigest = BaseEncoding.base16().encode(archiveDigestStream.getMessageDigest().digest());</span>
+<span class="fc" id="L109">                    installationDirectory = new File(installationBaseDirectory, INSTALL_DIRECTORY_PREFIX + installationDigest);</span>
+<span class="fc" id="L110">                    EmbeddedUtil.mkdirs(installationDirectory);</span>
+                }
+            }
+
+<span class="fc" id="L114">            final File unpackLockFile = new File(installationDirectory, lockFileName);</span>
+<span class="fc" id="L115">            final File installationExistsFile = new File(installationDirectory, &quot;.exists&quot;);</span>
+
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">            if (!installationExistsFile.exists()) {</span>
+<span class="nc" id="L118">                try (FileOutputStream lockStream = new FileOutputStream(unpackLockFile);</span>
+<span class="nc" id="L119">                        FileLock unpackLock = lockStream.getChannel().tryLock()) {</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                    if (unpackLock != null) {</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">                        checkState(!installationExistsFile.exists(), &quot;unpack lock acquired but .exists file is present &quot; + installationExistsFile);</span>
+<span class="nc" id="L122">                        LOG.info(&quot;extracting archive...&quot;);</span>
+<span class="nc" id="L123">                        InputStream archiveStream = inputStreamLocator.get();</span>
+<span class="nc" id="L124">                        extractTxz(archiveStream, installationDirectory.getPath());</span>
+<span class="nc" id="L125">                        checkState(installationExistsFile.createNewFile(), &quot;couldn't create %s file!&quot;, installationExistsFile);</span>
+<span class="nc" id="L126">                    } else {</span>
+                        // the other guy is unpacking for us.
+<span class="nc" id="L128">                        int maxAttempts = 60;</span>
+<span class="nc bnc" id="L129" title="All 4 branches missed.">                        while (!installationExistsFile.exists() &amp;&amp; --maxAttempts &gt; 0) { // NOPMD</span>
+<span class="nc" id="L130">                            Thread.sleep(1000L);</span>
+                        }
+<span class="nc" id="L132">                        checkState(installationExistsFile.exists(), &quot;Waited 60 seconds for archive to be unpacked but it never finished!&quot;);</span>
+                    }
+                } finally {
+<span class="nc bnc" id="L135" title="All 4 branches missed.">                    if (unpackLockFile.exists() &amp;&amp; !unpackLockFile.delete()) {</span>
+<span class="nc" id="L136">                        LOG.error(format(&quot;could not remove lock file %s&quot;, unpackLockFile.getAbsolutePath()));</span>
+                    }
+                }
+            }
+
+<span class="fc" id="L141">            KNOWN_INSTALLATIONS.putIfAbsent(inputStreamLocator, installationDirectory);</span>
+<span class="fc" id="L142">            LOG.debug(format(&quot;Unpacked archive at %s&quot;, installationDirectory));</span>
+<span class="fc" id="L143">            return installationDirectory;</span>
+
+<span class="nc" id="L145">        } catch (final NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L146">            throw new IOException(e);</span>
+<span class="nc" id="L147">        } catch (final InterruptedException e) {</span>
+<span class="nc" id="L148">            Thread.currentThread().interrupt();</span>
+<span class="nc" id="L149">            throw new IOException(e);</span>
+        } finally {
+<span class="fc" id="L151">            prepareBinariesLock.lock();</span>
+        }
+    }
+
+    /**
+     * Unpack archive compressed by tar with xz compression.
+     *
+     * @param stream    A tar-xz compressed data stream.
+     * @param targetDir The directory to extract the content to.
+     */
+    private static void extractTxz(InputStream stream, String targetDir) throws IOException {
+<span class="nc" id="L162">        try (XZInputStream xzIn = new XZInputStream(stream);</span>
+<span class="nc" id="L163">                TarArchiveInputStream tarIn = new TarArchiveInputStream(xzIn)) {</span>
+<span class="nc" id="L164">            final Phaser phaser = new Phaser(1);</span>
+            TarArchiveEntry entry;
+
+<span class="nc bnc" id="L167" title="All 2 branches missed.">            while ((entry = tarIn.getNextTarEntry()) != null) { //NOPMD</span>
+<span class="nc" id="L168">                final String individualFile = entry.getName();</span>
+<span class="nc" id="L169">                final File fsObject = new File(targetDir, individualFile);</span>
+<span class="nc" id="L170">                final Path fsPath = fsObject.toPath();</span>
+<span class="nc bnc" id="L171" title="All 4 branches missed.">                if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS) &amp;&amp; !Files.isDirectory(fsPath, LinkOption.NOFOLLOW_LINKS)) {</span>
+<span class="nc" id="L172">                    Files.delete(fsPath);</span>
+<span class="nc" id="L173">                    LOG.debug(format(&quot;Deleting existing entry %s&quot;, fsPath));</span>
+                }
+
+<span class="nc bnc" id="L176" title="All 4 branches missed.">                if (entry.isSymbolicLink() || entry.isLink()) {</span>
+<span class="nc" id="L177">                    Path target = FileSystems.getDefault().getPath(entry.getLinkName());</span>
+<span class="nc" id="L178">                    Files.createSymbolicLink(fsPath, target);</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">                } else if (entry.isFile()) {</span>
+<span class="nc" id="L180">                    byte[] content = new byte[(int) entry.getSize()];</span>
+<span class="nc" id="L181">                    int read = tarIn.read(content, 0, content.length);</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">                    checkState(read != -1, &quot;could not read %s&quot;, individualFile);</span>
+<span class="nc" id="L183">                    EmbeddedUtil.mkdirs(fsObject.getParentFile());</span>
+
+<span class="nc" id="L185">                    final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(fsPath, CREATE, WRITE); //NOPMD</span>
+<span class="nc" id="L186">                    final ByteBuffer buffer = ByteBuffer.wrap(content); //NOPMD</span>
+
+<span class="nc" id="L188">                    phaser.register();</span>
+<span class="nc" id="L189">                    fileChannel.write(buffer, 0, fileChannel, new CompletionHandler&lt;Integer, Channel&gt;() {</span>
+                        @Override
+                        public void completed(Integer written, Channel channel) {
+<span class="nc" id="L192">                            closeChannel(channel);</span>
+<span class="nc" id="L193">                        }</span>
+
+                        @Override
+                        public void failed(Throwable error, Channel channel) {
+<span class="nc" id="L197">                            LOG.error(format(&quot;could not write file %s&quot;, fsObject.getAbsolutePath()), error);</span>
+<span class="nc" id="L198">                            closeChannel(channel);</span>
+<span class="nc" id="L199">                        }</span>
+
+                        private void closeChannel(Channel channel) {
+                            try {
+<span class="nc" id="L203">                                channel.close();</span>
+<span class="nc" id="L204">                            } catch (IOException e) {</span>
+<span class="nc" id="L205">                                LOG.error(&quot;While closing channel:&quot;, e);</span>
+                            } finally {
+<span class="nc" id="L207">                                phaser.arriveAndDeregister();</span>
+                            }
+<span class="nc" id="L209">                        }</span>
+                    });
+<span class="nc bnc" id="L211" title="All 2 branches missed.">                } else if (entry.isDirectory()) {</span>
+<span class="nc" id="L212">                    EmbeddedUtil.mkdirs(fsObject);</span>
+                } else {
+<span class="nc" id="L214">                    throw new IOException(format(&quot;Unsupported entry in tar file found: %s&quot;, individualFile));</span>
+                }
+
+<span class="nc bnc" id="L217" title="All 4 branches missed.">                if (individualFile.startsWith(&quot;bin/&quot;) || individualFile.startsWith(&quot;./bin/&quot;)) {</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">                    if (!fsObject.setExecutable(true, false)) {</span>
+<span class="nc" id="L219">                        throw new IOException(format(&quot;Could not make %s executable!&quot;, individualFile));</span>
+                    }
+                }
+<span class="nc" id="L222">            }</span>
+
+<span class="nc" id="L224">            phaser.arriveAndAwaitAdvance();</span>
+        }
+<span class="nc" id="L226">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

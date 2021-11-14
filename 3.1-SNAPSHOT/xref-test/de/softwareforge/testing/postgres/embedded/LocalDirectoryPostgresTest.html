@@ -42,7 +42,7 @@
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testEmbeddedPg() <strong class="jxr_keyword">throws</strong> Exception {
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>          Assumptions.assumeTrue(USR_LOCAL_BIN_POSTGRES.exists(), <span class="jxr_string">"Skipping test, PostgreSQL binary not found in /usr/local/bin"</span>);
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>          <strong class="jxr_keyword">try</strong> (EmbeddedPostgres pg = EmbeddedPostgres.builderWithDefaults().setPostgresBinaryDirectory(USR_LOCAL).build();
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>          <strong class="jxr_keyword">try</strong> (EmbeddedPostgres pg = EmbeddedPostgres.builderWithDefaults().useLocalPostgresInstallation(USR_LOCAL).build();
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>                  Connection c = pg.createDefaultDataSource().getConnection();
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>                  Statement s = c.createStatement()) {
 <a class="jxr_linenumber" name="L40" href="#L40">40</a>              <strong class="jxr_keyword">try</strong> (ResultSet rs = s.executeQuery(<span class="jxr_string">"SELECT 1"</span>)) {

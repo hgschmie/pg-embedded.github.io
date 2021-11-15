@@ -14,90 +14,128 @@
 package de.softwareforge.testing.postgres.embedded;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
 
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 
+/**
+ * Information about a database located on a PostgreSQL server connected to an {@link EmbeddedPostgres} instance.
+ */
 @AutoValue
-<span class="fc" id="L27">public abstract class DatabaseInfo {</span>
+<span class="fc" id="L32">public abstract class DatabaseInfo {</span>
 
-    public static final String JDBC_FORMAT = &quot;jdbc:postgresql://localhost:%d/%s?user=%s&quot;;
+    private static final String JDBC_FORMAT = &quot;jdbc:postgresql://localhost:%d/%s?user=%s&quot;;
 
-    // default user used for databases
-    public static final String PG_DEFAULT_USER = &quot;postgres&quot;;
-    public static final String PG_DEFAULT_DB = &quot;postgres&quot;;
+    /**
+     * The default user used for databases.
+     */
+    static final String PG_DEFAULT_USER = &quot;postgres&quot;;
 
+    /**
+     * The default database name.
+     */
+    static final String PG_DEFAULT_DB = &quot;postgres&quot;;
 
+    /**
+     * Returns the name of the database created.
+     *
+     * @return Name of the database. Is never null.
+     */
+    @Nonnull
     public abstract String dbName();
 
+    /**
+     * Returns the TCP port for the database server.
+     *
+     * @return A port number. May be -1 if this objects represents an error connection.
+     */
     public abstract int port();
 
+    /**
+     * Returns the user that can connect to this database.
+     *
+     * @return The user name. Is never null.
+     */
+    @Nonnull
     public abstract String user();
 
-    public abstract ImmutableMap&lt;String, String&gt; properties();
+    /**
+     * Returns all properties that are be applied to a new data source connection to this database. See
+     * &lt;a href=&quot;https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters&quot;&gt;the
+     * PostgreSQL JDBC driver documentation&lt;/a&gt; for a comprehensive list.
+     *
+     * @return Map of key-value pairs representing data source connection properties.
+     */
+    public abstract ImmutableMap&lt;String, String&gt; connectionProperties();
 
-    public abstract Optional&lt;SQLException&gt; exception();
+    abstract Optional&lt;SQLException&gt; exception();
 
-    public static Builder builder() {
-<span class="fc" id="L47">        return new AutoValue_DatabaseInfo.Builder()</span>
-<span class="fc" id="L48">                .dbName(PG_DEFAULT_DB)</span>
-<span class="fc" id="L49">                .user(PG_DEFAULT_USER);</span>
+    static Builder builder() {
+<span class="fc" id="L81">        return new AutoValue_DatabaseInfo.Builder()</span>
+<span class="fc" id="L82">                .dbName(PG_DEFAULT_DB)</span>
+<span class="fc" id="L83">                .user(PG_DEFAULT_USER);</span>
     }
 
-    public static DatabaseInfo forException(SQLException e) {
-<span class="fc" id="L53">        return builder().exception(e).port(-1).build();</span>
+    static DatabaseInfo forException(SQLException e) {
+<span class="fc" id="L87">        return builder().exception(e).port(-1).build();</span>
     }
 
+    /**
+     * Returns a JDBC url to connect to the described database.
+     * @return A JDBC url that can be used to connect to the database. Never null.
+     */
+    @Nonnull
     public String asJdbcUrl() {
-<span class="fc" id="L57">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
+<span class="fc" id="L96">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
 
-<span class="fc" id="L59">        String additionalParameters = properties().entrySet().stream()</span>
-<span class="fc" id="L60">                .map(e -&gt; String.format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
-<span class="fc" id="L61">                .collect(Collectors.joining());</span>
-<span class="fc" id="L62">        return String.format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
+<span class="fc" id="L98">        String additionalParameters = connectionProperties().entrySet().stream()</span>
+<span class="fc" id="L99">                .map(e -&gt; format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
+<span class="fc" id="L100">                .collect(Collectors.joining());</span>
+<span class="fc" id="L101">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
     }
 
+    /**
+     * Returns a {@link DataSource} instance connected to the described database.
+     *
+     * @return An initialized {@link DataSource} object. Never null.
+     * @throws SQLException A problem occured trying to connect to the database.
+     */
     public DataSource asDataSource() throws SQLException {
-<span class="fc" id="L66">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
-
-<span class="fc" id="L68">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), properties());</span>
-    }
-
-    public String asString() {
-<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (exception().isPresent()) {</span>
-<span class="nc" id="L73">            return &quot;&lt;no connection&gt;: &quot; + exception().toString();</span>
-        } else {
-<span class="nc" id="L75">            return asJdbcUrl();</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if (exception().isPresent()) {</span>
+<span class="nc" id="L112">            throw exception().get();</span>
         }
-    }
 
+<span class="fc" id="L115">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
+    }
 
     @AutoValue.Builder
-<span class="fc" id="L81">    public abstract static class Builder {</span>
+<span class="fc" id="L119">    abstract static class Builder {</span>
 
-        public abstract Builder dbName(String dbName);
+        abstract Builder dbName(String dbName);
 
-        public abstract Builder port(int port);
+        abstract Builder port(int port);
 
-        public abstract Builder user(String user);
+        abstract Builder user(String user);
 
         abstract Builder exception(SQLException exception);
 
-        abstract ImmutableMap.Builder&lt;String, String&gt; propertiesBuilder();
+        abstract ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder();
 
-        public final Builder addProperty(String key, String value) {
-<span class="fc" id="L94">            propertiesBuilder().put(key, value);</span>
-<span class="fc" id="L95">            return this;</span>
+        final Builder addConnectionProperty(String key, String value) {
+<span class="fc" id="L132">            connectionPropertiesBuilder().put(key, value);</span>
+<span class="fc" id="L133">            return this;</span>
         }
 
-        public abstract Builder properties(ImmutableMap&lt;String, String&gt; properties);
+        abstract Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties);
 
-        public abstract DatabaseInfo build();
+        abstract DatabaseInfo build();
 
     }
 }

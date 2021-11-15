@@ -74,14 +74,14 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
 
     /**
      * Returns a {@link DatabaseInfo} describing the database connection.
+     *
+     * @return A {@link DatabaseInfo} instance. This is never null.
      */
     public DatabaseInfo createDatabaseInfo() throws SQLException {
-<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        checkState(databaseManager != null, &quot;no before method has been called!&quot;);</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        checkState(databaseManager != null, &quot;no before method has been called!&quot;);</span>
 
-<span class="fc" id="L81">        DatabaseInfo databaseInfo = databaseManager.getDatabaseInfo();</span>
-<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if (databaseInfo.exception().isEmpty()) {</span>
-<span class="fc" id="L83">            LOG.info(&quot;Connection to {}&quot;, databaseInfo.asJdbcUrl());</span>
-        }
+<span class="fc" id="L83">        DatabaseInfo databaseInfo = databaseManager.getDatabaseInfo();</span>
+<span class="fc" id="L84">        LOG.info(&quot;Connection to {}&quot;, databaseInfo.asJdbcUrl());</span>
 <span class="fc" id="L85">        return databaseInfo;</span>
     }
 
@@ -143,7 +143,7 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
         @Override
         public EmbeddedPgExtension build() {
 <span class="fc" id="L145">            DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder = new DatabaseManagerBuilder(multiMode)</span>
-<span class="fc" id="L146">                    .withDataSourcePreparer(dataSourcePreparer);</span>
+<span class="fc" id="L146">                    .withDataSourcePreparers(dataSourcePreparers.build());</span>
 
 <span class="fc" id="L148">            instancePreparers.build().forEach(databaseManagerBuilder::withInstancePreparer);</span>
 <span class="fc" id="L149">            return new EmbeddedPgExtension(databaseManagerBuilder);</span>

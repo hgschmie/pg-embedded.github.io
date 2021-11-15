@@ -53,7 +53,7 @@
 <span class="source-line-no">040</span><span id="line-40">    public void test() throws SQLException {</span>
 <span class="source-line-no">041</span><span id="line-41">        DatabaseInfo databaseInfo = db.createDatabaseInfo();</span>
 <span class="source-line-no">042</span><span id="line-42"></span>
-<span class="source-line-no">043</span><span id="line-43">        Map&lt;String, String&gt; properties = databaseInfo.properties();</span>
+<span class="source-line-no">043</span><span id="line-43">        Map&lt;String, String&gt; properties = databaseInfo.connectionProperties();</span>
 <span class="source-line-no">044</span><span id="line-44">        assertEquals(1, properties.size());</span>
 <span class="source-line-no">045</span><span id="line-45">        assertEquals("20", properties.get("connectTimeout"));</span>
 <span class="source-line-no">046</span><span id="line-46"></span>

@@ -3,6 +3,7 @@
 import com.google.common.collect.ImmutableMap;
 import java.sql.SQLException;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 import javax.annotation.processing.Generated;
 
 @Generated(&quot;com.google.auto.value.processor.AutoValueProcessor&quot;)
@@ -14,7 +15,7 @@ final class AutoValue_DatabaseInfo extends DatabaseInfo {
 
   private final String user;
 
-  private final ImmutableMap&lt;String, String&gt; properties;
+  private final ImmutableMap&lt;String, String&gt; connectionProperties;
 
   private final Optional&lt;SQLException&gt; exception;
 
@@ -22,169 +23,171 @@ final class AutoValue_DatabaseInfo extends DatabaseInfo {
       String dbName,
       int port,
       String user,
-      ImmutableMap&lt;String, String&gt; properties,
-<span class="fc" id="L26">      Optional&lt;SQLException&gt; exception) {</span>
-<span class="fc" id="L27">    this.dbName = dbName;</span>
-<span class="fc" id="L28">    this.port = port;</span>
-<span class="fc" id="L29">    this.user = user;</span>
-<span class="fc" id="L30">    this.properties = properties;</span>
-<span class="fc" id="L31">    this.exception = exception;</span>
-<span class="fc" id="L32">  }</span>
+      ImmutableMap&lt;String, String&gt; connectionProperties,
+<span class="fc" id="L27">      Optional&lt;SQLException&gt; exception) {</span>
+<span class="fc" id="L28">    this.dbName = dbName;</span>
+<span class="fc" id="L29">    this.port = port;</span>
+<span class="fc" id="L30">    this.user = user;</span>
+<span class="fc" id="L31">    this.connectionProperties = connectionProperties;</span>
+<span class="fc" id="L32">    this.exception = exception;</span>
+<span class="fc" id="L33">  }</span>
 
+  @Nonnull
   @Override
   public String dbName() {
-<span class="fc" id="L36">    return dbName;</span>
+<span class="fc" id="L38">    return dbName;</span>
   }
 
   @Override
   public int port() {
-<span class="fc" id="L41">    return port;</span>
+<span class="fc" id="L43">    return port;</span>
   }
 
+  @Nonnull
   @Override
   public String user() {
-<span class="fc" id="L46">    return user;</span>
+<span class="fc" id="L49">    return user;</span>
   }
 
   @Override
-  public ImmutableMap&lt;String, String&gt; properties() {
-<span class="fc" id="L51">    return properties;</span>
+  public ImmutableMap&lt;String, String&gt; connectionProperties() {
+<span class="fc" id="L54">    return connectionProperties;</span>
   }
 
   @Override
-  public Optional&lt;SQLException&gt; exception() {
-<span class="fc" id="L56">    return exception;</span>
+  Optional&lt;SQLException&gt; exception() {
+<span class="fc" id="L59">    return exception;</span>
   }
 
   @Override
   public String toString() {
-<span class="nc" id="L61">    return &quot;DatabaseInfo{&quot;</span>
+<span class="nc" id="L64">    return &quot;DatabaseInfo{&quot;</span>
         + &quot;dbName=&quot; + dbName + &quot;, &quot;
         + &quot;port=&quot; + port + &quot;, &quot;
         + &quot;user=&quot; + user + &quot;, &quot;
-        + &quot;properties=&quot; + properties + &quot;, &quot;
+        + &quot;connectionProperties=&quot; + connectionProperties + &quot;, &quot;
         + &quot;exception=&quot; + exception
         + &quot;}&quot;;
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="pc bpc" id="L72" title="1 of 2 branches missed.">    if (o == this) {</span>
-<span class="nc" id="L73">      return true;</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    if (o == this) {</span>
+<span class="nc" id="L76">      return true;</span>
     }
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    if (o instanceof DatabaseInfo) {</span>
-<span class="fc" id="L76">      DatabaseInfo that = (DatabaseInfo) o;</span>
-<span class="fc bfc" id="L77" title="All 2 branches covered.">      return this.dbName.equals(that.dbName())</span>
-<span class="pc bpc" id="L78" title="1 of 2 branches missed.">          &amp;&amp; this.port == that.port()</span>
-<span class="pc bpc" id="L79" title="1 of 2 branches missed.">          &amp;&amp; this.user.equals(that.user())</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">          &amp;&amp; this.properties.equals(that.properties())</span>
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">          &amp;&amp; this.exception.equals(that.exception());</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">    if (o instanceof DatabaseInfo) {</span>
+<span class="fc" id="L79">      DatabaseInfo that = (DatabaseInfo) o;</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">      return this.dbName.equals(that.dbName())</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">          &amp;&amp; this.port == that.port()</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">          &amp;&amp; this.user.equals(that.user())</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">          &amp;&amp; this.connectionProperties.equals(that.connectionProperties())</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">          &amp;&amp; this.exception.equals(that.exception());</span>
     }
-<span class="nc" id="L83">    return false;</span>
+<span class="nc" id="L86">    return false;</span>
   }
 
   @Override
   public int hashCode() {
-<span class="nc" id="L88">    int h$ = 1;</span>
-<span class="nc" id="L89">    h$ *= 1000003;</span>
-<span class="nc" id="L90">    h$ ^= dbName.hashCode();</span>
-<span class="nc" id="L91">    h$ *= 1000003;</span>
-<span class="nc" id="L92">    h$ ^= port;</span>
-<span class="nc" id="L93">    h$ *= 1000003;</span>
-<span class="nc" id="L94">    h$ ^= user.hashCode();</span>
-<span class="nc" id="L95">    h$ *= 1000003;</span>
-<span class="nc" id="L96">    h$ ^= properties.hashCode();</span>
-<span class="nc" id="L97">    h$ *= 1000003;</span>
-<span class="nc" id="L98">    h$ ^= exception.hashCode();</span>
-<span class="nc" id="L99">    return h$;</span>
+<span class="nc" id="L91">    int h$ = 1;</span>
+<span class="nc" id="L92">    h$ *= 1000003;</span>
+<span class="nc" id="L93">    h$ ^= dbName.hashCode();</span>
+<span class="nc" id="L94">    h$ *= 1000003;</span>
+<span class="nc" id="L95">    h$ ^= port;</span>
+<span class="nc" id="L96">    h$ *= 1000003;</span>
+<span class="nc" id="L97">    h$ ^= user.hashCode();</span>
+<span class="nc" id="L98">    h$ *= 1000003;</span>
+<span class="nc" id="L99">    h$ ^= connectionProperties.hashCode();</span>
+<span class="nc" id="L100">    h$ *= 1000003;</span>
+<span class="nc" id="L101">    h$ ^= exception.hashCode();</span>
+<span class="nc" id="L102">    return h$;</span>
   }
 
   static final class Builder extends DatabaseInfo.Builder {
     private String dbName;
     private Integer port;
     private String user;
-    private ImmutableMap.Builder&lt;String, String&gt; propertiesBuilder$;
-    private ImmutableMap&lt;String, String&gt; properties;
-<span class="fc" id="L108">    private Optional&lt;SQLException&gt; exception = Optional.empty();</span>
-<span class="fc" id="L109">    Builder() {</span>
-<span class="fc" id="L110">    }</span>
+    private ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder$;
+    private ImmutableMap&lt;String, String&gt; connectionProperties;
+<span class="fc" id="L111">    private Optional&lt;SQLException&gt; exception = Optional.empty();</span>
+<span class="fc" id="L112">    Builder() {</span>
+<span class="fc" id="L113">    }</span>
     @Override
-    public DatabaseInfo.Builder dbName(String dbName) {
-<span class="pc bpc" id="L113" title="1 of 2 branches missed.">      if (dbName == null) {</span>
-<span class="nc" id="L114">        throw new NullPointerException(&quot;Null dbName&quot;);</span>
+    DatabaseInfo.Builder dbName(String dbName) {
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">      if (dbName == null) {</span>
+<span class="nc" id="L117">        throw new NullPointerException(&quot;Null dbName&quot;);</span>
       }
-<span class="fc" id="L116">      this.dbName = dbName;</span>
-<span class="fc" id="L117">      return this;</span>
+<span class="fc" id="L119">      this.dbName = dbName;</span>
+<span class="fc" id="L120">      return this;</span>
     }
     @Override
-    public DatabaseInfo.Builder port(int port) {
-<span class="fc" id="L121">      this.port = port;</span>
-<span class="fc" id="L122">      return this;</span>
+    DatabaseInfo.Builder port(int port) {
+<span class="fc" id="L124">      this.port = port;</span>
+<span class="fc" id="L125">      return this;</span>
     }
     @Override
-    public DatabaseInfo.Builder user(String user) {
-<span class="pc bpc" id="L126" title="1 of 2 branches missed.">      if (user == null) {</span>
-<span class="nc" id="L127">        throw new NullPointerException(&quot;Null user&quot;);</span>
+    DatabaseInfo.Builder user(String user) {
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">      if (user == null) {</span>
+<span class="nc" id="L130">        throw new NullPointerException(&quot;Null user&quot;);</span>
       }
-<span class="fc" id="L129">      this.user = user;</span>
-<span class="fc" id="L130">      return this;</span>
+<span class="fc" id="L132">      this.user = user;</span>
+<span class="fc" id="L133">      return this;</span>
     }
     @Override
-    public DatabaseInfo.Builder properties(ImmutableMap&lt;String, String&gt; properties) {
-<span class="pc bpc" id="L134" title="1 of 2 branches missed.">      if (properties == null) {</span>
-<span class="nc" id="L135">        throw new NullPointerException(&quot;Null properties&quot;);</span>
+    DatabaseInfo.Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties) {
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">      if (connectionProperties == null) {</span>
+<span class="nc" id="L138">        throw new NullPointerException(&quot;Null connectionProperties&quot;);</span>
       }
-<span class="pc bpc" id="L137" title="1 of 2 branches missed.">      if (propertiesBuilder$ != null) {</span>
-<span class="nc" id="L138">        throw new IllegalStateException(&quot;Cannot set properties after calling propertiesBuilder()&quot;);</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">      if (connectionPropertiesBuilder$ != null) {</span>
+<span class="nc" id="L141">        throw new IllegalStateException(&quot;Cannot set connectionProperties after calling connectionPropertiesBuilder()&quot;);</span>
       }
-<span class="fc" id="L140">      this.properties = properties;</span>
-<span class="fc" id="L141">      return this;</span>
+<span class="fc" id="L143">      this.connectionProperties = connectionProperties;</span>
+<span class="fc" id="L144">      return this;</span>
     }
     @Override
-    ImmutableMap.Builder&lt;String, String&gt; propertiesBuilder() {
-<span class="pc bpc" id="L145" title="1 of 2 branches missed.">      if (propertiesBuilder$ == null) {</span>
-<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (properties == null) {</span>
-<span class="fc" id="L147">          propertiesBuilder$ = ImmutableMap.builder();</span>
+    ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder() {
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">      if (connectionPropertiesBuilder$ == null) {</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">        if (connectionProperties == null) {</span>
+<span class="fc" id="L150">          connectionPropertiesBuilder$ = ImmutableMap.builder();</span>
         } else {
-<span class="nc" id="L149">          propertiesBuilder$ = ImmutableMap.builder();</span>
-<span class="nc" id="L150">          propertiesBuilder$.putAll(properties);</span>
-<span class="nc" id="L151">          properties = null;</span>
+<span class="nc" id="L152">          connectionPropertiesBuilder$ = ImmutableMap.builder();</span>
+<span class="nc" id="L153">          connectionPropertiesBuilder$.putAll(connectionProperties);</span>
+<span class="nc" id="L154">          connectionProperties = null;</span>
         }
       }
-<span class="fc" id="L154">      return propertiesBuilder$;</span>
+<span class="fc" id="L157">      return connectionPropertiesBuilder$;</span>
     }
     @Override
     DatabaseInfo.Builder exception(SQLException exception) {
-<span class="fc" id="L158">      this.exception = Optional.of(exception);</span>
-<span class="fc" id="L159">      return this;</span>
+<span class="fc" id="L161">      this.exception = Optional.of(exception);</span>
+<span class="fc" id="L162">      return this;</span>
     }
     @Override
-    public DatabaseInfo build() {
-<span class="fc bfc" id="L163" title="All 2 branches covered.">      if (propertiesBuilder$ != null) {</span>
-<span class="fc" id="L164">        this.properties = propertiesBuilder$.build();</span>
-<span class="fc bfc" id="L165" title="All 2 branches covered.">      } else if (this.properties == null) {</span>
-<span class="fc" id="L166">        this.properties = ImmutableMap.of();</span>
+    DatabaseInfo build() {
+<span class="fc bfc" id="L166" title="All 2 branches covered.">      if (connectionPropertiesBuilder$ != null) {</span>
+<span class="fc" id="L167">        this.connectionProperties = connectionPropertiesBuilder$.build();</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">      } else if (this.connectionProperties == null) {</span>
+<span class="fc" id="L169">        this.connectionProperties = ImmutableMap.of();</span>
       }
-<span class="pc bpc" id="L168" title="3 of 6 branches missed.">      if (this.dbName == null</span>
+<span class="pc bpc" id="L171" title="3 of 6 branches missed.">      if (this.dbName == null</span>
           || this.port == null
           || this.user == null) {
-<span class="nc" id="L171">        StringBuilder missing = new StringBuilder();</span>
-<span class="nc bnc" id="L172" title="All 2 branches missed.">        if (this.dbName == null) {</span>
-<span class="nc" id="L173">          missing.append(&quot; dbName&quot;);</span>
+<span class="nc" id="L174">        StringBuilder missing = new StringBuilder();</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">        if (this.dbName == null) {</span>
+<span class="nc" id="L176">          missing.append(&quot; dbName&quot;);</span>
         }
-<span class="nc bnc" id="L175" title="All 2 branches missed.">        if (this.port == null) {</span>
-<span class="nc" id="L176">          missing.append(&quot; port&quot;);</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        if (this.port == null) {</span>
+<span class="nc" id="L179">          missing.append(&quot; port&quot;);</span>
         }
-<span class="nc bnc" id="L178" title="All 2 branches missed.">        if (this.user == null) {</span>
-<span class="nc" id="L179">          missing.append(&quot; user&quot;);</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (this.user == null) {</span>
+<span class="nc" id="L182">          missing.append(&quot; user&quot;);</span>
         }
-<span class="nc" id="L181">        throw new IllegalStateException(&quot;Missing required properties:&quot; + missing);</span>
+<span class="nc" id="L184">        throw new IllegalStateException(&quot;Missing required properties:&quot; + missing);</span>
       }
-<span class="fc" id="L183">      return new AutoValue_DatabaseInfo(</span>
+<span class="fc" id="L186">      return new AutoValue_DatabaseInfo(</span>
           this.dbName,
-<span class="fc" id="L185">          this.port,</span>
+<span class="fc" id="L188">          this.port,</span>
           this.user,
-          this.properties,
+          this.connectionProperties,
           this.exception);
     }
   }

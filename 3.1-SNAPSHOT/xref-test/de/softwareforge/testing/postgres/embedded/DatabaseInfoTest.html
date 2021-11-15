@@ -37,7 +37,7 @@
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>          assertEquals(DatabaseInfo.PG_DEFAULT_USER, databaseInfo.user());
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>          assertEquals(DatabaseInfo.PG_DEFAULT_DB, databaseInfo.dbName());
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>          assertEquals(12345, databaseInfo.port());
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>          assertTrue(databaseInfo.properties().isEmpty());
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>          assertTrue(databaseInfo.connectionProperties().isEmpty());
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>          assertTrue(databaseInfo.exception().isEmpty());
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>      }
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>  
@@ -54,14 +54,14 @@
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>                  .dbName(dbName)
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>                  .user(user)
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>                  .port(port)
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>                  .addProperty(propertyName, propertyValue)
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>                  .addConnectionProperty(propertyName, propertyValue)
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>                  .build();
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>  
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>          assertEquals(user, databaseInfo.user());
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>          assertEquals(dbName, databaseInfo.dbName());
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>          assertEquals(port, databaseInfo.port());
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>          assertEquals(1, databaseInfo.properties().size());
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>          assertEquals(propertyValue, databaseInfo.properties().get(propertyName));
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>          assertEquals(1, databaseInfo.connectionProperties().size());
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>          assertEquals(propertyValue, databaseInfo.connectionProperties().get(propertyName));
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>          assertTrue(databaseInfo.exception().isEmpty());
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>      }
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>  

@@ -87,14 +87,14 @@
 <span class="source-line-no">074</span><span id="line-74"></span>
 <span class="source-line-no">075</span><span id="line-75">    /**</span>
 <span class="source-line-no">076</span><span id="line-76">     * Returns a {@link DatabaseInfo} describing the database connection.</span>
-<span class="source-line-no">077</span><span id="line-77">     */</span>
-<span class="source-line-no">078</span><span id="line-78">    public DatabaseInfo createDatabaseInfo() throws SQLException {</span>
-<span class="source-line-no">079</span><span id="line-79">        checkState(databaseManager != null, "no before method has been called!");</span>
-<span class="source-line-no">080</span><span id="line-80"></span>
-<span class="source-line-no">081</span><span id="line-81">        DatabaseInfo databaseInfo = databaseManager.getDatabaseInfo();</span>
-<span class="source-line-no">082</span><span id="line-82">        if (databaseInfo.exception().isEmpty()) {</span>
-<span class="source-line-no">083</span><span id="line-83">            LOG.info("Connection to {}", databaseInfo.asJdbcUrl());</span>
-<span class="source-line-no">084</span><span id="line-84">        }</span>
+<span class="source-line-no">077</span><span id="line-77">     *</span>
+<span class="source-line-no">078</span><span id="line-78">     * @return A {@link DatabaseInfo} instance. This is never null.</span>
+<span class="source-line-no">079</span><span id="line-79">     */</span>
+<span class="source-line-no">080</span><span id="line-80">    public DatabaseInfo createDatabaseInfo() throws SQLException {</span>
+<span class="source-line-no">081</span><span id="line-81">        checkState(databaseManager != null, "no before method has been called!");</span>
+<span class="source-line-no">082</span><span id="line-82"></span>
+<span class="source-line-no">083</span><span id="line-83">        DatabaseInfo databaseInfo = databaseManager.getDatabaseInfo();</span>
+<span class="source-line-no">084</span><span id="line-84">        LOG.info("Connection to {}", databaseInfo.asJdbcUrl());</span>
 <span class="source-line-no">085</span><span id="line-85">        return databaseInfo;</span>
 <span class="source-line-no">086</span><span id="line-86">    }</span>
 <span class="source-line-no">087</span><span id="line-87"></span>
@@ -156,7 +156,7 @@
 <span class="source-line-no">143</span><span id="line-143">        @Override</span>
 <span class="source-line-no">144</span><span id="line-144">        public EmbeddedPgExtension build() {</span>
 <span class="source-line-no">145</span><span id="line-145">            DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder = new DatabaseManagerBuilder(multiMode)</span>
-<span class="source-line-no">146</span><span id="line-146">                    .withDataSourcePreparer(dataSourcePreparer);</span>
+<span class="source-line-no">146</span><span id="line-146">                    .withDataSourcePreparers(dataSourcePreparers.build());</span>
 <span class="source-line-no">147</span><span id="line-147"></span>
 <span class="source-line-no">148</span><span id="line-148">            instancePreparers.build().forEach(databaseManagerBuilder::withInstancePreparer);</span>
 <span class="source-line-no">149</span><span id="line-149">            return new EmbeddedPgExtension(databaseManagerBuilder);</span>

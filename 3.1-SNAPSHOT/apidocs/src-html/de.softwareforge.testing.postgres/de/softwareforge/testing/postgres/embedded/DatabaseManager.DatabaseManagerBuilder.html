@@ -53,7 +53,7 @@
 <span class="source-line-no">040</span><span id="line-40">/**</span>
 <span class="source-line-no">041</span><span id="line-41"> * Controls database instances on a PostgreSQL server instances.</span>
 <span class="source-line-no">042</span><span id="line-42"> */</span>
-<span class="source-line-no">043</span><span id="line-43">public class DatabaseManager implements AutoCloseable {</span>
+<span class="source-line-no">043</span><span id="line-43">public final class DatabaseManager implements AutoCloseable {</span>
 <span class="source-line-no">044</span><span id="line-44"></span>
 <span class="source-line-no">045</span><span id="line-45">    private static final String PG_DEFAULT_ENCODING = "utf8";</span>
 <span class="source-line-no">046</span><span id="line-46"></span>
@@ -358,7 +358,7 @@
 <span class="source-line-no">345</span><span id="line-345">    /**</span>
 <span class="source-line-no">346</span><span id="line-346">     * Create new {@link DatabaseManager} instances.</span>
 <span class="source-line-no">347</span><span id="line-347">     */</span>
-<span class="source-line-no">348</span><span id="line-348">    public static class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {</span>
+<span class="source-line-no">348</span><span id="line-348">    public static final class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {</span>
 <span class="source-line-no">349</span><span id="line-349"></span>
 <span class="source-line-no">350</span><span id="line-350">        /**</span>
 <span class="source-line-no">351</span><span id="line-351">         * Creates a new builder for {@DatabaseManager} instances.</span>

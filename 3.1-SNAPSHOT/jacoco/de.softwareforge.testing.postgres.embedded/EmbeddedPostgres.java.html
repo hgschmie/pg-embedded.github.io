@@ -377,9 +377,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="fc bfc" id="L377" title="All 2 branches covered.">                if (verifyReady()) {</span>
 <span class="fc" id="L378">                    return true;</span>
                 }
-<span class="fc" id="L380">            } catch (final SQLException e) {</span>
-<span class="fc" id="L381">                lastCause = e;</span>
-<span class="fc" id="L382">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
+<span class="nc" id="L380">            } catch (final SQLException e) {</span>
+<span class="nc" id="L381">                lastCause = e;</span>
+<span class="nc" id="L382">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
 <span class="fc" id="L383">            }</span>
 
             try {
@@ -472,8 +472,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="nc" id="L472">            return;</span>
         }
 <span class="fc bfc" id="L474" title="All 2 branches covered.">        for (final File dir : children) {</span>
-<span class="fc bfc" id="L475" title="All 2 branches covered.">            if (!dir.isDirectory()) {</span>
-<span class="fc" id="L476">                continue;</span>
+<span class="pc bpc" id="L475" title="1 of 2 branches missed.">            if (!dir.isDirectory()) {</span>
+<span class="nc" id="L476">                continue;</span>
             }
 
             // only ever touch known data directories.

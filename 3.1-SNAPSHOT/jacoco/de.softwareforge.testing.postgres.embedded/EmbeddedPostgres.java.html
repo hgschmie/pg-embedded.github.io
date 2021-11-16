@@ -690,10 +690,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @return The builder itself.
          */
         public Builder addServerConfiguration(String key, String value) {
-<span class="nc" id="L693">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="nc" id="L694">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="nc" id="L695">            this.serverConfiguration.put(key, value);</span>
-<span class="nc" id="L696">            return this;</span>
+<span class="fc" id="L693">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="fc" id="L694">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="fc" id="L695">            this.serverConfiguration.put(key, value);</span>
+<span class="fc" id="L696">            return this;</span>
         }
 
         /**

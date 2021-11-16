@@ -40,14 +40,14 @@
 <span class="source-line-no">027</span><span id="line-27"></span>
 <span class="source-line-no">028</span><span id="line-28">public class LocalDirectoryPostgresTest {</span>
 <span class="source-line-no">029</span><span id="line-29"></span>
-<span class="source-line-no">030</span><span id="line-30">    private static final File USR_LOCAL = new File("/usr/local");</span>
-<span class="source-line-no">031</span><span id="line-31">    private static final File USR_LOCAL_BIN_POSTGRES = new File(USR_LOCAL, "/bin/postgres");</span>
+<span class="source-line-no">030</span><span id="line-30">    private static final File LOCAL_INSTALL_LOCATION = new File(System.getProperty("pg-embedded.local-dir", "/usr/local"));</span>
+<span class="source-line-no">031</span><span id="line-31">    private static final File LOCAL_INSTALL_BIN_POSTGRES = new File(LOCAL_INSTALL_LOCATION, "/bin/postgres");</span>
 <span class="source-line-no">032</span><span id="line-32"></span>
 <span class="source-line-no">033</span><span id="line-33">    @Test</span>
 <span class="source-line-no">034</span><span id="line-34">    public void testEmbeddedPg() throws Exception {</span>
-<span class="source-line-no">035</span><span id="line-35">        Assumptions.assumeTrue(USR_LOCAL_BIN_POSTGRES.exists(), "Skipping test, PostgreSQL binary not found in /usr/local/bin");</span>
+<span class="source-line-no">035</span><span id="line-35">        Assumptions.assumeTrue(LOCAL_INSTALL_BIN_POSTGRES.exists(), "Skipping test, PostgreSQL binary not found in /usr/local/bin");</span>
 <span class="source-line-no">036</span><span id="line-36"></span>
-<span class="source-line-no">037</span><span id="line-37">        try (EmbeddedPostgres pg = EmbeddedPostgres.builderWithDefaults().useLocalPostgresInstallation(USR_LOCAL).build();</span>
+<span class="source-line-no">037</span><span id="line-37">        try (EmbeddedPostgres pg = EmbeddedPostgres.builderWithDefaults().useLocalPostgresInstallation(LOCAL_INSTALL_LOCATION).build();</span>
 <span class="source-line-no">038</span><span id="line-38">                Connection c = pg.createDefaultDataSource().getConnection();</span>
 <span class="source-line-no">039</span><span id="line-39">                Statement s = c.createStatement()) {</span>
 <span class="source-line-no">040</span><span id="line-40">            try (ResultSet rs = s.executeQuery("SELECT 1")) {</span>

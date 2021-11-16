@@ -89,22 +89,26 @@
 <span class="source-line-no">076</span><span id="line-76">        String architecture = EmbeddedUtil.OS_ARCH;</span>
 <span class="source-line-no">077</span><span id="line-77">        if (EmbeddedUtil.IS_ARCH_X86_64) {</span>
 <span class="source-line-no">078</span><span id="line-78">            architecture = "x86_64";  // Zonky uses x86_64</span>
-<span class="source-line-no">079</span><span id="line-79">        }</span>
-<span class="source-line-no">080</span><span id="line-80">        return architecture;</span>
-<span class="source-line-no">081</span><span id="line-81">    }</span>
-<span class="source-line-no">082</span><span id="line-82"></span>
-<span class="source-line-no">083</span><span id="line-83">    private static String computeOS() {</span>
-<span class="source-line-no">084</span><span id="line-84">        String os = EmbeddedUtil.OS_NAME;</span>
-<span class="source-line-no">085</span><span id="line-85">        if (EmbeddedUtil.IS_OS_LINUX) {</span>
-<span class="source-line-no">086</span><span id="line-86">            os = "linux";</span>
-<span class="source-line-no">087</span><span id="line-87">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
-<span class="source-line-no">088</span><span id="line-88">            os = "darwin";</span>
-<span class="source-line-no">089</span><span id="line-89">        } else if (EmbeddedUtil.IS_OS_WINDOWS) {</span>
-<span class="source-line-no">090</span><span id="line-90">            os = "windows";</span>
-<span class="source-line-no">091</span><span id="line-91">        }</span>
-<span class="source-line-no">092</span><span id="line-92">        return os;</span>
-<span class="source-line-no">093</span><span id="line-93">    }</span>
-<span class="source-line-no">094</span><span id="line-94">}</span>
+<span class="source-line-no">079</span><span id="line-79">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
+<span class="source-line-no">080</span><span id="line-80">            architecture = "arm_64";</span>
+<span class="source-line-no">081</span><span id="line-81">        } else if (EmbeddedUtil.IS_ARCH_AARCH32) {</span>
+<span class="source-line-no">082</span><span id="line-82">            architecture = "arm_32";</span>
+<span class="source-line-no">083</span><span id="line-83">        }</span>
+<span class="source-line-no">084</span><span id="line-84">        return architecture;</span>
+<span class="source-line-no">085</span><span id="line-85">    }</span>
+<span class="source-line-no">086</span><span id="line-86"></span>
+<span class="source-line-no">087</span><span id="line-87">    private static String computeOS() {</span>
+<span class="source-line-no">088</span><span id="line-88">        String os = EmbeddedUtil.OS_NAME;</span>
+<span class="source-line-no">089</span><span id="line-89">        if (EmbeddedUtil.IS_OS_LINUX) {</span>
+<span class="source-line-no">090</span><span id="line-90">            os = "linux";</span>
+<span class="source-line-no">091</span><span id="line-91">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="source-line-no">092</span><span id="line-92">            os = "darwin";</span>
+<span class="source-line-no">093</span><span id="line-93">        } else if (EmbeddedUtil.IS_OS_WINDOWS) {</span>
+<span class="source-line-no">094</span><span id="line-94">            os = "windows";</span>
+<span class="source-line-no">095</span><span id="line-95">        }</span>
+<span class="source-line-no">096</span><span id="line-96">        return os;</span>
+<span class="source-line-no">097</span><span id="line-97">    }</span>
+<span class="source-line-no">098</span><span id="line-98">}</span>
 
 
 

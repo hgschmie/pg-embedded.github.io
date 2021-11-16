@@ -157,6 +157,18 @@
 <td><a class="externalLink" href="https://github.com/zonkyio/embedded-postgres-binaries">embedded-postgres-binaries-linux-amd64</a></td>
 <td>13.4.0</td>
 <td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>io.zonky.test.postgres</td>
+<td><a class="externalLink" href="https://github.com/zonkyio/embedded-postgres-binaries">embedded-postgres-binaries-linux-arm32v7</a></td>
+<td>13.4.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>io.zonky.test.postgres</td>
+<td><a class="externalLink" href="https://github.com/zonkyio/embedded-postgres-binaries">embedded-postgres-binaries-linux-arm64v8</a></td>
+<td>13.4.0</td>
+<td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></td></tr></table></section><a name="Project_Dependencies_test"></a><section>
 <h3><a name="test"></a>test</h3>
 <p>The following is a list of test dependencies for this project. These dependencies are only required to compile and run unit tests for the application:</p>
@@ -532,7 +544,25 @@ Brotli, Zstandard and ar, cpio, jar, tar, zip, dump, 7z, arj.</p>
 <p><b>Description: </b>A lightweight bundle of PostgreSQL database with reduced size</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/zonkyio/embedded-postgres-binaries">https://github.com/zonkyio/embedded-postgres-binaries</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.slf4j:slf4j-simple:jar:1.7.32 (test) <img id="_img45" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep44', '_img45' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep44" style="display:none">
+<li>io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8:jar:13.4.0 (runtime) <img id="_img45" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep44', '_img45' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep44" style="display:none">
+<table border="0" class="table table-striped">
+<tr class="a">
+<th>embedded-postgres-binaries-linux-arm64v8</th></tr>
+<tr class="b">
+<td>
+<p><b>Description: </b>A lightweight bundle of PostgreSQL database with reduced size</p>
+<p><b>URL: </b><a class="externalLink" href="https://github.com/zonkyio/embedded-postgres-binaries">https://github.com/zonkyio/embedded-postgres-binaries</a></p>
+<p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></p></td></tr></table></div></li>
+<li>io.zonky.test.postgres:embedded-postgres-binaries-linux-arm32v7:jar:13.4.0 (runtime) <img id="_img47" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep46', '_img47' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep46" style="display:none">
+<table border="0" class="table table-striped">
+<tr class="a">
+<th>embedded-postgres-binaries-linux-arm32v7</th></tr>
+<tr class="b">
+<td>
+<p><b>Description: </b>A lightweight bundle of PostgreSQL database with reduced size</p>
+<p><b>URL: </b><a class="externalLink" href="https://github.com/zonkyio/embedded-postgres-binaries">https://github.com/zonkyio/embedded-postgres-binaries</a></p>
+<p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></p></td></tr></table></div></li>
+<li>org.slf4j:slf4j-simple:jar:1.7.32 (test) <img id="_img49" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep48', '_img49' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep48" style="display:none">
 <table border="0" class="table table-striped">
 <tr class="a">
 <th>SLF4J Simple Binding</th></tr>
@@ -543,7 +573,7 @@ Brotli, Zstandard and ar, cpio, jar, tar, zip, dump, 7z, arj.</p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></p></td></tr></table></div></li></ul></li></ul></section></section><a name="Licenses"></a><section>
 <h2><a name="Licenses"></a>Licenses</h2>
 <p><b>Apache 2.0: </b>AutoValue Annotations, AutoValue Processor, error-prone annotations</p>
-<p><b>The Apache License, Version 2.0: </b>embedded-postgres-binaries-darwin-amd64, embedded-postgres-binaries-linux-amd64, org.apiguardian:apiguardian-api, org.opentest4j:opentest4j</p>
+<p><b>The Apache License, Version 2.0: </b>embedded-postgres-binaries-darwin-amd64, embedded-postgres-binaries-linux-amd64, embedded-postgres-binaries-linux-arm32v7, embedded-postgres-binaries-linux-arm64v8, org.apiguardian:apiguardian-api, org.opentest4j:opentest4j</p>
 <p><b>MIT License: </b>SLF4J API Module, SLF4J Simple Binding</p>
 <p><b>The MIT License: </b>Checker Qual</p>
 <p><b>BSD-2-Clause: </b>PostgreSQL JDBC Driver</p>
@@ -629,6 +659,24 @@ Brotli, Zstandard and ar, cpio, jar, tar, zip, dump, 7z, arj.</p>
 <tr class="a">
 <td>embedded-postgres-binaries-linux-amd64-13.4.0.jar</td>
 <td>12.1 MB</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>-</td>
+<td>No</td>
+<td>No</td></tr>
+<tr class="b">
+<td>embedded-postgres-binaries-linux-arm32v7-13.4.0.jar</td>
+<td>11.2 MB</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>-</td>
+<td>No</td>
+<td>No</td></tr>
+<tr class="a">
+<td>embedded-postgres-binaries-linux-arm64v8-13.4.0.jar</td>
+<td>11.2 MB</td>
 <td>3</td>
 <td>0</td>
 <td>0</td>
@@ -771,9 +819,9 @@ Brotli, Zstandard and ar, cpio, jar, tar, zip, dump, 7z, arj.</p>
 <th>Debug Information</th>
 <th>Sealed</th></tr>
 <tr class="a">
-<td>22</td>
-<td>41.7 MB</td>
-<td>6073</td>
+<td>24</td>
+<td>64.2 MB</td>
+<td>6079</td>
 <td>5504</td>
 <td>276</td>
 <td>1.8</td>
@@ -798,9 +846,9 @@ Brotli, Zstandard and ar, cpio, jar, tar, zip, dump, 7z, arj.</p>
 <td>test: 1</td>
 <td>-</td></tr>
 <tr class="b">
-<td>runtime: 2</td>
-<td>runtime: 33.3 MB</td>
-<td>runtime: 6</td>
+<td>runtime: 4</td>
+<td>runtime: 55.8 MB</td>
+<td>runtime: 12</td>
 <td>-</td>
 <td>-</td>
 <td>-</td>

@@ -165,8 +165,8 @@ public final class DatabaseManager implements AutoCloseable {
      */
     @Nonnull
     public EmbeddedPostgres getEmbeddedPostgres() {
-<span class="nc" id="L168">        checkState(started.get(), &quot;not yet started!&quot;);</span>
-<span class="nc" id="L169">        return pg;</span>
+<span class="fc" id="L168">        checkState(started.get(), &quot;not yet started!&quot;);</span>
+<span class="fc" id="L169">        return pg;</span>
     }
 
     private interface InstanceProvider extends Supplier&lt;DatabaseInfo&gt;, AutoCloseable {

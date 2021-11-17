@@ -18,29 +18,34 @@ import de.softwareforge.testing.postgres.embedded.DatabasePreparer;
 import de.softwareforge.testing.postgres.embedded.EmbeddedPostgres;
 import de.softwareforge.testing.postgres.embedded.EmbeddedPostgresPreparer;
 
+import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 /**
- * Create a new cluster that supports multiple databases. Each database is cloned from a template.
+ * Create a new PostgreSQL server that supports multiple databases. Each database is cloned from a template.
  */
 public final class MultiDatabaseBuilder {
 
-<span class="nc" id="L28">    private MultiDatabaseBuilder() {</span>
-<span class="nc" id="L29">        throw new AssertionError(&quot;MultiDatabaseBuilder can not be instantiated&quot;);</span>
+<span class="nc" id="L29">    private MultiDatabaseBuilder() {</span>
+<span class="nc" id="L30">        throw new AssertionError(&quot;MultiDatabaseBuilder can not be instantiated&quot;);</span>
     }
 
     /**
-     * Create a vanilla database -- just initialized, no customizations applied.
+     * Create a builder without any customizations applied.
+     *
+     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instance() {
-<span class="nc" id="L36">        return EmbeddedPgExtension.multiDatabase();</span>
+<span class="nc" id="L39">        return EmbeddedPgExtension.multiDatabase();</span>
     }
 
     /**
-     * Create a vanilla database with standard initializations ({@link EmbeddedPostgres.Builder#withDefaults()}).
+     * Create a builder with standard initializations ({@link EmbeddedPostgres.Builder#withDefaults()}) applied.
+     *
+     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instanceWithDefaults() {
-<span class="fc" id="L43">        return EmbeddedPgExtension.multiDatabase().withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+<span class="fc" id="L48">        return EmbeddedPgExtension.multiDatabase().withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 
     /**
@@ -48,7 +53,7 @@ public final class MultiDatabaseBuilder {
      */
     @Deprecated
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(DatabasePreparer preparer) {
-<span class="nc" id="L51">        return EmbeddedPgExtension.multiDatabase().withPreparer(preparer);</span>
+<span class="nc" id="L56">        return EmbeddedPgExtension.multiDatabase().withPreparer(preparer);</span>
     }
 
     /**
@@ -56,21 +61,28 @@ public final class MultiDatabaseBuilder {
      */
     @Deprecated
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(DatabasePreparer preparer) {
-<span class="nc" id="L59">        return EmbeddedPgExtension.multiDatabase().withPreparer(preparer).withCustomizer(EmbeddedPostgres.Builder::withDefaults);</span>
+<span class="nc" id="L64">        return EmbeddedPgExtension.multiDatabase().withPreparer(preparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 
     /**
-     * Create a vanilla database and execute a {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} for data source initialization on it.
+     * Create a builder and register a {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} to set up the template database.
+     *
+     * @param dataSourcePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.
+     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
-    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
-<span class="nc" id="L66">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer);</span>
+    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@Nonnull EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
+<span class="nc" id="L74">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer);</span>
     }
 
     /**
-     * Create a vanilla database with defaults and execute a {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} for data source initialization on it.
+     * Create a builder with standard initializations ({@link EmbeddedPostgres.Builder#withDefaults()}) applied and register a {@link
+     * EmbeddedPostgresPreparer&lt;DataSource&gt;} to set up the template database.
+     *
+     * @param dataSourcePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.
+     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
-    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
-<span class="fc" id="L73">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@Nonnull EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
+<span class="fc" id="L85">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

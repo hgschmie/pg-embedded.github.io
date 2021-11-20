@@ -49,7 +49,7 @@ public final class MultiDatabaseBuilder {
     }
 
     /**
-     * @deprecated Use {@link #preparedInstance(EmbeddedPostgresPreparer&lt;DataSource&gt;)}.
+     * @deprecated Use {@link #preparedInstance(EmbeddedPostgresPreparer)}.
      */
     @Deprecated
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(DatabasePreparer preparer) {
@@ -57,7 +57,7 @@ public final class MultiDatabaseBuilder {
     }
 
     /**
-     * @deprecated Use {@link #preparedInstanceWithDefaults(EmbeddedPostgresPreparer&lt;DataSource&gt;)}.
+     * @deprecated Use {@link #preparedInstanceWithDefaults(EmbeddedPostgresPreparer)}.
      */
     @Deprecated
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(DatabasePreparer preparer) {

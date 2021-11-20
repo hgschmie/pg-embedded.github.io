@@ -1,5 +1,5 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedUtil,55,287,14,24,14,69,14,21,1,15
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedUtil,55,279,14,24,14,65,14,21,1,15
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProvider,0,2,0,0,0,2,0,2,0,2
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabasePreparer,4,0,0,0,1,0,2,0,2,0
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.DatabaseManagerBuilder,0,16,0,0,0,3,0,2,0,2
@@ -10,10 +10,10 @@ pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager,5,186,3,9
 pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager.new CompletionHandler() {...},42,0,0,0,11,0,4,0,4,0
 pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo,69,75,6,8,15,20,8,8,2,7
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.Builder,27,42,0,0,5,11,2,4,2,4
-pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres,231,855,27,29,45,169,24,41,3,34
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres,231,852,27,29,45,169,24,41,3,34
 pg-embedded,de.softwareforge.testing.postgres.embedded,FlywayPreparer,4,58,0,0,1,15,1,6,1,6
-pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator,36,115,14,8,10,23,12,8,1,8
-pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProviderPipeline,25,95,2,4,7,30,2,6,0,5
+pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator,41,115,16,8,12,23,13,8,1,8
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProviderPipeline,25,94,2,4,7,30,2,6,0,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager,272,137,37,5,51,27,21,4,1,3
 pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo.Builder,63,94,15,13,15,28,12,10,0,8
 pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres.Builder,98,233,9,7,23,54,14,13,8,11

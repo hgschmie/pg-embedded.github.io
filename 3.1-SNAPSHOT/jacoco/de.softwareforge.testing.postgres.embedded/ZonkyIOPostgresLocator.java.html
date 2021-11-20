@@ -77,23 +77,28 @@ public final class ZonkyIOPostgresLocator implements Supplier&lt;InputStream&gt;
 <span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_ARCH_X86_64) {</span>
 <span class="fc" id="L78">            architecture = &quot;x86_64&quot;;  // Zonky uses x86_64</span>
 <span class="nc bnc" id="L79" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
-<span class="nc" id="L80">            architecture = &quot;arm_64&quot;;</span>
-<span class="nc bnc" id="L81" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH32) {</span>
-<span class="nc" id="L82">            architecture = &quot;arm_32&quot;;</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            if (EmbeddedUtil.IS_OS_MAC) {</span>
+                // Mac binaries are fat binaries stored as x86_64
+<span class="nc" id="L82">                architecture = &quot;x86_64&quot;;</span>
+            } else {
+<span class="nc" id="L84">                architecture = &quot;arm_64&quot;;</span>
+            }
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH32) {</span>
+<span class="nc" id="L87">            architecture = &quot;arm_32&quot;;</span>
         }
-<span class="fc" id="L84">        return architecture;</span>
+<span class="fc" id="L89">        return architecture;</span>
     }
 
     private static String computeOS() {
-<span class="fc" id="L88">        String os = EmbeddedUtil.OS_NAME;</span>
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_OS_LINUX) {</span>
-<span class="nc" id="L90">            os = &quot;linux&quot;;</span>
-<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
-<span class="fc" id="L92">            os = &quot;darwin&quot;;</span>
-<span class="nc bnc" id="L93" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_WINDOWS) {</span>
-<span class="nc" id="L94">            os = &quot;windows&quot;;</span>
+<span class="fc" id="L93">        String os = EmbeddedUtil.OS_NAME;</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_OS_LINUX) {</span>
+<span class="nc" id="L95">            os = &quot;linux&quot;;</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="fc" id="L97">            os = &quot;darwin&quot;;</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_WINDOWS) {</span>
+<span class="nc" id="L99">            os = &quot;windows&quot;;</span>
         }
-<span class="fc" id="L96">        return os;</span>
+<span class="fc" id="L101">        return os;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

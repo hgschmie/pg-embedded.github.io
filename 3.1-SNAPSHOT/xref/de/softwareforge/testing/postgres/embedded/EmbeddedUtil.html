@@ -132,10 +132,10 @@
 <a class="jxr_linenumber" name="L124" href="#L124">124</a> 
 <a class="jxr_linenumber" name="L125" href="#L125">125</a>     <strong class="jxr_keyword">static</strong> String formatDuration(Duration duration) {
 <a class="jxr_linenumber" name="L126" href="#L126">126</a>         <strong class="jxr_keyword">long</strong> millis = duration.toMillis();
-<a class="jxr_linenumber" name="L127" href="#L127">127</a>         <strong class="jxr_keyword">long</strong> hours = 0;
-<a class="jxr_linenumber" name="L128" href="#L128">128</a>         <strong class="jxr_keyword">long</strong> minutes = 0;
-<a class="jxr_linenumber" name="L129" href="#L129">129</a>         <strong class="jxr_keyword">long</strong> secs = 0;
-<a class="jxr_linenumber" name="L130" href="#L130">130</a>         <strong class="jxr_keyword">long</strong> ms = 0;
+<a class="jxr_linenumber" name="L127" href="#L127">127</a>         <strong class="jxr_keyword">long</strong> hours;
+<a class="jxr_linenumber" name="L128" href="#L128">128</a>         <strong class="jxr_keyword">long</strong> minutes;
+<a class="jxr_linenumber" name="L129" href="#L129">129</a>         <strong class="jxr_keyword">long</strong> secs;
+<a class="jxr_linenumber" name="L130" href="#L130">130</a>         <strong class="jxr_keyword">long</strong> ms;
 <a class="jxr_linenumber" name="L131" href="#L131">131</a>         ImmutableList.Builder&lt;String&gt; builder = ImmutableList.builder();
 <a class="jxr_linenumber" name="L132" href="#L132">132</a>         <strong class="jxr_keyword">if</strong> (millis == 0) {
 <a class="jxr_linenumber" name="L133" href="#L133">133</a>             builder.add(<span class="jxr_string">"0 ms"</span>);

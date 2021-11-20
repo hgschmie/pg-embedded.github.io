@@ -124,10 +124,10 @@ final class EmbeddedUtil {
 
     static String formatDuration(Duration duration) {
 <span class="fc" id="L126">        long millis = duration.toMillis();</span>
-<span class="fc" id="L127">        long hours = 0;</span>
-<span class="fc" id="L128">        long minutes = 0;</span>
-<span class="fc" id="L129">        long secs = 0;</span>
-<span class="fc" id="L130">        long ms = 0;</span>
+        long hours;
+        long minutes;
+        long secs;
+        long ms;
 <span class="fc" id="L131">        ImmutableList.Builder&lt;String&gt; builder = ImmutableList.builder();</span>
 <span class="pc bpc" id="L132" title="1 of 2 branches missed.">        if (millis == 0) {</span>
 <span class="nc" id="L133">            builder.add(&quot;0 ms&quot;);</span>

@@ -228,7 +228,7 @@
 <span class="source-line-no">215</span><span id="line-215">                try {</span>
 <span class="source-line-no">216</span><span id="line-216">                    final String newDbName = EmbeddedUtil.randomLowercase(12);</span>
 <span class="source-line-no">217</span><span id="line-217">                    try {</span>
-<span class="source-line-no">218</span><span id="line-218">                        createDatabase(pg.createDefaultDataSource(), newDbName, PG_DEFAULT_USER);</span>
+<span class="source-line-no">218</span><span id="line-218">                        createDatabase(pg.createDefaultDataSource(), newDbName);</span>
 <span class="source-line-no">219</span><span id="line-219">                        nextDatabase.put(DatabaseInfo.builder()</span>
 <span class="source-line-no">220</span><span id="line-220">                                .dbName(newDbName)</span>
 <span class="source-line-no">221</span><span id="line-221">                                .port(pg.getPort())</span>
@@ -262,10 +262,10 @@
 <span class="source-line-no">249</span><span id="line-249">    }</span>
 <span class="source-line-no">250</span><span id="line-250"></span>
 <span class="source-line-no">251</span><span id="line-251">    @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")</span>
-<span class="source-line-no">252</span><span id="line-252">    private static void createDatabase(final DataSource dataSource, final String databaseName, final String user) throws SQLException {</span>
+<span class="source-line-no">252</span><span id="line-252">    private static void createDatabase(final DataSource dataSource, final String databaseName) throws SQLException {</span>
 <span class="source-line-no">253</span><span id="line-253">        try (Connection c = dataSource.getConnection();</span>
 <span class="source-line-no">254</span><span id="line-254">                Statement stmt = c.createStatement()) {</span>
-<span class="source-line-no">255</span><span id="line-255">            stmt.executeUpdate(format("CREATE DATABASE %s OWNER %s ENCODING = '%s'", databaseName, user, PG_DEFAULT_ENCODING));</span>
+<span class="source-line-no">255</span><span id="line-255">            stmt.executeUpdate(format("CREATE DATABASE %s OWNER %s ENCODING = '%s'", databaseName, PG_DEFAULT_USER, PG_DEFAULT_ENCODING));</span>
 <span class="source-line-no">256</span><span id="line-256">        }</span>
 <span class="source-line-no">257</span><span id="line-257">    }</span>
 <span class="source-line-no">258</span><span id="line-258"></span>
@@ -290,7 +290,7 @@
 <span class="source-line-no">277</span><span id="line-277">        }</span>
 <span class="source-line-no">278</span><span id="line-278"></span>
 <span class="source-line-no">279</span><span id="line-279">        /**</span>
-<span class="source-line-no">280</span><span id="line-280">         * @deprecated Use {@link #withDataSourcePreparer(EmbeddedPostgresPreparer&lt;DataSource&gt;)}.</span>
+<span class="source-line-no">280</span><span id="line-280">         * @deprecated Use {@link #withDataSourcePreparer(EmbeddedPostgresPreparer)}.</span>
 <span class="source-line-no">281</span><span id="line-281">         */</span>
 <span class="source-line-no">282</span><span id="line-282">        @Deprecated</span>
 <span class="source-line-no">283</span><span id="line-283">        @Nonnull</span>
@@ -337,7 +337,7 @@
 <span class="source-line-no">324</span><span id="line-324">        }</span>
 <span class="source-line-no">325</span><span id="line-325"></span>
 <span class="source-line-no">326</span><span id="line-326">        /**</span>
-<span class="source-line-no">327</span><span id="line-327">         * @deprecated Use {@link #withInstancePreparer(EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;)}.</span>
+<span class="source-line-no">327</span><span id="line-327">         * @deprecated Use {@link #withInstancePreparer(EmbeddedPostgresPreparer)}.</span>
 <span class="source-line-no">328</span><span id="line-328">         */</span>
 <span class="source-line-no">329</span><span id="line-329">        @Deprecated</span>
 <span class="source-line-no">330</span><span id="line-330">        @Nonnull</span>
@@ -361,7 +361,7 @@
 <span class="source-line-no">348</span><span id="line-348">    public static final class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {</span>
 <span class="source-line-no">349</span><span id="line-349"></span>
 <span class="source-line-no">350</span><span id="line-350">        /**</span>
-<span class="source-line-no">351</span><span id="line-351">         * Creates a new builder for {@DatabaseManager} instances.</span>
+<span class="source-line-no">351</span><span id="line-351">         * Creates a new builder for {@link DatabaseManager} instances.</span>
 <span class="source-line-no">352</span><span id="line-352">         *</span>
 <span class="source-line-no">353</span><span id="line-353">         * @param multiMode True if the database manager should return a new database instance for every {@link DatabaseManager#getDatabaseInfo()}} call, false</span>
 <span class="source-line-no">354</span><span id="line-354">         *                  if it should return the same database instance.</span>
@@ -372,15 +372,16 @@
 <span class="source-line-no">359</span><span id="line-359"></span>
 <span class="source-line-no">360</span><span id="line-360">        /**</span>
 <span class="source-line-no">361</span><span id="line-361">         * Creates a new {@link DatabaseManager} instance from the builder.</span>
-<span class="source-line-no">362</span><span id="line-362">         * @return A database manager. Never null.</span>
-<span class="source-line-no">363</span><span id="line-363">         */</span>
-<span class="source-line-no">364</span><span id="line-364">        @Override</span>
-<span class="source-line-no">365</span><span id="line-365">        @Nonnull</span>
-<span class="source-line-no">366</span><span id="line-366">        public DatabaseManager build() {</span>
-<span class="source-line-no">367</span><span id="line-367">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
-<span class="source-line-no">368</span><span id="line-368">        }</span>
-<span class="source-line-no">369</span><span id="line-369">    }</span>
-<span class="source-line-no">370</span><span id="line-370">}</span>
+<span class="source-line-no">362</span><span id="line-362">         *</span>
+<span class="source-line-no">363</span><span id="line-363">         * @return A database manager. Never null.</span>
+<span class="source-line-no">364</span><span id="line-364">         */</span>
+<span class="source-line-no">365</span><span id="line-365">        @Override</span>
+<span class="source-line-no">366</span><span id="line-366">        @Nonnull</span>
+<span class="source-line-no">367</span><span id="line-367">        public DatabaseManager build() {</span>
+<span class="source-line-no">368</span><span id="line-368">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
+<span class="source-line-no">369</span><span id="line-369">        }</span>
+<span class="source-line-no">370</span><span id="line-370">    }</span>
+<span class="source-line-no">371</span><span id="line-371">}</span>
 
 
 

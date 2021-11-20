@@ -215,7 +215,7 @@ public final class DatabaseManager implements AutoCloseable {
                 try {
 <span class="fc" id="L216">                    final String newDbName = EmbeddedUtil.randomLowercase(12);</span>
                     try {
-<span class="fc" id="L218">                        createDatabase(pg.createDefaultDataSource(), newDbName, PG_DEFAULT_USER);</span>
+<span class="fc" id="L218">                        createDatabase(pg.createDefaultDataSource(), newDbName);</span>
 <span class="fc" id="L219">                        nextDatabase.put(DatabaseInfo.builder()</span>
 <span class="fc" id="L220">                                .dbName(newDbName)</span>
 <span class="fc" id="L221">                                .port(pg.getPort())</span>
@@ -249,10 +249,10 @@ public final class DatabaseManager implements AutoCloseable {
     }
 
     @SuppressFBWarnings(&quot;RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE&quot;)
-    private static void createDatabase(final DataSource dataSource, final String databaseName, final String user) throws SQLException {
+    private static void createDatabase(final DataSource dataSource, final String databaseName) throws SQLException {
 <span class="fc" id="L253">        try (Connection c = dataSource.getConnection();</span>
 <span class="fc" id="L254">                Statement stmt = c.createStatement()) {</span>
-<span class="fc" id="L255">            stmt.executeUpdate(format(&quot;CREATE DATABASE %s OWNER %s ENCODING = '%s'&quot;, databaseName, user, PG_DEFAULT_ENCODING));</span>
+<span class="fc" id="L255">            stmt.executeUpdate(format(&quot;CREATE DATABASE %s OWNER %s ENCODING = '%s'&quot;, databaseName, PG_DEFAULT_USER, PG_DEFAULT_ENCODING));</span>
         }
 <span class="fc" id="L257">    }</span>
 
@@ -277,7 +277,7 @@ public final class DatabaseManager implements AutoCloseable {
 <span class="fc" id="L277">        }</span>
 
         /**
-         * @deprecated Use {@link #withDataSourcePreparer(EmbeddedPostgresPreparer&lt;DataSource&gt;)}.
+         * @deprecated Use {@link #withDataSourcePreparer(EmbeddedPostgresPreparer)}.
          */
         @Deprecated
         @Nonnull
@@ -324,7 +324,7 @@ public final class DatabaseManager implements AutoCloseable {
         }
 
         /**
-         * @deprecated Use {@link #withInstancePreparer(EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;)}.
+         * @deprecated Use {@link #withInstancePreparer(EmbeddedPostgresPreparer)}.
          */
         @Deprecated
         @Nonnull
@@ -348,7 +348,7 @@ public final class DatabaseManager implements AutoCloseable {
     public static final class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {
 
         /**
-         * Creates a new builder for {@DatabaseManager} instances.
+         * Creates a new builder for {@link DatabaseManager} instances.
          *
          * @param multiMode True if the database manager should return a new database instance for every {@link DatabaseManager#getDatabaseInfo()}} call, false
          *                  if it should return the same database instance.
@@ -359,12 +359,13 @@ public final class DatabaseManager implements AutoCloseable {
 
         /**
          * Creates a new {@link DatabaseManager} instance from the builder.
+         *
          * @return A database manager. Never null.
          */
         @Override
         @Nonnull
         public DatabaseManager build() {
-<span class="fc" id="L367">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
+<span class="fc" id="L368">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
         }
     }
 }

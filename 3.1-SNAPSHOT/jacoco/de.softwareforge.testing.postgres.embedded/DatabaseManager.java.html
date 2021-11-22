@@ -281,7 +281,7 @@ public final class DatabaseManager implements AutoCloseable {
          */
         @Deprecated
         @NonNull
-        public Builder&lt;T&gt; withPreparer(DatabasePreparer databasePreparer) {
+        public Builder&lt;T&gt; withPreparer(@NonNull DatabasePreparer databasePreparer) {
 <span class="nc" id="L285">            checkNotNull(databasePreparer, &quot;databasePreparer is null&quot;);</span>
 <span class="nc" id="L286">            return withDataSourcePreparer(databasePreparer::prepare);</span>
         }
@@ -339,6 +339,7 @@ public final class DatabaseManager implements AutoCloseable {
          *
          * @return The instance to create.
          */
+        @NonNull
         public abstract T build();
     }
 
@@ -354,8 +355,8 @@ public final class DatabaseManager implements AutoCloseable {
          *                  if it should return the same database instance.
          */
         public DatabaseManagerBuilder(boolean multiMode) {
-<span class="fc" id="L357">            super(multiMode);</span>
-<span class="fc" id="L358">        }</span>
+<span class="fc" id="L358">            super(multiMode);</span>
+<span class="fc" id="L359">        }</span>
 
         /**
          * Creates a new {@link DatabaseManager} instance from the builder.
@@ -365,7 +366,7 @@ public final class DatabaseManager implements AutoCloseable {
         @Override
         @NonNull
         public DatabaseManager build() {
-<span class="fc" id="L368">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
+<span class="fc" id="L369">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
         }
     }
 }

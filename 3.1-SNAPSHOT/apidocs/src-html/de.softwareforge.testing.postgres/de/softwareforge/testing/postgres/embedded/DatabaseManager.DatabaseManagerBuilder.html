@@ -294,7 +294,7 @@
 <span class="source-line-no">281</span><span id="line-281">         */</span>
 <span class="source-line-no">282</span><span id="line-282">        @Deprecated</span>
 <span class="source-line-no">283</span><span id="line-283">        @NonNull</span>
-<span class="source-line-no">284</span><span id="line-284">        public Builder&lt;T&gt; withPreparer(DatabasePreparer databasePreparer) {</span>
+<span class="source-line-no">284</span><span id="line-284">        public Builder&lt;T&gt; withPreparer(@NonNull DatabasePreparer databasePreparer) {</span>
 <span class="source-line-no">285</span><span id="line-285">            checkNotNull(databasePreparer, "databasePreparer is null");</span>
 <span class="source-line-no">286</span><span id="line-286">            return withDataSourcePreparer(databasePreparer::prepare);</span>
 <span class="source-line-no">287</span><span id="line-287">        }</span>
@@ -352,36 +352,37 @@
 <span class="source-line-no">339</span><span id="line-339">         *</span>
 <span class="source-line-no">340</span><span id="line-340">         * @return The instance to create.</span>
 <span class="source-line-no">341</span><span id="line-341">         */</span>
-<span class="source-line-no">342</span><span id="line-342">        public abstract T build();</span>
-<span class="source-line-no">343</span><span id="line-343">    }</span>
-<span class="source-line-no">344</span><span id="line-344"></span>
-<span class="source-line-no">345</span><span id="line-345">    /**</span>
-<span class="source-line-no">346</span><span id="line-346">     * Create new {@link DatabaseManager} instances.</span>
-<span class="source-line-no">347</span><span id="line-347">     */</span>
-<span class="source-line-no">348</span><span id="line-348">    public static final class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {</span>
-<span class="source-line-no">349</span><span id="line-349"></span>
-<span class="source-line-no">350</span><span id="line-350">        /**</span>
-<span class="source-line-no">351</span><span id="line-351">         * Creates a new builder for {@link DatabaseManager} instances.</span>
-<span class="source-line-no">352</span><span id="line-352">         *</span>
-<span class="source-line-no">353</span><span id="line-353">         * @param multiMode True if the database manager should return a new database instance for every {@link DatabaseManager#getDatabaseInfo()}} call, false</span>
-<span class="source-line-no">354</span><span id="line-354">         *                  if it should return the same database instance.</span>
-<span class="source-line-no">355</span><span id="line-355">         */</span>
-<span class="source-line-no">356</span><span id="line-356">        public DatabaseManagerBuilder(boolean multiMode) {</span>
-<span class="source-line-no">357</span><span id="line-357">            super(multiMode);</span>
-<span class="source-line-no">358</span><span id="line-358">        }</span>
-<span class="source-line-no">359</span><span id="line-359"></span>
-<span class="source-line-no">360</span><span id="line-360">        /**</span>
-<span class="source-line-no">361</span><span id="line-361">         * Creates a new {@link DatabaseManager} instance from the builder.</span>
-<span class="source-line-no">362</span><span id="line-362">         *</span>
-<span class="source-line-no">363</span><span id="line-363">         * @return A database manager. Never null.</span>
-<span class="source-line-no">364</span><span id="line-364">         */</span>
-<span class="source-line-no">365</span><span id="line-365">        @Override</span>
-<span class="source-line-no">366</span><span id="line-366">        @NonNull</span>
-<span class="source-line-no">367</span><span id="line-367">        public DatabaseManager build() {</span>
-<span class="source-line-no">368</span><span id="line-368">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
-<span class="source-line-no">369</span><span id="line-369">        }</span>
-<span class="source-line-no">370</span><span id="line-370">    }</span>
-<span class="source-line-no">371</span><span id="line-371">}</span>
+<span class="source-line-no">342</span><span id="line-342">        @NonNull</span>
+<span class="source-line-no">343</span><span id="line-343">        public abstract T build();</span>
+<span class="source-line-no">344</span><span id="line-344">    }</span>
+<span class="source-line-no">345</span><span id="line-345"></span>
+<span class="source-line-no">346</span><span id="line-346">    /**</span>
+<span class="source-line-no">347</span><span id="line-347">     * Create new {@link DatabaseManager} instances.</span>
+<span class="source-line-no">348</span><span id="line-348">     */</span>
+<span class="source-line-no">349</span><span id="line-349">    public static final class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {</span>
+<span class="source-line-no">350</span><span id="line-350"></span>
+<span class="source-line-no">351</span><span id="line-351">        /**</span>
+<span class="source-line-no">352</span><span id="line-352">         * Creates a new builder for {@link DatabaseManager} instances.</span>
+<span class="source-line-no">353</span><span id="line-353">         *</span>
+<span class="source-line-no">354</span><span id="line-354">         * @param multiMode True if the database manager should return a new database instance for every {@link DatabaseManager#getDatabaseInfo()}} call, false</span>
+<span class="source-line-no">355</span><span id="line-355">         *                  if it should return the same database instance.</span>
+<span class="source-line-no">356</span><span id="line-356">         */</span>
+<span class="source-line-no">357</span><span id="line-357">        public DatabaseManagerBuilder(boolean multiMode) {</span>
+<span class="source-line-no">358</span><span id="line-358">            super(multiMode);</span>
+<span class="source-line-no">359</span><span id="line-359">        }</span>
+<span class="source-line-no">360</span><span id="line-360"></span>
+<span class="source-line-no">361</span><span id="line-361">        /**</span>
+<span class="source-line-no">362</span><span id="line-362">         * Creates a new {@link DatabaseManager} instance from the builder.</span>
+<span class="source-line-no">363</span><span id="line-363">         *</span>
+<span class="source-line-no">364</span><span id="line-364">         * @return A database manager. Never null.</span>
+<span class="source-line-no">365</span><span id="line-365">         */</span>
+<span class="source-line-no">366</span><span id="line-366">        @Override</span>
+<span class="source-line-no">367</span><span id="line-367">        @NonNull</span>
+<span class="source-line-no">368</span><span id="line-368">        public DatabaseManager build() {</span>
+<span class="source-line-no">369</span><span id="line-369">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
+<span class="source-line-no">370</span><span id="line-370">        }</span>
+<span class="source-line-no">371</span><span id="line-371">    }</span>
+<span class="source-line-no">372</span><span id="line-372">}</span>
 
 
 

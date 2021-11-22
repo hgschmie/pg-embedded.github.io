@@ -36,8 +36,9 @@ public final class MultiDatabaseBuilder {
      *
      * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
+    @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instance() {
-<span class="nc" id="L40">        return EmbeddedPgExtension.multiDatabase();</span>
+<span class="nc" id="L41">        return EmbeddedPgExtension.multiDatabase();</span>
     }
 
     /**
@@ -45,24 +46,27 @@ public final class MultiDatabaseBuilder {
      *
      * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
+    @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instanceWithDefaults() {
-<span class="fc" id="L49">        return EmbeddedPgExtension.multiDatabase().withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+<span class="fc" id="L51">        return EmbeddedPgExtension.multiDatabase().withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 
     /**
      * @deprecated Use {@link #preparedInstance(EmbeddedPostgresPreparer)}.
      */
     @Deprecated
+    @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@NonNull DatabasePreparer preparer) {
-<span class="nc" id="L57">        return EmbeddedPgExtension.multiDatabase().withPreparer(preparer);</span>
+<span class="nc" id="L60">        return EmbeddedPgExtension.multiDatabase().withPreparer(preparer);</span>
     }
 
     /**
      * @deprecated Use {@link #preparedInstanceWithDefaults(EmbeddedPostgresPreparer)}.
      */
     @Deprecated
+    @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@NonNull DatabasePreparer preparer) {
-<span class="nc" id="L65">        return EmbeddedPgExtension.multiDatabase().withPreparer(preparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+<span class="nc" id="L69">        return EmbeddedPgExtension.multiDatabase().withPreparer(preparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 
     /**
@@ -71,8 +75,9 @@ public final class MultiDatabaseBuilder {
      * @param dataSourcePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.
      * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
+    @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
-<span class="nc" id="L75">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer);</span>
+<span class="nc" id="L80">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer);</span>
     }
 
     /**
@@ -82,8 +87,9 @@ public final class MultiDatabaseBuilder {
      * @param dataSourcePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.
      * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
+    @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
-<span class="fc" id="L86">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+<span class="fc" id="L92">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

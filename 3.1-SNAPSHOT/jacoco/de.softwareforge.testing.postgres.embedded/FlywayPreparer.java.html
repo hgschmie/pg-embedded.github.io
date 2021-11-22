@@ -41,18 +41,19 @@ public final class FlywayPreparer implements EmbeddedPostgresPreparer&lt;DataSou
      * @param locations One or more locations on the classpath.
      * @return A {@link FlywayPreparer} instance.
      */
+    @NonNull
     public static FlywayPreparer forClasspathLocation(String... locations) {
-<span class="fc" id="L45">        FlywayPreparer preparer = new FlywayPreparer();</span>
-<span class="fc" id="L46">        preparer.addCustomizer(c -&gt; c.locations(locations));</span>
-<span class="fc" id="L47">        return preparer;</span>
+<span class="fc" id="L46">        FlywayPreparer preparer = new FlywayPreparer();</span>
+<span class="fc" id="L47">        preparer.addCustomizer(c -&gt; c.locations(locations));</span>
+<span class="fc" id="L48">        return preparer;</span>
     }
 
     /**
      * Create a new, uninitialized preparer instance. Use {@link #addCustomizer(Consumer)} to modify the configuration for the {@link FluentConfiguration}
      * object.
      */
-<span class="fc" id="L54">    public FlywayPreparer() {</span>
-<span class="fc" id="L55">    }</span>
+<span class="fc" id="L55">    public FlywayPreparer() {</span>
+<span class="fc" id="L56">    }</span>
 
     /**
      * Add a new customizer instance. Each customizer is called once with the {@link FluentConfiguration} instance before setting the datasource and calling
@@ -61,31 +62,33 @@ public final class FlywayPreparer implements EmbeddedPostgresPreparer&lt;DataSou
      * @param customizer A {@link Consumer&lt;FluentConfiguration&gt;} instance. Must not be null.
      * @return This object.
      */
+    @NonNull
     public FlywayPreparer addCustomizer(@NonNull Consumer&lt;FluentConfiguration&gt; customizer) {
-<span class="fc" id="L65">        checkNotNull(customizer, &quot;customizer is null&quot;);</span>
-<span class="fc" id="L66">        customizers.add(customizer);</span>
+<span class="fc" id="L67">        checkNotNull(customizer, &quot;customizer is null&quot;);</span>
+<span class="fc" id="L68">        customizers.add(customizer);</span>
 
-<span class="fc" id="L68">        return this;</span>
+<span class="fc" id="L70">        return this;</span>
     }
 
     /**
      * @deprecated Use {@link #addCustomizer(Consumer)}.
      */
     @Deprecated
+    @NonNull
     public FlywayPreparer customize(@NonNull Consumer&lt;FluentConfiguration&gt; customizer) {
-<span class="nc" id="L76">        return addCustomizer(customizer);</span>
+<span class="nc" id="L79">        return addCustomizer(customizer);</span>
     }
 
     @Override
     public void prepare(@NonNull DataSource dataSource) {
-<span class="fc" id="L81">        checkNotNull(dataSource, &quot;dataSource is null&quot;);</span>
+<span class="fc" id="L84">        checkNotNull(dataSource, &quot;dataSource is null&quot;);</span>
 
-<span class="fc" id="L83">        final FluentConfiguration config = Flyway.configure();</span>
+<span class="fc" id="L86">        final FluentConfiguration config = Flyway.configure();</span>
 
-<span class="fc" id="L85">        customizers.build().forEach(c -&gt; c.accept(config));</span>
+<span class="fc" id="L88">        customizers.build().forEach(c -&gt; c.accept(config));</span>
 
-<span class="fc" id="L87">        config.dataSource(dataSource);</span>
-<span class="fc" id="L88">        config.load().migrate();</span>
-<span class="fc" id="L89">    }</span>
+<span class="fc" id="L90">        config.dataSource(dataSource);</span>
+<span class="fc" id="L91">        config.load().migrate();</span>
+<span class="fc" id="L92">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

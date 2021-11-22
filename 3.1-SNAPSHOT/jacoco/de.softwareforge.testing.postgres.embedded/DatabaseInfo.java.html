@@ -19,11 +19,11 @@ import static java.lang.String.format;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Information about a database located on a PostgreSQL server connected to an {@link EmbeddedPostgres} instance.
@@ -51,7 +51,7 @@ public abstract class DatabaseInfo {
      *
      * @return Name of the database. Is never null.
      */
-    @Nonnull
+    @NonNull
     public abstract String dbName();
 
     /**
@@ -66,7 +66,7 @@ public abstract class DatabaseInfo {
      *
      * @return The user name. Is never null.
      */
-    @Nonnull
+    @NonNull
     public abstract String user();
 
     /**
@@ -92,16 +92,17 @@ public abstract class DatabaseInfo {
 
     /**
      * Returns a JDBC url to connect to the described database.
+     *
      * @return A JDBC url that can be used to connect to the database. Never null.
      */
-    @Nonnull
+    @NonNull
     public String asJdbcUrl() {
-<span class="fc" id="L99">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
+<span class="fc" id="L100">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
 
-<span class="fc" id="L101">        String additionalParameters = connectionProperties().entrySet().stream()</span>
-<span class="fc" id="L102">                .map(e -&gt; format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
-<span class="fc" id="L103">                .collect(Collectors.joining());</span>
-<span class="fc" id="L104">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
+<span class="fc" id="L102">        String additionalParameters = connectionProperties().entrySet().stream()</span>
+<span class="fc" id="L103">                .map(e -&gt; format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
+<span class="fc" id="L104">                .collect(Collectors.joining());</span>
+<span class="fc" id="L105">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
     }
 
     /**
@@ -111,15 +112,15 @@ public abstract class DatabaseInfo {
      * @throws SQLException A problem occured trying to connect to the database.
      */
     public DataSource asDataSource() throws SQLException {
-<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if (exception().isPresent()) {</span>
-<span class="nc" id="L115">            throw exception().get();</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if (exception().isPresent()) {</span>
+<span class="nc" id="L116">            throw exception().get();</span>
         }
 
-<span class="fc" id="L118">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
+<span class="fc" id="L119">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
     }
 
     @AutoValue.Builder
-<span class="fc" id="L122">    abstract static class Builder {</span>
+<span class="fc" id="L123">    abstract static class Builder {</span>
 
         abstract Builder dbName(String dbName);
 
@@ -132,8 +133,8 @@ public abstract class DatabaseInfo {
         abstract ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder();
 
         final Builder addConnectionProperty(String key, String value) {
-<span class="fc" id="L135">            connectionPropertiesBuilder().put(key, value);</span>
-<span class="fc" id="L136">            return this;</span>
+<span class="fc" id="L136">            connectionPropertiesBuilder().put(key, value);</span>
+<span class="fc" id="L137">            return this;</span>
         }
 
         abstract Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties);

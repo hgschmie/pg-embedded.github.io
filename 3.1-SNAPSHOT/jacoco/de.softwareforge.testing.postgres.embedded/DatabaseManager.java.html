@@ -28,11 +28,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,7 @@ public final class DatabaseManager implements AutoCloseable {
      *
      * @return A builder instance.
      */
-    @Nonnull
+    @NonNull
     public static Builder&lt;DatabaseManager&gt; multiDatabases() {
 <span class="fc" id="L74">        return new DatabaseManagerBuilder(true);</span>
     }
@@ -79,7 +79,7 @@ public final class DatabaseManager implements AutoCloseable {
      *
      * @return A builder instance.
      */
-    @Nonnull
+    @NonNull
     public static Builder&lt;DatabaseManager&gt; singleDatabase() {
 <span class="fc" id="L84">        return new DatabaseManagerBuilder(false);</span>
     }
@@ -91,7 +91,7 @@ public final class DatabaseManager implements AutoCloseable {
      * @throws IOException  The server could not be started.
      * @throws SQLException A SQL problem occured while trying to initialize the database.
      */
-    @Nonnull
+    @NonNull
     public DatabaseManager start() throws IOException, SQLException {
 <span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (!started.getAndSet(true)) {</span>
 
@@ -146,7 +146,7 @@ public final class DatabaseManager implements AutoCloseable {
      * @return A {@link DatabaseInfo} instance. This is never null.
      * @throws SQLException Any error that happened during the database creation is thrown here.
      */
-    @Nonnull
+    @NonNull
     public DatabaseInfo getDatabaseInfo() throws SQLException {
 <span class="fc" id="L151">        checkState(started.get(), &quot;not yet started!&quot;);</span>
 
@@ -163,7 +163,7 @@ public final class DatabaseManager implements AutoCloseable {
      *
      * @return An {@link EmbeddedPostgres} instance. Never null.
      */
-    @Nonnull
+    @NonNull
     public EmbeddedPostgres getEmbeddedPostgres() {
 <span class="fc" id="L168">        checkState(started.get(), &quot;not yet started!&quot;);</span>
 <span class="fc" id="L169">        return pg;</span>
@@ -280,7 +280,7 @@ public final class DatabaseManager implements AutoCloseable {
          * @deprecated Use {@link #withDataSourcePreparer(EmbeddedPostgresPreparer)}.
          */
         @Deprecated
-        @Nonnull
+        @NonNull
         public Builder&lt;T&gt; withPreparer(DatabasePreparer databasePreparer) {
 <span class="nc" id="L285">            checkNotNull(databasePreparer, &quot;databasePreparer is null&quot;);</span>
 <span class="nc" id="L286">            return withDataSourcePreparer(databasePreparer::prepare);</span>
@@ -292,8 +292,8 @@ public final class DatabaseManager implements AutoCloseable {
          * @param dataSourcePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.
          * @return This object instance.
          */
-        @Nonnull
-        public Builder&lt;T&gt; withDataSourcePreparer(EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
+        @NonNull
+        public Builder&lt;T&gt; withDataSourcePreparer(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
 <span class="fc" id="L297">            this.dataSourcePreparers.add(checkNotNull(dataSourcePreparer, &quot;dataSourcePreparer is null&quot;));</span>
 <span class="fc" id="L298">            return this;</span>
         }
@@ -304,8 +304,8 @@ public final class DatabaseManager implements AutoCloseable {
          * @param dataSourcePreparers A set of {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instances. Must not be null.
          * @return This object instance.
          */
-        @Nonnull
-        public Builder&lt;T&gt; withDataSourcePreparers(Set&lt;EmbeddedPostgresPreparer&lt;DataSource&gt;&gt; dataSourcePreparers) {
+        @NonNull
+        public Builder&lt;T&gt; withDataSourcePreparers(@NonNull Set&lt;EmbeddedPostgresPreparer&lt;DataSource&gt;&gt; dataSourcePreparers) {
 <span class="fc" id="L309">            this.dataSourcePreparers.addAll(checkNotNull(dataSourcePreparers, &quot;dataSourcePreparers is null&quot;));</span>
 <span class="fc" id="L310">            return this;</span>
         }
@@ -317,8 +317,8 @@ public final class DatabaseManager implements AutoCloseable {
          * @param instancePreparer A {@link EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;} instance. Must not be null.
          * @return This object instance.
          */
-        @Nonnull
-        public Builder&lt;T&gt; withInstancePreparer(EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt; instancePreparer) {
+        @NonNull
+        public Builder&lt;T&gt; withInstancePreparer(@NonNull EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt; instancePreparer) {
 <span class="fc" id="L322">            this.instancePreparers.add(checkNotNull(instancePreparer, &quot;instancePreparer is null&quot;));</span>
 <span class="fc" id="L323">            return this;</span>
         }
@@ -327,8 +327,8 @@ public final class DatabaseManager implements AutoCloseable {
          * @deprecated Use {@link #withInstancePreparer(EmbeddedPostgresPreparer)}.
          */
         @Deprecated
-        @Nonnull
-        public Builder&lt;T&gt; withCustomizer(EmbeddedPostgres.BuilderCustomizer customizer) {
+        @NonNull
+        public Builder&lt;T&gt; withCustomizer(@NonNull EmbeddedPostgres.BuilderCustomizer customizer) {
 <span class="nc" id="L332">            checkNotNull(customizer, &quot;customizer is null&quot;);</span>
 <span class="nc" id="L333">            this.instancePreparers.add(customizer::customize);</span>
 <span class="nc" id="L334">            return this;</span>
@@ -363,7 +363,7 @@ public final class DatabaseManager implements AutoCloseable {
          * @return A database manager. Never null.
          */
         @Override
-        @Nonnull
+        @NonNull
         public DatabaseManager build() {
 <span class="fc" id="L368">            return new DatabaseManager(dataSourcePreparers.build(), instancePreparers.build(), multiMode);</span>
         }

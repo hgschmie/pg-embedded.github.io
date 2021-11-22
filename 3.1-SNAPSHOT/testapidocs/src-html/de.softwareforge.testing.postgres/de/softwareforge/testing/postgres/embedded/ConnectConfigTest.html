@@ -34,9 +34,9 @@
 <span class="source-line-no">021</span><span id="line-21"></span>
 <span class="source-line-no">022</span><span id="line-22">import java.sql.SQLException;</span>
 <span class="source-line-no">023</span><span id="line-23">import java.util.Map;</span>
-<span class="source-line-no">024</span><span id="line-24">import javax.annotation.Nonnull;</span>
-<span class="source-line-no">025</span><span id="line-25">import javax.sql.DataSource;</span>
-<span class="source-line-no">026</span><span id="line-26"></span>
+<span class="source-line-no">024</span><span id="line-24">import javax.sql.DataSource;</span>
+<span class="source-line-no">025</span><span id="line-25"></span>
+<span class="source-line-no">026</span><span id="line-26">import edu.umd.cs.findbugs.annotations.NonNull;</span>
 <span class="source-line-no">027</span><span id="line-27">import org.junit.jupiter.api.Test;</span>
 <span class="source-line-no">028</span><span id="line-28">import org.junit.jupiter.api.extension.RegisterExtension;</span>
 <span class="source-line-no">029</span><span id="line-29">import org.postgresql.ds.common.BaseDataSource;</span>
@@ -70,7 +70,7 @@
 <span class="source-line-no">057</span><span id="line-57">        private DataSource dataSource;</span>
 <span class="source-line-no">058</span><span id="line-58"></span>
 <span class="source-line-no">059</span><span id="line-59">        @Override</span>
-<span class="source-line-no">060</span><span id="line-60">        public void prepare(@Nonnull DataSource dataSource) {</span>
+<span class="source-line-no">060</span><span id="line-60">        public void prepare(@NonNull DataSource dataSource) {</span>
 <span class="source-line-no">061</span><span id="line-61">            checkState(this.dataSource == null, "database preparer has been called multiple times");</span>
 <span class="source-line-no">062</span><span id="line-62">            this.dataSource = dataSource;</span>
 <span class="source-line-no">063</span><span id="line-63">        }</span>

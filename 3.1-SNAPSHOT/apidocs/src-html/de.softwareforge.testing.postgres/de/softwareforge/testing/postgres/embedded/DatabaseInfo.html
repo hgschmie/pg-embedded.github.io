@@ -32,11 +32,11 @@
 <span class="source-line-no">019</span><span id="line-19">import java.sql.SQLException;</span>
 <span class="source-line-no">020</span><span id="line-20">import java.util.Optional;</span>
 <span class="source-line-no">021</span><span id="line-21">import java.util.stream.Collectors;</span>
-<span class="source-line-no">022</span><span id="line-22">import javax.annotation.Nonnull;</span>
-<span class="source-line-no">023</span><span id="line-23">import javax.sql.DataSource;</span>
-<span class="source-line-no">024</span><span id="line-24"></span>
-<span class="source-line-no">025</span><span id="line-25">import com.google.auto.value.AutoValue;</span>
-<span class="source-line-no">026</span><span id="line-26">import com.google.common.collect.ImmutableMap;</span>
+<span class="source-line-no">022</span><span id="line-22">import javax.sql.DataSource;</span>
+<span class="source-line-no">023</span><span id="line-23"></span>
+<span class="source-line-no">024</span><span id="line-24">import com.google.auto.value.AutoValue;</span>
+<span class="source-line-no">025</span><span id="line-25">import com.google.common.collect.ImmutableMap;</span>
+<span class="source-line-no">026</span><span id="line-26">import edu.umd.cs.findbugs.annotations.NonNull;</span>
 <span class="source-line-no">027</span><span id="line-27"></span>
 <span class="source-line-no">028</span><span id="line-28">/**</span>
 <span class="source-line-no">029</span><span id="line-29"> * Information about a database located on a PostgreSQL server connected to an {@link EmbeddedPostgres} instance.</span>
@@ -64,7 +64,7 @@
 <span class="source-line-no">051</span><span id="line-51">     *</span>
 <span class="source-line-no">052</span><span id="line-52">     * @return Name of the database. Is never null.</span>
 <span class="source-line-no">053</span><span id="line-53">     */</span>
-<span class="source-line-no">054</span><span id="line-54">    @Nonnull</span>
+<span class="source-line-no">054</span><span id="line-54">    @NonNull</span>
 <span class="source-line-no">055</span><span id="line-55">    public abstract String dbName();</span>
 <span class="source-line-no">056</span><span id="line-56"></span>
 <span class="source-line-no">057</span><span id="line-57">    /**</span>
@@ -79,7 +79,7 @@
 <span class="source-line-no">066</span><span id="line-66">     *</span>
 <span class="source-line-no">067</span><span id="line-67">     * @return The user name. Is never null.</span>
 <span class="source-line-no">068</span><span id="line-68">     */</span>
-<span class="source-line-no">069</span><span id="line-69">    @Nonnull</span>
+<span class="source-line-no">069</span><span id="line-69">    @NonNull</span>
 <span class="source-line-no">070</span><span id="line-70">    public abstract String user();</span>
 <span class="source-line-no">071</span><span id="line-71"></span>
 <span class="source-line-no">072</span><span id="line-72">    /**</span>
@@ -105,56 +105,57 @@
 <span class="source-line-no">092</span><span id="line-92"></span>
 <span class="source-line-no">093</span><span id="line-93">    /**</span>
 <span class="source-line-no">094</span><span id="line-94">     * Returns a JDBC url to connect to the described database.</span>
-<span class="source-line-no">095</span><span id="line-95">     * @return A JDBC url that can be used to connect to the database. Never null.</span>
-<span class="source-line-no">096</span><span id="line-96">     */</span>
-<span class="source-line-no">097</span><span id="line-97">    @Nonnull</span>
-<span class="source-line-no">098</span><span id="line-98">    public String asJdbcUrl() {</span>
-<span class="source-line-no">099</span><span id="line-99">        checkState(exception().isEmpty(), "DatabaseInfo contains SQLException: %s", exception());</span>
-<span class="source-line-no">100</span><span id="line-100"></span>
-<span class="source-line-no">101</span><span id="line-101">        String additionalParameters = connectionProperties().entrySet().stream()</span>
-<span class="source-line-no">102</span><span id="line-102">                .map(e -&gt; format("&amp;%s=%s", e.getKey(), e.getValue()))</span>
-<span class="source-line-no">103</span><span id="line-103">                .collect(Collectors.joining());</span>
-<span class="source-line-no">104</span><span id="line-104">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
-<span class="source-line-no">105</span><span id="line-105">    }</span>
-<span class="source-line-no">106</span><span id="line-106"></span>
-<span class="source-line-no">107</span><span id="line-107">    /**</span>
-<span class="source-line-no">108</span><span id="line-108">     * Returns a {@link DataSource} instance connected to the described database.</span>
-<span class="source-line-no">109</span><span id="line-109">     *</span>
-<span class="source-line-no">110</span><span id="line-110">     * @return An initialized {@link DataSource} object. Never null.</span>
-<span class="source-line-no">111</span><span id="line-111">     * @throws SQLException A problem occured trying to connect to the database.</span>
-<span class="source-line-no">112</span><span id="line-112">     */</span>
-<span class="source-line-no">113</span><span id="line-113">    public DataSource asDataSource() throws SQLException {</span>
-<span class="source-line-no">114</span><span id="line-114">        if (exception().isPresent()) {</span>
-<span class="source-line-no">115</span><span id="line-115">            throw exception().get();</span>
-<span class="source-line-no">116</span><span id="line-116">        }</span>
-<span class="source-line-no">117</span><span id="line-117"></span>
-<span class="source-line-no">118</span><span id="line-118">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
-<span class="source-line-no">119</span><span id="line-119">    }</span>
-<span class="source-line-no">120</span><span id="line-120"></span>
-<span class="source-line-no">121</span><span id="line-121">    @AutoValue.Builder</span>
-<span class="source-line-no">122</span><span id="line-122">    abstract static class Builder {</span>
-<span class="source-line-no">123</span><span id="line-123"></span>
-<span class="source-line-no">124</span><span id="line-124">        abstract Builder dbName(String dbName);</span>
-<span class="source-line-no">125</span><span id="line-125"></span>
-<span class="source-line-no">126</span><span id="line-126">        abstract Builder port(int port);</span>
-<span class="source-line-no">127</span><span id="line-127"></span>
-<span class="source-line-no">128</span><span id="line-128">        abstract Builder user(String user);</span>
-<span class="source-line-no">129</span><span id="line-129"></span>
-<span class="source-line-no">130</span><span id="line-130">        abstract Builder exception(SQLException exception);</span>
-<span class="source-line-no">131</span><span id="line-131"></span>
-<span class="source-line-no">132</span><span id="line-132">        abstract ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder();</span>
-<span class="source-line-no">133</span><span id="line-133"></span>
-<span class="source-line-no">134</span><span id="line-134">        final Builder addConnectionProperty(String key, String value) {</span>
-<span class="source-line-no">135</span><span id="line-135">            connectionPropertiesBuilder().put(key, value);</span>
-<span class="source-line-no">136</span><span id="line-136">            return this;</span>
-<span class="source-line-no">137</span><span id="line-137">        }</span>
-<span class="source-line-no">138</span><span id="line-138"></span>
-<span class="source-line-no">139</span><span id="line-139">        abstract Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties);</span>
-<span class="source-line-no">140</span><span id="line-140"></span>
-<span class="source-line-no">141</span><span id="line-141">        abstract DatabaseInfo build();</span>
-<span class="source-line-no">142</span><span id="line-142"></span>
-<span class="source-line-no">143</span><span id="line-143">    }</span>
-<span class="source-line-no">144</span><span id="line-144">}</span>
+<span class="source-line-no">095</span><span id="line-95">     *</span>
+<span class="source-line-no">096</span><span id="line-96">     * @return A JDBC url that can be used to connect to the database. Never null.</span>
+<span class="source-line-no">097</span><span id="line-97">     */</span>
+<span class="source-line-no">098</span><span id="line-98">    @NonNull</span>
+<span class="source-line-no">099</span><span id="line-99">    public String asJdbcUrl() {</span>
+<span class="source-line-no">100</span><span id="line-100">        checkState(exception().isEmpty(), "DatabaseInfo contains SQLException: %s", exception());</span>
+<span class="source-line-no">101</span><span id="line-101"></span>
+<span class="source-line-no">102</span><span id="line-102">        String additionalParameters = connectionProperties().entrySet().stream()</span>
+<span class="source-line-no">103</span><span id="line-103">                .map(e -&gt; format("&amp;%s=%s", e.getKey(), e.getValue()))</span>
+<span class="source-line-no">104</span><span id="line-104">                .collect(Collectors.joining());</span>
+<span class="source-line-no">105</span><span id="line-105">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
+<span class="source-line-no">106</span><span id="line-106">    }</span>
+<span class="source-line-no">107</span><span id="line-107"></span>
+<span class="source-line-no">108</span><span id="line-108">    /**</span>
+<span class="source-line-no">109</span><span id="line-109">     * Returns a {@link DataSource} instance connected to the described database.</span>
+<span class="source-line-no">110</span><span id="line-110">     *</span>
+<span class="source-line-no">111</span><span id="line-111">     * @return An initialized {@link DataSource} object. Never null.</span>
+<span class="source-line-no">112</span><span id="line-112">     * @throws SQLException A problem occured trying to connect to the database.</span>
+<span class="source-line-no">113</span><span id="line-113">     */</span>
+<span class="source-line-no">114</span><span id="line-114">    public DataSource asDataSource() throws SQLException {</span>
+<span class="source-line-no">115</span><span id="line-115">        if (exception().isPresent()) {</span>
+<span class="source-line-no">116</span><span id="line-116">            throw exception().get();</span>
+<span class="source-line-no">117</span><span id="line-117">        }</span>
+<span class="source-line-no">118</span><span id="line-118"></span>
+<span class="source-line-no">119</span><span id="line-119">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
+<span class="source-line-no">120</span><span id="line-120">    }</span>
+<span class="source-line-no">121</span><span id="line-121"></span>
+<span class="source-line-no">122</span><span id="line-122">    @AutoValue.Builder</span>
+<span class="source-line-no">123</span><span id="line-123">    abstract static class Builder {</span>
+<span class="source-line-no">124</span><span id="line-124"></span>
+<span class="source-line-no">125</span><span id="line-125">        abstract Builder dbName(String dbName);</span>
+<span class="source-line-no">126</span><span id="line-126"></span>
+<span class="source-line-no">127</span><span id="line-127">        abstract Builder port(int port);</span>
+<span class="source-line-no">128</span><span id="line-128"></span>
+<span class="source-line-no">129</span><span id="line-129">        abstract Builder user(String user);</span>
+<span class="source-line-no">130</span><span id="line-130"></span>
+<span class="source-line-no">131</span><span id="line-131">        abstract Builder exception(SQLException exception);</span>
+<span class="source-line-no">132</span><span id="line-132"></span>
+<span class="source-line-no">133</span><span id="line-133">        abstract ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder();</span>
+<span class="source-line-no">134</span><span id="line-134"></span>
+<span class="source-line-no">135</span><span id="line-135">        final Builder addConnectionProperty(String key, String value) {</span>
+<span class="source-line-no">136</span><span id="line-136">            connectionPropertiesBuilder().put(key, value);</span>
+<span class="source-line-no">137</span><span id="line-137">            return this;</span>
+<span class="source-line-no">138</span><span id="line-138">        }</span>
+<span class="source-line-no">139</span><span id="line-139"></span>
+<span class="source-line-no">140</span><span id="line-140">        abstract Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties);</span>
+<span class="source-line-no">141</span><span id="line-141"></span>
+<span class="source-line-no">142</span><span id="line-142">        abstract DatabaseInfo build();</span>
+<span class="source-line-no">143</span><span id="line-143"></span>
+<span class="source-line-no">144</span><span id="line-144">    }</span>
+<span class="source-line-no">145</span><span id="line-145">}</span>
 
 
 

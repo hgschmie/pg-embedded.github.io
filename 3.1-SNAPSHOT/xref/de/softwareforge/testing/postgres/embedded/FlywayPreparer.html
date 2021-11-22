@@ -24,10 +24,10 @@
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> com.google.common.base.Preconditions.checkNotNull;
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> java.util.function.Consumer;
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> javax.annotation.Nonnull;
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> javax.sql.DataSource;
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>  
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.ImmutableList;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> javax.sql.DataSource;
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.ImmutableList;
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> edu.umd.cs.findbugs.annotations.NonNull;
 <a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> org.flywaydb.core.Flyway;
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.flywaydb.core.api.configuration.FluentConfiguration;
 <a class="jxr_linenumber" name="L25" href="#L25">25</a>  
@@ -69,7 +69,7 @@
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>  <em class="jxr_javadoccomment">     * @param customizer A {@link Consumer&lt;FluentConfiguration&gt;} instance. Must not be null.</em>
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>  <em class="jxr_javadoccomment">     * @return This object.</em>
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>      <strong class="jxr_keyword">public</strong> <a name="FlywayPreparer" href="../../../../../de/softwareforge/testing/postgres/embedded/FlywayPreparer.html#FlywayPreparer">FlywayPreparer</a> addCustomizer(Consumer&lt;FluentConfiguration&gt; customizer) {
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>      <strong class="jxr_keyword">public</strong> <a name="FlywayPreparer" href="../../../../../de/softwareforge/testing/postgres/embedded/FlywayPreparer.html#FlywayPreparer">FlywayPreparer</a> addCustomizer(@NonNull Consumer&lt;FluentConfiguration&gt; customizer) {
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>          checkNotNull(customizer, <span class="jxr_string">"customizer is null"</span>);
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>          customizers.add(customizer);
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>  
@@ -80,12 +80,12 @@
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>  <em class="jxr_javadoccomment">     * @deprecated Use {@link #addCustomizer(Consumer)}.</em>
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>  <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>      @Deprecated
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>      <strong class="jxr_keyword">public</strong> <a name="FlywayPreparer" href="../../../../../de/softwareforge/testing/postgres/embedded/FlywayPreparer.html#FlywayPreparer">FlywayPreparer</a> customize(Consumer&lt;FluentConfiguration&gt; customizer) {
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>      <strong class="jxr_keyword">public</strong> <a name="FlywayPreparer" href="../../../../../de/softwareforge/testing/postgres/embedded/FlywayPreparer.html#FlywayPreparer">FlywayPreparer</a> customize(@NonNull Consumer&lt;FluentConfiguration&gt; customizer) {
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>          <strong class="jxr_keyword">return</strong> addCustomizer(customizer);
 <a class="jxr_linenumber" name="L77" href="#L77">77</a>      }
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>  
 <a class="jxr_linenumber" name="L79" href="#L79">79</a>      @Override
-<a class="jxr_linenumber" name="L80" href="#L80">80</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> prepare(@Nonnull DataSource dataSource) {
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> prepare(@NonNull DataSource dataSource) {
 <a class="jxr_linenumber" name="L81" href="#L81">81</a>          checkNotNull(dataSource, <span class="jxr_string">"dataSource is null"</span>);
 <a class="jxr_linenumber" name="L82" href="#L82">82</a>  
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>          <strong class="jxr_keyword">final</strong> FluentConfiguration config = Flyway.configure();

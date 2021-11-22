@@ -36,11 +36,11 @@
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> java.util.concurrent.SynchronousQueue;
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> java.util.concurrent.atomic.AtomicBoolean;
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> java.util.function.Supplier;
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> javax.annotation.Nonnull;
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> javax.sql.DataSource;
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.ImmutableSet;
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> com.google.common.util.concurrent.ThreadFactoryBuilder;
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> javax.sql.DataSource;
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.ImmutableSet;
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> com.google.common.util.concurrent.ThreadFactoryBuilder;
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> edu.umd.cs.findbugs.annotations.NonNull;
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> org.slf4j.Logger;
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>  <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>  <em class="jxr_javadoccomment">     * @return A builder instance.</em>
 <a class="jxr_linenumber" name="L71" href="#L71">71</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>      @Nonnull
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>      @NonNull
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Builder&lt;DatabaseManager&gt; multiDatabases() {
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> DatabaseManagerBuilder(<strong class="jxr_keyword">true</strong>);
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>      }
@@ -87,7 +87,7 @@
 <a class="jxr_linenumber" name="L79" href="#L79">79</a>  <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L80" href="#L80">80</a>  <em class="jxr_javadoccomment">     * @return A builder instance.</em>
 <a class="jxr_linenumber" name="L81" href="#L81">81</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L82" href="#L82">82</a>      @Nonnull
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>      @NonNull
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Builder&lt;DatabaseManager&gt; singleDatabase() {
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> DatabaseManagerBuilder(false);
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>      }
@@ -99,7 +99,7 @@
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>  <em class="jxr_javadoccomment">     * @throws IOException  The server could not be started.</em>
 <a class="jxr_linenumber" name="L92" href="#L92">92</a>  <em class="jxr_javadoccomment">     * @throws SQLException A SQL problem occured while trying to initialize the database.</em>
 <a class="jxr_linenumber" name="L93" href="#L93">93</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L94" href="#L94">94</a>      @Nonnull
+<a class="jxr_linenumber" name="L94" href="#L94">94</a>      @NonNull
 <a class="jxr_linenumber" name="L95" href="#L95">95</a>      <strong class="jxr_keyword">public</strong> <a name="DatabaseManager" href="../../../../../de/softwareforge/testing/postgres/embedded/DatabaseManager.html#DatabaseManager">DatabaseManager</a> start() <strong class="jxr_keyword">throws</strong> IOException, SQLException {
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>          <strong class="jxr_keyword">if</strong> (!started.getAndSet(<strong class="jxr_keyword">true</strong>)) {
 <a class="jxr_linenumber" name="L97" href="#L97">97</a>  
@@ -154,7 +154,7 @@
 <a class="jxr_linenumber" name="L146" href="#L146">146</a> <em class="jxr_javadoccomment">     * @return A {@link DatabaseInfo} instance. This is never null.</em>
 <a class="jxr_linenumber" name="L147" href="#L147">147</a> <em class="jxr_javadoccomment">     * @throws SQLException Any error that happened during the database creation is thrown here.</em>
 <a class="jxr_linenumber" name="L148" href="#L148">148</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L149" href="#L149">149</a>     @Nonnull
+<a class="jxr_linenumber" name="L149" href="#L149">149</a>     @NonNull
 <a class="jxr_linenumber" name="L150" href="#L150">150</a>     <strong class="jxr_keyword">public</strong> <a name="DatabaseInfo" href="../../../../../de/softwareforge/testing/postgres/embedded/DatabaseInfo.html#DatabaseInfo">DatabaseInfo</a> getDatabaseInfo() <strong class="jxr_keyword">throws</strong> SQLException {
 <a class="jxr_linenumber" name="L151" href="#L151">151</a>         checkState(started.get(), <span class="jxr_string">"not yet started!"</span>);
 <a class="jxr_linenumber" name="L152" href="#L152">152</a> 
@@ -171,7 +171,7 @@
 <a class="jxr_linenumber" name="L163" href="#L163">163</a> <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L164" href="#L164">164</a> <em class="jxr_javadoccomment">     * @return An {@link EmbeddedPostgres} instance. Never null.</em>
 <a class="jxr_linenumber" name="L165" href="#L165">165</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L166" href="#L166">166</a>     @Nonnull
+<a class="jxr_linenumber" name="L166" href="#L166">166</a>     @NonNull
 <a class="jxr_linenumber" name="L167" href="#L167">167</a>     <strong class="jxr_keyword">public</strong> <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a> getEmbeddedPostgres() {
 <a class="jxr_linenumber" name="L168" href="#L168">168</a>         checkState(started.get(), <span class="jxr_string">"not yet started!"</span>);
 <a class="jxr_linenumber" name="L169" href="#L169">169</a>         <strong class="jxr_keyword">return</strong> pg;
@@ -288,7 +288,7 @@
 <a class="jxr_linenumber" name="L280" href="#L280">280</a> <em class="jxr_javadoccomment">         * @deprecated Use {@link #withDataSourcePreparer(EmbeddedPostgresPreparer)}.</em>
 <a class="jxr_linenumber" name="L281" href="#L281">281</a> <em class="jxr_javadoccomment">         */</em>
 <a class="jxr_linenumber" name="L282" href="#L282">282</a>         @Deprecated
-<a class="jxr_linenumber" name="L283" href="#L283">283</a>         @Nonnull
+<a class="jxr_linenumber" name="L283" href="#L283">283</a>         @NonNull
 <a class="jxr_linenumber" name="L284" href="#L284">284</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withPreparer(<a name="DatabasePreparer" href="../../../../../de/softwareforge/testing/postgres/embedded/DatabasePreparer.html#DatabasePreparer">DatabasePreparer</a> databasePreparer) {
 <a class="jxr_linenumber" name="L285" href="#L285">285</a>             checkNotNull(databasePreparer, <span class="jxr_string">"databasePreparer is null"</span>);
 <a class="jxr_linenumber" name="L286" href="#L286">286</a>             <strong class="jxr_keyword">return</strong> withDataSourcePreparer(databasePreparer::prepare);
@@ -300,8 +300,8 @@
 <a class="jxr_linenumber" name="L292" href="#L292">292</a> <em class="jxr_javadoccomment">         * @param dataSourcePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.</em>
 <a class="jxr_linenumber" name="L293" href="#L293">293</a> <em class="jxr_javadoccomment">         * @return This object instance.</em>
 <a class="jxr_linenumber" name="L294" href="#L294">294</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L295" href="#L295">295</a>         @Nonnull
-<a class="jxr_linenumber" name="L296" href="#L296">296</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withDataSourcePreparer(EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
+<a class="jxr_linenumber" name="L295" href="#L295">295</a>         @NonNull
+<a class="jxr_linenumber" name="L296" href="#L296">296</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withDataSourcePreparer(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {
 <a class="jxr_linenumber" name="L297" href="#L297">297</a>             <strong class="jxr_keyword">this</strong>.dataSourcePreparers.add(checkNotNull(dataSourcePreparer, <span class="jxr_string">"dataSourcePreparer is null"</span>));
 <a class="jxr_linenumber" name="L298" href="#L298">298</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
 <a class="jxr_linenumber" name="L299" href="#L299">299</a>         }
@@ -312,8 +312,8 @@
 <a class="jxr_linenumber" name="L304" href="#L304">304</a> <em class="jxr_javadoccomment">         * @param dataSourcePreparers A set of {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instances. Must not be null.</em>
 <a class="jxr_linenumber" name="L305" href="#L305">305</a> <em class="jxr_javadoccomment">         * @return This object instance.</em>
 <a class="jxr_linenumber" name="L306" href="#L306">306</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L307" href="#L307">307</a>         @Nonnull
-<a class="jxr_linenumber" name="L308" href="#L308">308</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withDataSourcePreparers(Set&lt;EmbeddedPostgresPreparer&lt;DataSource&gt;&gt; dataSourcePreparers) {
+<a class="jxr_linenumber" name="L307" href="#L307">307</a>         @NonNull
+<a class="jxr_linenumber" name="L308" href="#L308">308</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withDataSourcePreparers(@NonNull Set&lt;EmbeddedPostgresPreparer&lt;DataSource&gt;&gt; dataSourcePreparers) {
 <a class="jxr_linenumber" name="L309" href="#L309">309</a>             <strong class="jxr_keyword">this</strong>.dataSourcePreparers.addAll(checkNotNull(dataSourcePreparers, <span class="jxr_string">"dataSourcePreparers is null"</span>));
 <a class="jxr_linenumber" name="L310" href="#L310">310</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
 <a class="jxr_linenumber" name="L311" href="#L311">311</a>         }
@@ -325,8 +325,8 @@
 <a class="jxr_linenumber" name="L317" href="#L317">317</a> <em class="jxr_javadoccomment">         * @param instancePreparer A {@link EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;} instance. Must not be null.</em>
 <a class="jxr_linenumber" name="L318" href="#L318">318</a> <em class="jxr_javadoccomment">         * @return This object instance.</em>
 <a class="jxr_linenumber" name="L319" href="#L319">319</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L320" href="#L320">320</a>         @Nonnull
-<a class="jxr_linenumber" name="L321" href="#L321">321</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withInstancePreparer(EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt; instancePreparer) {
+<a class="jxr_linenumber" name="L320" href="#L320">320</a>         @NonNull
+<a class="jxr_linenumber" name="L321" href="#L321">321</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withInstancePreparer(@NonNull EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt; instancePreparer) {
 <a class="jxr_linenumber" name="L322" href="#L322">322</a>             <strong class="jxr_keyword">this</strong>.instancePreparers.add(checkNotNull(instancePreparer, <span class="jxr_string">"instancePreparer is null"</span>));
 <a class="jxr_linenumber" name="L323" href="#L323">323</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
 <a class="jxr_linenumber" name="L324" href="#L324">324</a>         }
@@ -335,8 +335,8 @@
 <a class="jxr_linenumber" name="L327" href="#L327">327</a> <em class="jxr_javadoccomment">         * @deprecated Use {@link #withInstancePreparer(EmbeddedPostgresPreparer)}.</em>
 <a class="jxr_linenumber" name="L328" href="#L328">328</a> <em class="jxr_javadoccomment">         */</em>
 <a class="jxr_linenumber" name="L329" href="#L329">329</a>         @Deprecated
-<a class="jxr_linenumber" name="L330" href="#L330">330</a>         @Nonnull
-<a class="jxr_linenumber" name="L331" href="#L331">331</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withCustomizer(EmbeddedPostgres.BuilderCustomizer customizer) {
+<a class="jxr_linenumber" name="L330" href="#L330">330</a>         @NonNull
+<a class="jxr_linenumber" name="L331" href="#L331">331</a>         <strong class="jxr_keyword">public</strong> Builder&lt;T&gt; withCustomizer(@NonNull EmbeddedPostgres.BuilderCustomizer customizer) {
 <a class="jxr_linenumber" name="L332" href="#L332">332</a>             checkNotNull(customizer, <span class="jxr_string">"customizer is null"</span>);
 <a class="jxr_linenumber" name="L333" href="#L333">333</a>             <strong class="jxr_keyword">this</strong>.instancePreparers.add(customizer::customize);
 <a class="jxr_linenumber" name="L334" href="#L334">334</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
@@ -371,7 +371,7 @@
 <a class="jxr_linenumber" name="L363" href="#L363">363</a> <em class="jxr_javadoccomment">         * @return A database manager. Never null.</em>
 <a class="jxr_linenumber" name="L364" href="#L364">364</a> <em class="jxr_javadoccomment">         */</em>
 <a class="jxr_linenumber" name="L365" href="#L365">365</a>         @Override
-<a class="jxr_linenumber" name="L366" href="#L366">366</a>         @Nonnull
+<a class="jxr_linenumber" name="L366" href="#L366">366</a>         @NonNull
 <a class="jxr_linenumber" name="L367" href="#L367">367</a>         <strong class="jxr_keyword">public</strong> <a name="DatabaseManager" href="../../../../../de/softwareforge/testing/postgres/embedded/DatabaseManager.html#DatabaseManager">DatabaseManager</a> build() {
 <a class="jxr_linenumber" name="L368" href="#L368">368</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a name="DatabaseManager" href="../../../../../de/softwareforge/testing/postgres/embedded/DatabaseManager.html#DatabaseManager">DatabaseManager</a>(dataSourcePreparers.build(), instancePreparers.build(), multiMode);
 <a class="jxr_linenumber" name="L369" href="#L369">369</a>         }

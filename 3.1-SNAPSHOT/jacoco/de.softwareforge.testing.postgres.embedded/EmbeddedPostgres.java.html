@@ -46,7 +46,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.Nullable;
 import javax.sql.DataSource;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -55,6 +54,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.Logger;
@@ -65,15 +66,20 @@ import org.slf4j.LoggerFactory;
  */
 public final class EmbeddedPostgres implements AutoCloseable {
 
-<span class="fc" id="L68">    static final String[] LOCALHOST_SERVER_NAMES = new String[]{&quot;localhost&quot;};</span>
+    /**
+     * The version of postgres used if no more specific version has been given.
+     */
+<span class="fc" id="L72">    public static final String POSTGRES_VERSION = System.getProperty(&quot;pg-embedded.postgres-version&quot;, &quot;13&quot;);</span>
+
+<span class="fc" id="L74">    static final String[] LOCALHOST_SERVER_NAMES = new String[]{&quot;localhost&quot;};</span>
 
     private static final String PG_TEMPLATE_DB = &quot;template1&quot;;
 
     @VisibleForTesting
-<span class="fc" id="L73">    static final Duration DEFAULT_PG_STARTUP_WAIT = Duration.ofSeconds(10);</span>
+<span class="fc" id="L79">    static final Duration DEFAULT_PG_STARTUP_WAIT = Duration.ofSeconds(10);</span>
 
     // folders need to be at least 10 minutes old to be considered for deletion.
-<span class="fc" id="L76">    private static final long MINIMUM_AGE_IN_MS = Duration.ofMinutes(10).toMillis();</span>
+<span class="fc" id="L82">    private static final long MINIMUM_AGE_IN_MS = Duration.ofMinutes(10).toMillis();</span>
 
     // prefix for data folders in the parent that might be deleted
     private static final String DATA_DIRECTORY_PREFIX = &quot;epd-&quot;;
@@ -90,8 +96,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
 
     private final Duration serverStartupWait;
     private final int port;
-<span class="fc" id="L93">    private final AtomicBoolean started = new AtomicBoolean();</span>
-<span class="fc" id="L94">    private final AtomicBoolean closed = new AtomicBoolean();</span>
+<span class="fc" id="L99">    private final AtomicBoolean started = new AtomicBoolean();</span>
+<span class="fc" id="L100">    private final AtomicBoolean closed = new AtomicBoolean();</span>
 
     private final ImmutableMap&lt;String, String&gt; serverConfiguration;
     private final ImmutableMap&lt;String, String&gt; localeConfiguration;
@@ -111,21 +117,21 @@ public final class EmbeddedPostgres implements AutoCloseable {
      * Returns an instance that has been started and configured. The {@link Builder#withDefaults()} configuration has been applied.
      */
     public static EmbeddedPostgres defaultInstance() throws IOException {
-<span class="fc" id="L114">        return builderWithDefaults().build();</span>
+<span class="fc" id="L120">        return builderWithDefaults().build();</span>
     }
 
     /**
      * Returns a builder with default {@link Builder#withDefaults()} configuration already applied.
      */
     public static EmbeddedPostgres.Builder builderWithDefaults() {
-<span class="fc" id="L121">        return new Builder().withDefaults();</span>
+<span class="fc" id="L127">        return new Builder().withDefaults();</span>
     }
 
     /**
      * Returns a new {@link Builder}.
      */
     public static EmbeddedPostgres.Builder builder() {
-<span class="fc" id="L128">        return new Builder();</span>
+<span class="fc" id="L134">        return new Builder();</span>
     }
 
     private EmbeddedPostgres(
@@ -139,56 +145,51 @@ public final class EmbeddedPostgres implements AutoCloseable {
             final int port,
             final ProcessBuilder.Redirect errorRedirector,
             final ProcessBuilder.Redirect outputRedirector,
-<span class="fc" id="L142">            final Duration serverStartupWait) {</span>
+<span class="fc" id="L148">            final Duration serverStartupWait) {</span>
 
-<span class="fc" id="L144">        this.instanceId = checkNotNull(instanceId, &quot;instanceId is null&quot;);</span>
+<span class="fc" id="L150">        this.instanceId = checkNotNull(instanceId, &quot;instanceId is null&quot;);</span>
 
-<span class="fc" id="L146">        this.logger = LoggerFactory.getLogger(toString());</span>
+<span class="fc" id="L152">        this.logger = LoggerFactory.getLogger(toString());</span>
 
-<span class="fc" id="L148">        this.postgresInstallDirectory = checkNotNull(postgresInstallDirectory, &quot;postgresInstallDirectory is null&quot;);</span>
-<span class="fc" id="L149">        this.dataDirectory = checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
+<span class="fc" id="L154">        this.postgresInstallDirectory = checkNotNull(postgresInstallDirectory, &quot;postgresInstallDirectory is null&quot;);</span>
+<span class="fc" id="L155">        this.dataDirectory = checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
 
-<span class="fc" id="L151">        this.removeDataOnShutdown = removeDataOnShutdown;</span>
+<span class="fc" id="L157">        this.removeDataOnShutdown = removeDataOnShutdown;</span>
 
-<span class="fc" id="L153">        this.serverConfiguration = ImmutableMap.copyOf(checkNotNull(serverConfiguration, &quot;serverConfiguration is null&quot;));</span>
-<span class="fc" id="L154">        this.localeConfiguration = ImmutableMap.copyOf(checkNotNull(localeConfiguration, &quot;localeConfiguration is null&quot;));</span>
-<span class="fc" id="L155">        this.connectionProperties = ImmutableMap.copyOf(checkNotNull(connectionProperties, &quot;connectionProperties is null&quot;));</span>
+<span class="fc" id="L159">        this.serverConfiguration = ImmutableMap.copyOf(checkNotNull(serverConfiguration, &quot;serverConfiguration is null&quot;));</span>
+<span class="fc" id="L160">        this.localeConfiguration = ImmutableMap.copyOf(checkNotNull(localeConfiguration, &quot;localeConfiguration is null&quot;));</span>
+<span class="fc" id="L161">        this.connectionProperties = ImmutableMap.copyOf(checkNotNull(connectionProperties, &quot;connectionProperties is null&quot;));</span>
 
-<span class="fc" id="L157">        this.port = port;</span>
+<span class="fc" id="L163">        this.port = port;</span>
 
-<span class="fc" id="L159">        this.errorRedirector = checkNotNull(errorRedirector, &quot;errorRedirector is null&quot;);</span>
-<span class="fc" id="L160">        this.outputRedirector = checkNotNull(outputRedirector, &quot;outputRedirector is null&quot;);</span>
+<span class="fc" id="L165">        this.errorRedirector = checkNotNull(errorRedirector, &quot;errorRedirector is null&quot;);</span>
+<span class="fc" id="L166">        this.outputRedirector = checkNotNull(outputRedirector, &quot;outputRedirector is null&quot;);</span>
 
-<span class="fc" id="L162">        this.serverStartupWait = checkNotNull(serverStartupWait, &quot;serverStartupWait is null&quot;);</span>
-<span class="fc" id="L163">        this.lockFile = new File(this.dataDirectory, LOCK_FILE_NAME);</span>
+<span class="fc" id="L168">        this.serverStartupWait = checkNotNull(serverStartupWait, &quot;serverStartupWait is null&quot;);</span>
+<span class="fc" id="L169">        this.lockFile = new File(this.dataDirectory, LOCK_FILE_NAME);</span>
 
-<span class="fc" id="L165">        logger.debug(format(&quot;data dir is %s, install dir is %s&quot;, this.dataDirectory, this.postgresInstallDirectory));</span>
-<span class="fc" id="L166">    }</span>
-
-    /**
-     * Creates a {@link DatabaseInfo} object describing the default database (the &lt;pre&gt;postgres&lt;/pre&gt; database).
-     *
-     * @return @ {@link DatabaseInfo} instance that describes the default database.
-     */
-    public DatabaseInfo createDefaultDatabaseInfo() {
-<span class="fc" id="L174">        return DatabaseInfo.builder().port(getPort()).connectionProperties(this.connectionProperties).build();</span>
-    }
+<span class="fc" id="L171">        logger.debug(format(&quot;data dir is %s, install dir is %s&quot;, this.dataDirectory, this.postgresInstallDirectory));</span>
+<span class="fc" id="L172">    }</span>
 
     /**
-     * Creates a {@link DataSource} object that connects to the standard system database (normally &lt;pre&gt;template1&lt;/pre&gt;).
+     * Creates a {@link DataSource} object that connects to the standard system database.
+     * &lt;p&gt;
+     * The standard system database is the &lt;pre&gt;template1&lt;/pre&gt; database.
      * &lt;p&gt;
      * Any modification to this database will be propagated to any new database that is created with &lt;pre&gt;CREATE DATABASE...&lt;/pre&gt; unless another database is
      * explicitly named as the template..
      */
     public DataSource createTemplateDataSource() throws SQLException {
-<span class="fc" id="L184">        return createDataSource(PG_DEFAULT_USER, PG_TEMPLATE_DB, getPort(), this.connectionProperties);</span>
+<span class="fc" id="L183">        return createDataSource(PG_DEFAULT_USER, PG_TEMPLATE_DB, getPort(), getConnectionProperties());</span>
     }
 
     /**
-     * Creates a {@link DataSource} object that connects to the default database (&lt;pre&gt;postgres&lt;/pre&gt;).
+     * Creates a {@link DataSource} object that connects to the default database.
+     * &lt;p&gt;
+     * The default database is the &lt;pre&gt;postgres&lt;/pre&gt; database.
      */
     public DataSource createDefaultDataSource() throws SQLException {
-<span class="fc" id="L191">        return createDataSource(PG_DEFAULT_USER, PG_DEFAULT_DB, getPort(), this.connectionProperties);</span>
+<span class="fc" id="L192">        return createDataSource(PG_DEFAULT_USER, PG_DEFAULT_DB, getPort(), getConnectionProperties());</span>
     }
 
     /**
@@ -198,40 +199,40 @@ public final class EmbeddedPostgres implements AutoCloseable {
      * EmbeddedPostgresPreparer}).
      */
     public DataSource createDataSource(String user, String databaseName) throws SQLException {
-<span class="nc" id="L201">        return createDataSource(user, databaseName, getPort(), this.connectionProperties);</span>
+<span class="nc" id="L202">        return createDataSource(user, databaseName, getPort(), getConnectionProperties());</span>
     }
 
     static DataSource createDataSource(String user, String databaseName, int port, Map&lt;String, String&gt; connectionProperties) throws SQLException {
-<span class="fc" id="L205">        checkNotNull(user, &quot;user is null&quot;);</span>
-<span class="fc" id="L206">        checkNotNull(databaseName, &quot;databaseName is null&quot;);</span>
-<span class="fc" id="L207">        checkNotNull(connectionProperties, &quot;connectionProperties is null&quot;);</span>
+<span class="fc" id="L206">        checkNotNull(user, &quot;user is null&quot;);</span>
+<span class="fc" id="L207">        checkNotNull(databaseName, &quot;databaseName is null&quot;);</span>
+<span class="fc" id="L208">        checkNotNull(connectionProperties, &quot;connectionProperties is null&quot;);</span>
 
-<span class="fc" id="L209">        final PGSimpleDataSource ds = new PGSimpleDataSource();</span>
+<span class="fc" id="L210">        final PGSimpleDataSource ds = new PGSimpleDataSource();</span>
 
-<span class="fc" id="L211">        ds.setServerNames(LOCALHOST_SERVER_NAMES);</span>
-<span class="fc" id="L212">        ds.setPortNumbers(new int[]{port});</span>
-<span class="fc" id="L213">        ds.setDatabaseName(databaseName);</span>
-<span class="fc" id="L214">        ds.setUser(user);</span>
+<span class="fc" id="L212">        ds.setServerNames(LOCALHOST_SERVER_NAMES);</span>
+<span class="fc" id="L213">        ds.setPortNumbers(new int[]{port});</span>
+<span class="fc" id="L214">        ds.setDatabaseName(databaseName);</span>
+<span class="fc" id="L215">        ds.setUser(user);</span>
 
-<span class="fc bfc" id="L216" title="All 2 branches covered.">        for (final Entry&lt;String, String&gt; entry : connectionProperties.entrySet()) {</span>
-<span class="fc" id="L217">            ds.setProperty(entry.getKey(), entry.getValue());</span>
-<span class="fc" id="L218">        }</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">        for (final Entry&lt;String, String&gt; entry : connectionProperties.entrySet()) {</span>
+<span class="fc" id="L218">            ds.setProperty(entry.getKey(), entry.getValue());</span>
+<span class="fc" id="L219">        }</span>
 
-<span class="fc" id="L220">        return ds;</span>
+<span class="fc" id="L221">        return ds;</span>
     }
 
     /**
      * Returns the network (TCP) port for the PostgreSQL server instance.
      */
     public int getPort() {
-<span class="fc" id="L227">        return port;</span>
+<span class="fc" id="L228">        return port;</span>
     }
 
     /**
      * Returns the connection properties for the PostgreSQL server instance.
      */
     ImmutableMap&lt;String, String&gt; getConnectionProperties() {
-<span class="fc" id="L234">        return connectionProperties;</span>
+<span class="fc" id="L235">        return connectionProperties;</span>
     }
 
     /**
@@ -239,190 +240,193 @@ public final class EmbeddedPostgres implements AutoCloseable {
      * PostgreSQL server instances.
      */
     public String instanceId() {
-<span class="fc" id="L242">        return instanceId;</span>
+<span class="fc" id="L243">        return instanceId;</span>
     }
 
     @Override
     public String toString() {
-<span class="fc" id="L247">        return this.getClass().getName() + &quot;$&quot; + this.instanceId;</span>
+<span class="fc" id="L248">        return this.getClass().getName() + &quot;$&quot; + this.instanceId;</span>
     }
 
     @Override
     public boolean equals(Object o) {
-<span class="nc bnc" id="L252" title="All 2 branches missed.">        if (this == o) {</span>
-<span class="nc" id="L253">            return true;</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L254">            return true;</span>
         }
-<span class="nc bnc" id="L255" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L256">            return false;</span>
+<span class="nc bnc" id="L256" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L257">            return false;</span>
         }
-<span class="nc" id="L258">        EmbeddedPostgres that = (EmbeddedPostgres) o;</span>
-<span class="nc" id="L259">        return instanceId.equals(that.instanceId);</span>
+<span class="nc" id="L259">        EmbeddedPostgres that = (EmbeddedPostgres) o;</span>
+<span class="nc" id="L260">        return instanceId.equals(that.instanceId);</span>
     }
 
     @Override
     public int hashCode() {
-<span class="nc" id="L264">        return Objects.hash(instanceId);</span>
+<span class="nc" id="L265">        return Objects.hash(instanceId);</span>
     }
 
     // internal methods
+    DatabaseInfo createDefaultDatabaseInfo() {
+<span class="fc" id="L270">        return DatabaseInfo.builder().port(getPort()).connectionProperties(getConnectionProperties()).build();</span>
+    }
 
 
     private void boot() throws IOException {
-<span class="fc" id="L271">        EmbeddedUtil.mkdirs(this.dataDirectory);</span>
+<span class="fc" id="L275">        EmbeddedUtil.mkdirs(this.dataDirectory);</span>
 
-<span class="pc bpc" id="L273" title="3 of 4 branches missed.">        if (this.removeDataOnShutdown || !new File(this.dataDirectory, &quot;postgresql.conf&quot;).exists()) {</span>
-<span class="fc" id="L274">            initDatabase();</span>
+<span class="pc bpc" id="L277" title="3 of 4 branches missed.">        if (this.removeDataOnShutdown || !new File(this.dataDirectory, &quot;postgresql.conf&quot;).exists()) {</span>
+<span class="fc" id="L278">            initDatabase();</span>
         }
 
-<span class="fc" id="L277">        lock();</span>
+<span class="fc" id="L281">        lock();</span>
 
-<span class="fc" id="L279">        startDatabase();</span>
-<span class="fc" id="L280">    }</span>
+<span class="fc" id="L283">        startDatabase();</span>
+<span class="fc" id="L284">    }</span>
 
 
     private synchronized void lock() throws IOException {
-<span class="fc" id="L284">        this.lockStream = new FileOutputStream(this.lockFile);</span>
-<span class="fc" id="L285">        this.lock = lockStream.getChannel().tryLock();</span>
-<span class="pc bpc" id="L286" title="1 of 2 branches missed.">        checkState(lock != null, &quot;could not lock %s&quot;, lockFile);</span>
-<span class="fc" id="L287">    }</span>
+<span class="fc" id="L288">        this.lockStream = new FileOutputStream(this.lockFile);</span>
+<span class="fc" id="L289">        this.lock = lockStream.getChannel().tryLock();</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">        checkState(lock != null, &quot;could not lock %s&quot;, lockFile);</span>
+<span class="fc" id="L291">    }</span>
 
     private synchronized void unlock() throws IOException {
-<span class="pc bpc" id="L290" title="1 of 2 branches missed.">        if (lock != null) {</span>
-<span class="fc" id="L291">            lock.release();</span>
+<span class="pc bpc" id="L294" title="1 of 2 branches missed.">        if (lock != null) {</span>
+<span class="fc" id="L295">            lock.release();</span>
         }
-<span class="fc" id="L293">        Closeables.close(lockStream, true);</span>
-<span class="fc" id="L294">    }</span>
+<span class="fc" id="L297">        Closeables.close(lockStream, true);</span>
+<span class="fc" id="L298">    }</span>
 
     private void initDatabase() throws IOException {
-<span class="fc" id="L297">        ImmutableList.Builder&lt;String&gt; commandBuilder = ImmutableList.builder();</span>
-<span class="fc" id="L298">        commandBuilder.add(pgBin(&quot;initdb&quot;))</span>
-<span class="fc" id="L299">                .addAll(createLocaleOptions())</span>
-<span class="fc" id="L300">                .add(&quot;-A&quot;, &quot;trust&quot;,</span>
+<span class="fc" id="L301">        ImmutableList.Builder&lt;String&gt; commandBuilder = ImmutableList.builder();</span>
+<span class="fc" id="L302">        commandBuilder.add(pgBin(&quot;initdb&quot;))</span>
+<span class="fc" id="L303">                .addAll(createLocaleOptions())</span>
+<span class="fc" id="L304">                .add(&quot;-A&quot;, &quot;trust&quot;,</span>
                         &quot;-U&quot;, PG_DEFAULT_USER,
-<span class="fc" id="L302">                        &quot;-D&quot;, this.dataDirectory.getPath(),</span>
+<span class="fc" id="L306">                        &quot;-D&quot;, this.dataDirectory.getPath(),</span>
                         &quot;-E&quot;, &quot;UTF-8&quot;);
-<span class="fc" id="L304">        final Stopwatch watch = system(commandBuilder.build());</span>
-<span class="fc" id="L305">        logger.debug(format(&quot;initdb completed in %s&quot;, formatDuration(watch.elapsed())));</span>
-<span class="fc" id="L306">    }</span>
+<span class="fc" id="L308">        final Stopwatch watch = system(commandBuilder.build());</span>
+<span class="fc" id="L309">        logger.debug(format(&quot;initdb completed in %s&quot;, formatDuration(watch.elapsed())));</span>
+<span class="fc" id="L310">    }</span>
 
     private void startDatabase() throws IOException {
-<span class="pc bpc" id="L309" title="1 of 2 branches missed.">        checkState(!started.getAndSet(true), &quot;database already started!&quot;);</span>
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">        checkState(!started.getAndSet(true), &quot;database already started!&quot;);</span>
 
-<span class="fc" id="L311">        final ImmutableList.Builder&lt;String&gt; commandBuilder = ImmutableList.builder();</span>
-<span class="fc" id="L312">        commandBuilder.add(pgBin(&quot;pg_ctl&quot;),</span>
-<span class="fc" id="L313">                &quot;-D&quot;, this.dataDirectory.getPath(),</span>
-<span class="fc" id="L314">                &quot;-o&quot;, String.join(&quot; &quot;, createInitOptions()),</span>
+<span class="fc" id="L315">        final ImmutableList.Builder&lt;String&gt; commandBuilder = ImmutableList.builder();</span>
+<span class="fc" id="L316">        commandBuilder.add(pgBin(&quot;pg_ctl&quot;),</span>
+<span class="fc" id="L317">                &quot;-D&quot;, this.dataDirectory.getPath(),</span>
+<span class="fc" id="L318">                &quot;-o&quot;, String.join(&quot; &quot;, createInitOptions()),</span>
                 &quot;start&quot;
         );
 
-<span class="fc" id="L318">        final Stopwatch watch = Stopwatch.createStarted();</span>
-<span class="fc" id="L319">        final Process postmaster = spawn(&quot;pg&quot;, commandBuilder.build());</span>
+<span class="fc" id="L322">        final Stopwatch watch = Stopwatch.createStarted();</span>
+<span class="fc" id="L323">        final Process postmaster = spawn(&quot;pg&quot;, commandBuilder.build());</span>
 
-<span class="fc" id="L321">        logger.info(format(&quot;started as pid %d on port %d&quot;, postmaster.pid(), port));</span>
-<span class="fc" id="L322">        logger.debug(format(&quot;Waiting up to %s for server startup to finish&quot;, formatDuration(serverStartupWait)));</span>
+<span class="fc" id="L325">        logger.info(format(&quot;started as pid %d on port %d&quot;, postmaster.pid(), port));</span>
+<span class="fc" id="L326">        logger.debug(format(&quot;Waiting up to %s for server startup to finish&quot;, formatDuration(serverStartupWait)));</span>
 
-<span class="fc" id="L324">        Runtime.getRuntime().addShutdownHook(newCloserThread());</span>
+<span class="fc" id="L328">        Runtime.getRuntime().addShutdownHook(newCloserThread());</span>
 
-<span class="fc" id="L326">        checkState(waitForServerStartup(), &quot;Could not start pg, interrupted?&quot;);</span>
-<span class="fc" id="L327">        logger.debug(format(&quot;startup complete in %s&quot;, formatDuration(watch.elapsed())));</span>
-<span class="fc" id="L328">    }</span>
+<span class="fc" id="L330">        checkState(waitForServerStartup(), &quot;Could not start pg, interrupted?&quot;);</span>
+<span class="fc" id="L331">        logger.debug(format(&quot;startup complete in %s&quot;, formatDuration(watch.elapsed())));</span>
+<span class="fc" id="L332">    }</span>
 
     private void stopDatabase(File dataDirectory) throws IOException {
-<span class="fc" id="L331">        final ImmutableList.Builder&lt;String&gt; commandBuilder = ImmutableList.builder();</span>
-<span class="fc" id="L332">        commandBuilder.add(pgBin(&quot;pg_ctl&quot;),</span>
-<span class="fc" id="L333">                &quot;-D&quot;, dataDirectory.getPath(),</span>
+<span class="fc" id="L335">        final ImmutableList.Builder&lt;String&gt; commandBuilder = ImmutableList.builder();</span>
+<span class="fc" id="L336">        commandBuilder.add(pgBin(&quot;pg_ctl&quot;),</span>
+<span class="fc" id="L337">                &quot;-D&quot;, dataDirectory.getPath(),</span>
                 &quot;stop&quot;,
                 &quot;-m&quot;, PG_STOP_MODE,
                 &quot;-t&quot;, PG_STOP_WAIT_SECONDS, &quot;-w&quot;);
 
-<span class="fc" id="L338">        final Stopwatch watch = system(commandBuilder.build());</span>
-<span class="fc" id="L339">        logger.debug(format(&quot;shutdown complete in %s&quot;, formatDuration(watch.elapsed())));</span>
-<span class="fc" id="L340">    }</span>
+<span class="fc" id="L342">        final Stopwatch watch = system(commandBuilder.build());</span>
+<span class="fc" id="L343">        logger.debug(format(&quot;shutdown complete in %s&quot;, formatDuration(watch.elapsed())));</span>
+<span class="fc" id="L344">    }</span>
 
     private List&lt;String&gt; createInitOptions() {
-<span class="fc" id="L343">        final ImmutableList.Builder&lt;String&gt; initOptions = ImmutableList.builder();</span>
-<span class="fc" id="L344">        initOptions.add(</span>
-<span class="fc" id="L345">                &quot;-p&quot;, Integer.toString(port),</span>
+<span class="fc" id="L347">        final ImmutableList.Builder&lt;String&gt; initOptions = ImmutableList.builder();</span>
+<span class="fc" id="L348">        initOptions.add(</span>
+<span class="fc" id="L349">                &quot;-p&quot;, Integer.toString(port),</span>
                 &quot;-F&quot;);
 
-<span class="fc" id="L348">        serverConfiguration.forEach((k, v) -&gt; {</span>
-<span class="fc" id="L349">            initOptions.add(&quot;-c&quot;);</span>
-<span class="fc" id="L350">            initOptions.add(k + &quot;=&quot; + v);</span>
-<span class="fc" id="L351">        });</span>
+<span class="fc" id="L352">        serverConfiguration.forEach((k, v) -&gt; {</span>
+<span class="fc" id="L353">            initOptions.add(&quot;-c&quot;);</span>
+<span class="fc" id="L354">            initOptions.add(k + &quot;=&quot; + v);</span>
+<span class="fc" id="L355">        });</span>
 
-<span class="fc" id="L353">        return initOptions.build();</span>
+<span class="fc" id="L357">        return initOptions.build();</span>
     }
 
     @VisibleForTesting
     List&lt;String&gt; createLocaleOptions() {
-<span class="fc" id="L358">        final ImmutableList.Builder&lt;String&gt; localeOptions = ImmutableList.builder();</span>
+<span class="fc" id="L362">        final ImmutableList.Builder&lt;String&gt; localeOptions = ImmutableList.builder();</span>
 
-<span class="fc" id="L360">        localeConfiguration.forEach((key, value) -&gt; {</span>
-<span class="fc bfc" id="L361" title="All 2 branches covered.">            if (value.length() &gt; 0) {</span>
-<span class="fc" id="L362">                localeOptions.add(&quot;--&quot; + key + &quot;=&quot; + value);</span>
+<span class="fc" id="L364">        localeConfiguration.forEach((key, value) -&gt; {</span>
+<span class="fc bfc" id="L365" title="All 2 branches covered.">            if (value.length() &gt; 0) {</span>
+<span class="fc" id="L366">                localeOptions.add(&quot;--&quot; + key + &quot;=&quot; + value);</span>
             } else {
-<span class="fc" id="L364">                localeOptions.add(&quot;--&quot; + key);</span>
+<span class="fc" id="L368">                localeOptions.add(&quot;--&quot; + key);</span>
             }
-<span class="fc" id="L366">        });</span>
-<span class="fc" id="L367">        return localeOptions.build();</span>
+<span class="fc" id="L370">        });</span>
+<span class="fc" id="L371">        return localeOptions.build();</span>
     }
 
     private boolean waitForServerStartup() throws IOException {
-<span class="fc" id="L371">        Throwable lastCause = null;</span>
-<span class="fc" id="L372">        final long start = System.nanoTime();</span>
-<span class="fc" id="L373">        final long maxWaitNs = TimeUnit.NANOSECONDS.convert(serverStartupWait.toMillis(), TimeUnit.MILLISECONDS);</span>
-<span class="pc bpc" id="L374" title="1 of 2 branches missed.">        while (System.nanoTime() - start &lt; maxWaitNs) {</span>
+<span class="fc" id="L375">        Throwable lastCause = null;</span>
+<span class="fc" id="L376">        final long start = System.nanoTime();</span>
+<span class="fc" id="L377">        final long maxWaitNs = TimeUnit.NANOSECONDS.convert(serverStartupWait.toMillis(), TimeUnit.MILLISECONDS);</span>
+<span class="pc bpc" id="L378" title="1 of 2 branches missed.">        while (System.nanoTime() - start &lt; maxWaitNs) {</span>
             try {
-<span class="fc bfc" id="L376" title="All 2 branches covered.">                if (verifyReady()) {</span>
-<span class="fc" id="L377">                    return true;</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">                if (verifyReady()) {</span>
+<span class="fc" id="L381">                    return true;</span>
                 }
-<span class="nc" id="L379">            } catch (final SQLException e) {</span>
-<span class="nc" id="L380">                lastCause = e;</span>
-<span class="nc" id="L381">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
-<span class="fc" id="L382">            }</span>
+<span class="nc" id="L383">            } catch (final SQLException e) {</span>
+<span class="nc" id="L384">                lastCause = e;</span>
+<span class="nc" id="L385">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
+<span class="fc" id="L386">            }</span>
 
             try {
-<span class="fc" id="L385">                Thread.sleep(100);</span>
-<span class="nc" id="L386">            } catch (final InterruptedException e) {</span>
-<span class="nc" id="L387">                Thread.currentThread().interrupt();</span>
-<span class="nc" id="L388">                return false;</span>
-<span class="fc" id="L389">            }</span>
+<span class="fc" id="L389">                Thread.sleep(100);</span>
+<span class="nc" id="L390">            } catch (final InterruptedException e) {</span>
+<span class="nc" id="L391">                Thread.currentThread().interrupt();</span>
+<span class="nc" id="L392">                return false;</span>
+<span class="fc" id="L393">            }</span>
         }
-<span class="nc" id="L391">        throw new IOException(&quot;Gave up waiting for server to start after &quot; + serverStartupWait.toMillis() + &quot;ms&quot;, lastCause);</span>
+<span class="nc" id="L395">        throw new IOException(&quot;Gave up waiting for server to start after &quot; + serverStartupWait.toMillis() + &quot;ms&quot;, lastCause);</span>
     }
 
     private boolean verifyReady() throws IOException, SQLException {
         // check TCP connection
-<span class="fc" id="L396">        final InetAddress localhost = InetAddress.getLoopbackAddress();</span>
-<span class="fc" id="L397">        try (Socket sock = new Socket()) {</span>
-<span class="fc" id="L398">            sock.setSoTimeout((int) Duration.ofMillis(500).toMillis());</span>
-<span class="fc" id="L399">            sock.connect(new InetSocketAddress(localhost, port), (int) Duration.ofMillis(500).toMillis());</span>
-<span class="fc" id="L400">        } catch (ConnectException e) {</span>
-<span class="fc" id="L401">            return false;</span>
-<span class="fc" id="L402">        }</span>
+<span class="fc" id="L400">        final InetAddress localhost = InetAddress.getLoopbackAddress();</span>
+<span class="fc" id="L401">        try (Socket sock = new Socket()) {</span>
+<span class="fc" id="L402">            sock.setSoTimeout((int) Duration.ofMillis(500).toMillis());</span>
+<span class="fc" id="L403">            sock.connect(new InetSocketAddress(localhost, port), (int) Duration.ofMillis(500).toMillis());</span>
+<span class="fc" id="L404">        } catch (ConnectException e) {</span>
+<span class="fc" id="L405">            return false;</span>
+<span class="fc" id="L406">        }</span>
 
         // check JDBC connection
-<span class="fc" id="L405">        try (Connection c = createDefaultDataSource().getConnection();</span>
-<span class="fc" id="L406">                Statement s = c.createStatement();</span>
-<span class="fc" id="L407">                ResultSet rs = s.executeQuery(&quot;SELECT 1&quot;)) {</span>
-<span class="fc" id="L408">            checkState(rs.next(), &quot;expecting single row&quot;);</span>
-<span class="pc bpc" id="L409" title="1 of 2 branches missed.">            checkState(rs.getInt(1) == 1, &quot;expecting 1 as result&quot;);</span>
-<span class="pc bpc" id="L410" title="1 of 2 branches missed.">            checkState(!rs.next(), &quot;expecting single row&quot;);</span>
-<span class="fc" id="L411">            return true;</span>
+<span class="fc" id="L409">        try (Connection c = createDefaultDataSource().getConnection();</span>
+<span class="fc" id="L410">                Statement s = c.createStatement();</span>
+<span class="fc" id="L411">                ResultSet rs = s.executeQuery(&quot;SELECT 1&quot;)) {</span>
+<span class="fc" id="L412">            checkState(rs.next(), &quot;expecting single row&quot;);</span>
+<span class="pc bpc" id="L413" title="1 of 2 branches missed.">            checkState(rs.getInt(1) == 1, &quot;expecting 1 as result&quot;);</span>
+<span class="pc bpc" id="L414" title="1 of 2 branches missed.">            checkState(!rs.next(), &quot;expecting single row&quot;);</span>
+<span class="fc" id="L415">            return true;</span>
         }
     }
 
     private Thread newCloserThread() {
-<span class="fc" id="L416">        final Thread closeThread = new Thread(() -&gt; {</span>
+<span class="fc" id="L420">        final Thread closeThread = new Thread(() -&gt; {</span>
             try {
-<span class="fc" id="L418">                EmbeddedPostgres.this.close();</span>
-<span class="nc" id="L419">            } catch (IOException e) {</span>
-<span class="nc" id="L420">                logger.trace(&quot;while closing instance:&quot;, e);</span>
-<span class="fc" id="L421">            }</span>
-<span class="fc" id="L422">        });</span>
+<span class="fc" id="L422">                EmbeddedPostgres.this.close();</span>
+<span class="nc" id="L423">            } catch (IOException e) {</span>
+<span class="nc" id="L424">                logger.trace(&quot;while closing instance:&quot;, e);</span>
+<span class="fc" id="L425">            }</span>
+<span class="fc" id="L426">        });</span>
 
-<span class="fc" id="L424">        closeThread.setName(&quot;pg-closer&quot;);</span>
-<span class="fc" id="L425">        return closeThread;</span>
+<span class="fc" id="L428">        closeThread.setName(&quot;pg-closer&quot;);</span>
+<span class="fc" id="L429">        return closeThread;</span>
     }
 
     /**
@@ -430,130 +434,130 @@ public final class EmbeddedPostgres implements AutoCloseable {
      */
     @Override
     public void close() throws IOException {
-<span class="fc bfc" id="L433" title="All 2 branches covered.">        if (closed.getAndSet(true)) {</span>
-<span class="fc" id="L434">            return;</span>
+<span class="fc bfc" id="L437" title="All 2 branches covered.">        if (closed.getAndSet(true)) {</span>
+<span class="fc" id="L438">            return;</span>
         }
 
         try {
-<span class="fc" id="L438">            stopDatabase(this.dataDirectory);</span>
-<span class="nc" id="L439">        } catch (final Exception e) {</span>
-<span class="nc" id="L440">            logger.error(&quot;could not stop pg:&quot;, e);</span>
-<span class="fc" id="L441">        }</span>
+<span class="fc" id="L442">            stopDatabase(this.dataDirectory);</span>
+<span class="nc" id="L443">        } catch (final Exception e) {</span>
+<span class="nc" id="L444">            logger.error(&quot;could not stop pg:&quot;, e);</span>
+<span class="fc" id="L445">        }</span>
 
-<span class="fc" id="L443">        unlock();</span>
+<span class="fc" id="L447">        unlock();</span>
 
-<span class="pc bpc" id="L445" title="1 of 2 branches missed.">        if (removeDataOnShutdown) {</span>
+<span class="pc bpc" id="L449" title="1 of 2 branches missed.">        if (removeDataOnShutdown) {</span>
             try {
-<span class="fc" id="L447">                EmbeddedUtil.rmdirs(dataDirectory);</span>
-<span class="nc" id="L448">            } catch (Exception e) {</span>
-<span class="nc" id="L449">                logger.error(format(&quot;Could not clean up directory %s:&quot;, dataDirectory.getAbsolutePath()), e);</span>
-<span class="pc" id="L450">            }</span>
+<span class="fc" id="L451">                EmbeddedUtil.rmdirs(dataDirectory);</span>
+<span class="nc" id="L452">            } catch (Exception e) {</span>
+<span class="nc" id="L453">                logger.error(format(&quot;Could not clean up directory %s:&quot;, dataDirectory.getAbsolutePath()), e);</span>
+<span class="pc" id="L454">            }</span>
         } else {
-<span class="nc" id="L452">            logger.debug(format(&quot;preserved data directory %s&quot;, dataDirectory.getAbsolutePath()));</span>
+<span class="nc" id="L456">            logger.debug(format(&quot;preserved data directory %s&quot;, dataDirectory.getAbsolutePath()));</span>
         }
-<span class="fc" id="L454">    }</span>
+<span class="fc" id="L458">    }</span>
 
     @VisibleForTesting
     File getDataDirectory() {
-<span class="fc" id="L458">        return dataDirectory;</span>
+<span class="fc" id="L462">        return dataDirectory;</span>
     }
 
     @VisibleForTesting
     Map&lt;String, String&gt; getLocaleConfiguration() {
-<span class="fc" id="L463">        return localeConfiguration;</span>
+<span class="fc" id="L467">        return localeConfiguration;</span>
     }
 
 
     @SuppressFBWarnings(&quot;RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE&quot;)
     private void cleanOldDataDirectories(File parentDirectory) {
-<span class="fc" id="L469">        final File[] children = parentDirectory.listFiles();</span>
-<span class="pc bpc" id="L470" title="1 of 2 branches missed.">        if (children == null) {</span>
-<span class="nc" id="L471">            return;</span>
+<span class="fc" id="L473">        final File[] children = parentDirectory.listFiles();</span>
+<span class="pc bpc" id="L474" title="1 of 2 branches missed.">        if (children == null) {</span>
+<span class="nc" id="L475">            return;</span>
         }
-<span class="fc bfc" id="L473" title="All 2 branches covered.">        for (final File dir : children) {</span>
-<span class="pc bpc" id="L474" title="1 of 2 branches missed.">            if (!dir.isDirectory()) {</span>
-<span class="nc" id="L475">                continue;</span>
+<span class="fc bfc" id="L477" title="All 2 branches covered.">        for (final File dir : children) {</span>
+<span class="pc bpc" id="L478" title="1 of 2 branches missed.">            if (!dir.isDirectory()) {</span>
+<span class="nc" id="L479">                continue;</span>
             }
 
             // only ever touch known data directories.
-<span class="fc bfc" id="L479" title="All 2 branches covered.">            if (!dir.getName().startsWith(DATA_DIRECTORY_PREFIX)) {</span>
-<span class="fc" id="L480">                continue;</span>
+<span class="fc bfc" id="L483" title="All 2 branches covered.">            if (!dir.getName().startsWith(DATA_DIRECTORY_PREFIX)) {</span>
+<span class="fc" id="L484">                continue;</span>
             }
 
             // only touch data directories that hold a lock file.
-<span class="fc" id="L484">            final File lockFile = new File(dir, LOCK_FILE_NAME);</span>
-<span class="fc bfc" id="L485" title="All 2 branches covered.">            if (!lockFile.exists()) {</span>
-<span class="fc" id="L486">                continue;</span>
+<span class="fc" id="L488">            final File lockFile = new File(dir, LOCK_FILE_NAME);</span>
+<span class="fc bfc" id="L489" title="All 2 branches covered.">            if (!lockFile.exists()) {</span>
+<span class="fc" id="L490">                continue;</span>
             }
 
             // file must have a minimum age. This can not be the same check as
             // the exists b/c non-existent files return 0 (epoch) as lastModified so
             // they are considered &quot;ancient&quot;.
-<span class="pc bpc" id="L492" title="1 of 2 branches missed.">            if (System.currentTimeMillis() - lockFile.lastModified() &lt; MINIMUM_AGE_IN_MS) {</span>
-<span class="fc" id="L493">                continue;</span>
+<span class="pc bpc" id="L496" title="1 of 2 branches missed.">            if (System.currentTimeMillis() - lockFile.lastModified() &lt; MINIMUM_AGE_IN_MS) {</span>
+<span class="fc" id="L497">                continue;</span>
             }
 
-<span class="nc" id="L496">            try (FileOutputStream fos = new FileOutputStream(lockFile);</span>
-<span class="nc" id="L497">                    FileLock lock = fos.getChannel().tryLock()) {</span>
-<span class="nc bnc" id="L498" title="All 2 branches missed.">                if (lock != null) {</span>
-<span class="nc" id="L499">                    logger.debug(format(&quot;found stale data directory %s&quot;, dir));</span>
-<span class="nc bnc" id="L500" title="All 2 branches missed.">                    if (new File(dir, &quot;postmaster.pid&quot;).exists()) {</span>
+<span class="nc" id="L500">            try (FileOutputStream fos = new FileOutputStream(lockFile);</span>
+<span class="nc" id="L501">                    FileLock lock = fos.getChannel().tryLock()) {</span>
+<span class="nc bnc" id="L502" title="All 2 branches missed.">                if (lock != null) {</span>
+<span class="nc" id="L503">                    logger.debug(format(&quot;found stale data directory %s&quot;, dir));</span>
+<span class="nc bnc" id="L504" title="All 2 branches missed.">                    if (new File(dir, &quot;postmaster.pid&quot;).exists()) {</span>
                         try {
-<span class="nc" id="L502">                            stopDatabase(dir);</span>
-<span class="nc" id="L503">                            logger.debug(&quot;shutting down orphaned database!&quot;);</span>
-<span class="nc" id="L504">                        } catch (Exception e) {</span>
-<span class="nc" id="L505">                            logger.warn(format(&quot;failed to orphaned database in %s:&quot;, dir), e);</span>
-<span class="nc" id="L506">                        }</span>
+<span class="nc" id="L506">                            stopDatabase(dir);</span>
+<span class="nc" id="L507">                            logger.debug(&quot;shutting down orphaned database!&quot;);</span>
+<span class="nc" id="L508">                        } catch (Exception e) {</span>
+<span class="nc" id="L509">                            logger.warn(format(&quot;failed to orphaned database in %s:&quot;, dir), e);</span>
+<span class="nc" id="L510">                        }</span>
                     }
-<span class="nc" id="L508">                    EmbeddedUtil.rmdirs(dir);</span>
+<span class="nc" id="L512">                    EmbeddedUtil.rmdirs(dir);</span>
                 }
-<span class="nc" id="L510">            } catch (final OverlappingFileLockException e) {</span>
+<span class="nc" id="L514">            } catch (final OverlappingFileLockException e) {</span>
                 // The directory belongs to another instance in this VM.
-<span class="nc" id="L512">                logger.trace(&quot;while cleaning old data directories:&quot;, e);</span>
-<span class="nc" id="L513">            } catch (final Exception e) {</span>
-<span class="nc" id="L514">                logger.warn(&quot;while cleaning old data directories:&quot;, e);</span>
-<span class="nc" id="L515">            }</span>
+<span class="nc" id="L516">                logger.trace(&quot;while cleaning old data directories:&quot;, e);</span>
+<span class="nc" id="L517">            } catch (final Exception e) {</span>
+<span class="nc" id="L518">                logger.warn(&quot;while cleaning old data directories:&quot;, e);</span>
+<span class="nc" id="L519">            }</span>
         }
-<span class="fc" id="L517">    }</span>
+<span class="fc" id="L521">    }</span>
 
     private String pgBin(String binaryName) {
-<span class="pc bpc" id="L520" title="1 of 2 branches missed.">        final String extension = EmbeddedUtil.IS_OS_WINDOWS ? &quot;.exe&quot; : &quot;&quot;;</span>
-<span class="fc" id="L521">        return new File(this.postgresInstallDirectory, &quot;bin/&quot; + binaryName + extension).getPath();</span>
+<span class="pc bpc" id="L524" title="1 of 2 branches missed.">        final String extension = EmbeddedUtil.IS_OS_WINDOWS ? &quot;.exe&quot; : &quot;&quot;;</span>
+<span class="fc" id="L525">        return new File(this.postgresInstallDirectory, &quot;bin/&quot; + binaryName + extension).getPath();</span>
     }
 
     private Process spawn(@Nullable String processName, List&lt;String&gt; commandAndArgs) throws IOException {
-<span class="fc" id="L525">        final ProcessBuilder builder = new ProcessBuilder(commandAndArgs);</span>
-<span class="fc" id="L526">        builder.redirectErrorStream(true);</span>
-<span class="fc" id="L527">        builder.redirectError(errorRedirector);</span>
-<span class="fc" id="L528">        builder.redirectOutput(outputRedirector);</span>
-<span class="fc" id="L529">        final Process process = builder.start();</span>
+<span class="fc" id="L529">        final ProcessBuilder builder = new ProcessBuilder(commandAndArgs);</span>
+<span class="fc" id="L530">        builder.redirectErrorStream(true);</span>
+<span class="fc" id="L531">        builder.redirectError(errorRedirector);</span>
+<span class="fc" id="L532">        builder.redirectOutput(outputRedirector);</span>
+<span class="fc" id="L533">        final Process process = builder.start();</span>
 
-<span class="pc bpc" id="L531" title="1 of 2 branches missed.">        processName = processName != null ? processName : process.info().command().map(EmbeddedUtil::getFileBaseName).orElse(&quot;&lt;unknown&gt;&quot;);</span>
-<span class="fc" id="L532">        String name = format(&quot;%s (%d)&quot;, processName, process.pid());</span>
+<span class="pc bpc" id="L535" title="1 of 2 branches missed.">        processName = processName != null ? processName : process.info().command().map(EmbeddedUtil::getFileBaseName).orElse(&quot;&lt;unknown&gt;&quot;);</span>
+<span class="fc" id="L536">        String name = format(&quot;%s (%d)&quot;, processName, process.pid());</span>
 
-<span class="fc" id="L534">        ProcessOutputLogger.logOutput(logger, name, process);</span>
-<span class="fc" id="L535">        return process;</span>
+<span class="fc" id="L538">        ProcessOutputLogger.logOutput(logger, name, process);</span>
+<span class="fc" id="L539">        return process;</span>
     }
 
 
     private Stopwatch system(List&lt;String&gt; commandAndArgs) throws IOException {
-<span class="pc bpc" id="L540" title="1 of 2 branches missed.">        checkArgument(commandAndArgs.size() &gt; 0, &quot;No commandAndArgs given!&quot;);</span>
-<span class="fc" id="L541">        String prefix = EmbeddedUtil.getFileBaseName(commandAndArgs.get(0));</span>
+<span class="pc bpc" id="L544" title="1 of 2 branches missed.">        checkArgument(commandAndArgs.size() &gt; 0, &quot;No commandAndArgs given!&quot;);</span>
+<span class="fc" id="L545">        String prefix = EmbeddedUtil.getFileBaseName(commandAndArgs.get(0));</span>
 
-<span class="fc" id="L543">        Stopwatch watch = Stopwatch.createStarted();</span>
-<span class="fc" id="L544">        Process process = spawn(prefix, commandAndArgs);</span>
+<span class="fc" id="L547">        Stopwatch watch = Stopwatch.createStarted();</span>
+<span class="fc" id="L548">        Process process = spawn(prefix, commandAndArgs);</span>
         try {
-<span class="pc bpc" id="L546" title="1 of 2 branches missed.">            if (process.waitFor() != 0) {</span>
-<span class="nc" id="L547">                try (InputStreamReader reader = new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8)) {</span>
-<span class="nc" id="L548">                    throw new IllegalStateException(format(&quot;Process %s failed%n%s&quot;,</span>
-<span class="nc" id="L549">                            commandAndArgs, CharStreams.toString(reader)));</span>
+<span class="pc bpc" id="L550" title="1 of 2 branches missed.">            if (process.waitFor() != 0) {</span>
+<span class="nc" id="L551">                try (InputStreamReader reader = new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8)) {</span>
+<span class="nc" id="L552">                    throw new IllegalStateException(format(&quot;Process %s failed%n%s&quot;,</span>
+<span class="nc" id="L553">                            commandAndArgs, CharStreams.toString(reader)));</span>
                 }
             }
-<span class="nc" id="L552">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L553">            Thread.currentThread().interrupt();</span>
-<span class="fc" id="L554">        }</span>
+<span class="nc" id="L556">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L557">            Thread.currentThread().interrupt();</span>
+<span class="fc" id="L558">        }</span>
 
-<span class="fc" id="L556">        return watch;</span>
+<span class="fc" id="L560">        return watch;</span>
     }
 
 
@@ -581,22 +585,22 @@ public final class EmbeddedPostgres implements AutoCloseable {
      */
     public static class Builder {
 
-<span class="fc" id="L584">        private File installationBaseDirectory = null;</span>
-<span class="fc" id="L585">        private File dataDirectory = null;</span>
+<span class="fc" id="L588">        private File installationBaseDirectory = null;</span>
+<span class="fc" id="L589">        private File dataDirectory = null;</span>
 
-<span class="fc" id="L587">        private final Map&lt;String, String&gt; serverConfiguration = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L588">        private final Map&lt;String, String&gt; localeConfiguration = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L589">        private boolean removeDataOnShutdown = true;</span>
-<span class="fc" id="L590">        private int port = 0;</span>
-<span class="fc" id="L591">        private final Map&lt;String, String&gt; connectionProperties = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L592">        private NativeBinaryManager nativeBinaryManager = null;</span>
-<span class="fc" id="L593">        private Duration serverStartupWait = DEFAULT_PG_STARTUP_WAIT;</span>
+<span class="fc" id="L591">        private final Map&lt;String, String&gt; serverConfiguration = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L592">        private final Map&lt;String, String&gt; localeConfiguration = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L593">        private boolean removeDataOnShutdown = true;</span>
+<span class="fc" id="L594">        private int port = 0;</span>
+<span class="fc" id="L595">        private final Map&lt;String, String&gt; connectionProperties = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L596">        private NativeBinaryManager nativeBinaryManager = null;</span>
+<span class="fc" id="L597">        private Duration serverStartupWait = DEFAULT_PG_STARTUP_WAIT;</span>
 
-<span class="fc" id="L595">        private ProcessBuilder.Redirect errRedirector = ProcessBuilder.Redirect.PIPE;</span>
-<span class="fc" id="L596">        private ProcessBuilder.Redirect outRedirector = ProcessBuilder.Redirect.PIPE;</span>
+<span class="fc" id="L599">        private ProcessBuilder.Redirect errRedirector = ProcessBuilder.Redirect.PIPE;</span>
+<span class="fc" id="L600">        private ProcessBuilder.Redirect outRedirector = ProcessBuilder.Redirect.PIPE;</span>
 
-<span class="fc" id="L598">        Builder() {</span>
-<span class="fc" id="L599">        }</span>
+<span class="fc" id="L602">        Builder() {</span>
+<span class="fc" id="L603">        }</span>
 
         /**
          * Apply a set of defaults to the database server:
@@ -609,10 +613,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @return The builder itself.
          */
         public Builder withDefaults() {
-<span class="fc" id="L612">            serverConfiguration.put(&quot;timezone&quot;, &quot;UTC&quot;);</span>
-<span class="fc" id="L613">            serverConfiguration.put(&quot;synchronous_commit&quot;, &quot;off&quot;);</span>
-<span class="fc" id="L614">            serverConfiguration.put(&quot;max_connections&quot;, &quot;300&quot;);</span>
-<span class="fc" id="L615">            return this;</span>
+<span class="fc" id="L616">            serverConfiguration.put(&quot;timezone&quot;, &quot;UTC&quot;);</span>
+<span class="fc" id="L617">            serverConfiguration.put(&quot;synchronous_commit&quot;, &quot;off&quot;);</span>
+<span class="fc" id="L618">            serverConfiguration.put(&quot;max_connections&quot;, &quot;300&quot;);</span>
+<span class="fc" id="L619">            return this;</span>
         }
 
         /**
@@ -621,12 +625,12 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @param serverStartupWait Startup wait time. Must not be null or negative.
          * @return The builder itself.
          */
-        public Builder setServerStartupWait(Duration serverStartupWait) {
-<span class="nc" id="L625">            checkNotNull(serverStartupWait, &quot;serverStartupWait is null&quot;);</span>
-<span class="nc bnc" id="L626" title="All 2 branches missed.">            checkArgument(!serverStartupWait.isNegative(), &quot;Negative durations are not permitted.&quot;);</span>
+        public Builder setServerStartupWait(@NonNull Duration serverStartupWait) {
+<span class="nc" id="L629">            checkNotNull(serverStartupWait, &quot;serverStartupWait is null&quot;);</span>
+<span class="nc bnc" id="L630" title="All 2 branches missed.">            checkArgument(!serverStartupWait.isNegative(), &quot;Negative durations are not permitted.&quot;);</span>
 
-<span class="nc" id="L628">            this.serverStartupWait = serverStartupWait;</span>
-<span class="nc" id="L629">            return this;</span>
+<span class="nc" id="L632">            this.serverStartupWait = serverStartupWait;</span>
+<span class="nc" id="L633">            return this;</span>
         }
 
         /**
@@ -637,8 +641,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @return The builder itself.
          */
         public Builder setRemoveDataOnShutdown(boolean removeDataOnShutdown) {
-<span class="nc" id="L640">            this.removeDataOnShutdown = removeDataOnShutdown;</span>
-<span class="nc" id="L641">            return this;</span>
+<span class="nc" id="L644">            this.removeDataOnShutdown = removeDataOnShutdown;</span>
+<span class="nc" id="L645">            return this;</span>
         }
 
         /**
@@ -648,9 +652,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.
          * @return The builder itself.
          */
-        public Builder setDataDirectory(Path dataDirectory) {
-<span class="fc" id="L652">            checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
-<span class="fc" id="L653">            return setDataDirectory(dataDirectory.toFile());</span>
+        public Builder setDataDirectory(@NonNull Path dataDirectory) {
+<span class="fc" id="L656">            checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
+<span class="fc" id="L657">            return setDataDirectory(dataDirectory.toFile());</span>
         }
 
         /**
@@ -660,9 +664,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.
          * @return The builder itself.
          */
-        public Builder setDataDirectory(String dataDirectory) {
-<span class="nc" id="L664">            checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
-<span class="nc" id="L665">            return setDataDirectory(new File(dataDirectory));</span>
+        public Builder setDataDirectory(@NonNull String dataDirectory) {
+<span class="nc" id="L668">            checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
+<span class="nc" id="L669">            return setDataDirectory(new File(dataDirectory));</span>
         }
 
         /**
@@ -672,9 +676,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.
          * @return The builder itself.
          */
-        public Builder setDataDirectory(File dataDirectory) {
-<span class="fc" id="L676">            this.dataDirectory = checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
-<span class="fc" id="L677">            return this;</span>
+        public Builder setDataDirectory(@NonNull File dataDirectory) {
+<span class="fc" id="L680">            this.dataDirectory = checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
+<span class="fc" id="L681">            return this;</span>
         }
 
         /**
@@ -688,22 +692,22 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @param value Configuration parameter value. Must not be null.
          * @return The builder itself.
          */
-        public Builder addServerConfiguration(String key, String value) {
-<span class="fc" id="L692">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="fc" id="L693">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="fc" id="L694">            this.serverConfiguration.put(key, value);</span>
-<span class="fc" id="L695">            return this;</span>
+        public Builder addServerConfiguration(@NonNull String key, @NonNull String value) {
+<span class="fc" id="L696">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="fc" id="L697">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="fc" id="L698">            this.serverConfiguration.put(key, value);</span>
+<span class="fc" id="L699">            return this;</span>
         }
 
         /**
          * @deprecated Use {@link #addInitDbConfiguration(String, String)}.
          */
         @Deprecated
-        public Builder addLocaleConfiguration(String key, String value) {
-<span class="nc" id="L703">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="nc" id="L704">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="nc" id="L705">            this.localeConfiguration.put(key, value);</span>
-<span class="nc" id="L706">            return this;</span>
+        public Builder addLocaleConfiguration(@NonNull String key, @NonNull String value) {
+<span class="nc" id="L707">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="nc" id="L708">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="nc" id="L709">            this.localeConfiguration.put(key, value);</span>
+<span class="nc" id="L710">            return this;</span>
         }
 
         /**
@@ -718,11 +722,11 @@ public final class EmbeddedPostgres implements AutoCloseable {
          *              a equal sign and a value assigned.
          * @return The builder itself.
          */
-        public Builder addInitDbConfiguration(String key, String value) {
-<span class="fc" id="L722">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="fc" id="L723">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="fc" id="L724">            this.localeConfiguration.put(key, value);</span>
-<span class="fc" id="L725">            return this;</span>
+        public Builder addInitDbConfiguration(@NonNull String key, @NonNull String value) {
+<span class="fc" id="L726">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="fc" id="L727">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="fc" id="L728">            this.localeConfiguration.put(key, value);</span>
+<span class="fc" id="L729">            return this;</span>
         }
 
         /**
@@ -734,11 +738,11 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @param value connection property value. Must not be null.
          * @return The builder itself.
          */
-        public Builder addConnectionProperty(String key, String value) {
-<span class="fc" id="L738">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="fc" id="L739">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="fc" id="L740">            this.connectionProperties.put(key, value);</span>
-<span class="fc" id="L741">            return this;</span>
+        public Builder addConnectionProperty(@NonNull String key, @NonNull String value) {
+<span class="fc" id="L742">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="fc" id="L743">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="fc" id="L744">            this.connectionProperties.put(key, value);</span>
+<span class="fc" id="L745">            return this;</span>
         }
 
         /**
@@ -750,11 +754,11 @@ public final class EmbeddedPostgres implements AutoCloseable {
          *                                  Must not be null.
          * @return The builder itself.
          */
-        public Builder setInstallationBaseDirectory(File installationBaseDirectory) {
-<span class="nc" id="L754">            checkNotNull(installationBaseDirectory, &quot;installationBaseDirectory is null&quot;);</span>
-<span class="nc" id="L755">            this.installationBaseDirectory = installationBaseDirectory;</span>
-<span class="nc" id="L756">            this.nativeBinaryManager = null;</span>
-<span class="nc" id="L757">            return this;</span>
+        public Builder setInstallationBaseDirectory(@NonNull File installationBaseDirectory) {
+<span class="nc" id="L758">            checkNotNull(installationBaseDirectory, &quot;installationBaseDirectory is null&quot;);</span>
+<span class="nc" id="L759">            this.installationBaseDirectory = installationBaseDirectory;</span>
+<span class="nc" id="L760">            this.nativeBinaryManager = null;</span>
+<span class="nc" id="L761">            return this;</span>
         }
 
         /**
@@ -765,9 +769,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @return The builder itself.
          */
         public Builder setPort(int port) {
-<span class="nc bnc" id="L768" title="All 4 branches missed.">            checkState(port &gt; 1023 &amp;&amp; port &lt; 65535, &quot;Port %s is not within 1024..65535&quot;, port);</span>
-<span class="nc" id="L769">            this.port = port;</span>
-<span class="nc" id="L770">            return this;</span>
+<span class="nc bnc" id="L772" title="All 4 branches missed.">            checkState(port &gt; 1023 &amp;&amp; port &lt; 65535, &quot;Port %s is not within 1024..65535&quot;, port);</span>
+<span class="nc" id="L773">            this.port = port;</span>
+<span class="nc" id="L774">            return this;</span>
         }
 
         /**
@@ -776,9 +780,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @param errRedirector a {@link ProcessBuilder.Redirect} instance. Must not be null.
          * @return The builder itself.
          */
-        public Builder setErrorRedirector(ProcessBuilder.Redirect errRedirector) {
-<span class="nc" id="L780">            this.errRedirector = checkNotNull(errRedirector, &quot;errRedirector is null&quot;);</span>
-<span class="nc" id="L781">            return this;</span>
+        public Builder setErrorRedirector(@NonNull ProcessBuilder.Redirect errRedirector) {
+<span class="nc" id="L784">            this.errRedirector = checkNotNull(errRedirector, &quot;errRedirector is null&quot;);</span>
+<span class="nc" id="L785">            return this;</span>
         }
 
         /**
@@ -787,9 +791,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @param outRedirector a {@link ProcessBuilder.Redirect} instance. Must not be null.
          * @return The builder itself.
          */
-        public Builder setOutputRedirector(ProcessBuilder.Redirect outRedirector) {
-<span class="nc" id="L791">            this.outRedirector = checkNotNull(outRedirector, &quot;outRedirector is null&quot;);</span>
-<span class="nc" id="L792">            return this;</span>
+        public Builder setOutputRedirector(@NonNull ProcessBuilder.Redirect outRedirector) {
+<span class="nc" id="L795">            this.outRedirector = checkNotNull(outRedirector, &quot;outRedirector is null&quot;);</span>
+<span class="nc" id="L796">            return this;</span>
         }
 
         /**
@@ -800,9 +804,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @param nativeBinaryManager A {@link NativeBinaryManager} implementation. Must not be null.
          * @return The builder itself.
          */
-        public Builder setNativeBinaryManager(NativeBinaryManager nativeBinaryManager) {
-<span class="fc" id="L804">            this.nativeBinaryManager = checkNotNull(nativeBinaryManager, &quot;nativeBinaryManager is null&quot;);</span>
-<span class="fc" id="L805">            return this;</span>
+        public Builder setNativeBinaryManager(@NonNull NativeBinaryManager nativeBinaryManager) {
+<span class="fc" id="L808">            this.nativeBinaryManager = checkNotNull(nativeBinaryManager, &quot;nativeBinaryManager is null&quot;);</span>
+<span class="fc" id="L809">            return this;</span>
         }
 
         /**
@@ -813,10 +817,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          * @param directory A local directory that contains a standard PostgreSQL installation. The directory must exist and read and executable.
          * @return The builder itself.
          */
-        public Builder useLocalPostgresInstallation(File directory) {
-<span class="fc" id="L817">            checkNotNull(directory, &quot;directory is null&quot;);</span>
-<span class="pc bpc" id="L818" title="2 of 4 branches missed.">            checkState(directory.exists() &amp;&amp; directory.isDirectory(), &quot;'%s' either does not exist or is not a directory!&quot;, directory);</span>
-<span class="fc" id="L819">            return setNativeBinaryManager(() -&gt; directory);</span>
+        public Builder useLocalPostgresInstallation(@NonNull File directory) {
+<span class="fc" id="L821">            checkNotNull(directory, &quot;directory is null&quot;);</span>
+<span class="pc bpc" id="L822" title="2 of 4 branches missed.">            checkState(directory.exists() &amp;&amp; directory.isDirectory(), &quot;'%s' either does not exist or is not a directory!&quot;, directory);</span>
+<span class="fc" id="L823">            return setNativeBinaryManager(() -&gt; directory);</span>
         }
 
         /**
@@ -827,40 +831,40 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         public EmbeddedPostgres build() throws IOException {
             // Builder Id
-<span class="fc" id="L830">            final String instanceId = EmbeddedUtil.randomAlphaNumeric(16);</span>
+<span class="fc" id="L834">            final String instanceId = EmbeddedUtil.randomAlphaNumeric(16);</span>
 
-<span class="pc bpc" id="L832" title="1 of 2 branches missed.">            int port = this.port != 0 ? this.port : EmbeddedUtil.allocatePort();</span>
+<span class="pc bpc" id="L836" title="1 of 2 branches missed.">            int port = this.port != 0 ? this.port : EmbeddedUtil.allocatePort();</span>
 
             // installation root if nothing has been set by the user.
-<span class="fc" id="L835">            final File parentDirectory = EmbeddedUtil.getWorkingDirectory();</span>
-<span class="fc" id="L836">            EmbeddedUtil.mkdirs(parentDirectory);</span>
+<span class="fc" id="L839">            final File parentDirectory = EmbeddedUtil.getWorkingDirectory();</span>
+<span class="fc" id="L840">            EmbeddedUtil.mkdirs(parentDirectory);</span>
 
-<span class="fc" id="L838">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
-<span class="fc bfc" id="L839" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
+<span class="fc" id="L842">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
+<span class="fc bfc" id="L843" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
                 // Use the parent directory if no installation directory set.
-<span class="fc" id="L841">                File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
-<span class="fc" id="L842">                nativeBinaryManager = new TarXzCompressedBinaryManager(installationBaseDirectory,</span>
+<span class="fc" id="L845">                File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
+<span class="fc" id="L846">                nativeBinaryManager = new TarXzCompressedBinaryManager(installationBaseDirectory,</span>
                         EmbeddedPostgres.LOCK_FILE_NAME, new ZonkyIOPostgresLocator());
             }
 
             // this is where the binary manager actually places the unpackaged postgres installation.
-<span class="fc" id="L847">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
+<span class="fc" id="L851">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
 
-<span class="fc" id="L849">            File dataDirectory = this.dataDirectory;</span>
-<span class="fc bfc" id="L850" title="All 2 branches covered.">            if (dataDirectory == null) {</span>
-<span class="fc" id="L851">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
+<span class="fc" id="L853">            File dataDirectory = this.dataDirectory;</span>
+<span class="fc bfc" id="L854" title="All 2 branches covered.">            if (dataDirectory == null) {</span>
+<span class="fc" id="L855">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
             }
 
-<span class="fc" id="L854">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
+<span class="fc" id="L858">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
                     removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,
                     port, errRedirector, outRedirector,
                     serverStartupWait);
 
-<span class="fc" id="L859">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
+<span class="fc" id="L863">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
 
-<span class="fc" id="L861">            embeddedPostgres.boot();</span>
+<span class="fc" id="L865">            embeddedPostgres.boot();</span>
 
-<span class="fc" id="L863">            return embeddedPostgres;</span>
+<span class="fc" id="L867">            return embeddedPostgres;</span>
         }
     }
 }

@@ -16,10 +16,10 @@ package de.softwareforge.testing.postgres.embedded;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 import com.google.common.collect.ImmutableList;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 
@@ -61,7 +61,7 @@ public final class FlywayPreparer implements EmbeddedPostgresPreparer&lt;DataSou
      * @param customizer A {@link Consumer&lt;FluentConfiguration&gt;} instance. Must not be null.
      * @return This object.
      */
-    public FlywayPreparer addCustomizer(Consumer&lt;FluentConfiguration&gt; customizer) {
+    public FlywayPreparer addCustomizer(@NonNull Consumer&lt;FluentConfiguration&gt; customizer) {
 <span class="fc" id="L65">        checkNotNull(customizer, &quot;customizer is null&quot;);</span>
 <span class="fc" id="L66">        customizers.add(customizer);</span>
 
@@ -72,12 +72,12 @@ public final class FlywayPreparer implements EmbeddedPostgresPreparer&lt;DataSou
      * @deprecated Use {@link #addCustomizer(Consumer)}.
      */
     @Deprecated
-    public FlywayPreparer customize(Consumer&lt;FluentConfiguration&gt; customizer) {
+    public FlywayPreparer customize(@NonNull Consumer&lt;FluentConfiguration&gt; customizer) {
 <span class="nc" id="L76">        return addCustomizer(customizer);</span>
     }
 
     @Override
-    public void prepare(@Nonnull DataSource dataSource) {
+    public void prepare(@NonNull DataSource dataSource) {
 <span class="fc" id="L81">        checkNotNull(dataSource, &quot;dataSource is null&quot;);</span>
 
 <span class="fc" id="L83">        final FluentConfiguration config = Flyway.configure();</span>

@@ -125,7 +125,7 @@
 <span class="source-line-no">112</span><span id="line-112">            assertEquals(lcMessages, localeConfig.get("lc-messages"));</span>
 <span class="source-line-no">113</span><span id="line-113">            assertEquals("", localeConfig.get("no-sync"));</span>
 <span class="source-line-no">114</span><span id="line-114"></span>
-<span class="source-line-no">115</span><span id="line-115">            List&lt;String&gt; options = pg.createLocaleOptions();</span>
+<span class="source-line-no">115</span><span id="line-115">            List&lt;String&gt; options = pg.createInitDbOptions();</span>
 <span class="source-line-no">116</span><span id="line-116">            assertTrue(options.contains("--locale=" + locale));</span>
 <span class="source-line-no">117</span><span id="line-117">            assertTrue(options.contains("--lc-messages=" + lcMessages));</span>
 <span class="source-line-no">118</span><span id="line-118">            assertTrue(options.contains("--no-sync"));</span>

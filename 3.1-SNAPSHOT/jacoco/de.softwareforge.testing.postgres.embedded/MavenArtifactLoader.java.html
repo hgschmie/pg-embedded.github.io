@@ -62,129 +62,138 @@ class MavenArtifactLoader {
 
 <span class="fc" id="L63">    private static final Logger LOG = LoggerFactory.getLogger(MavenArtifactLoader.class);</span>
 
-<span class="fc" id="L65">    private static final String USER_HOME = System.getProperty(&quot;user.home&quot;);</span>
-<span class="fc" id="L66">    private static final File USER_MAVEN_HOME = new File(USER_HOME, &quot;.m2&quot;);</span>
-<span class="fc" id="L67">    private static final String ENV_M2_HOME = System.getenv(&quot;M2_HOME&quot;);</span>
+<span class="fc" id="L65">    private static final RemoteRepository CENTRAL_REPO = new RemoteRepository.Builder(&quot;central&quot;, &quot;default&quot;, &quot;https://repo.maven.apache.org/maven2/&quot;).build();</span>
 
-<span class="fc" id="L69">    private static final File DEFAULT_USER_SETTINGS_FILE = new File(USER_MAVEN_HOME, &quot;settings.xml&quot;);</span>
-<span class="fc" id="L70">    private static final File DEFAULT_USER_REPOSITORY = new File(USER_MAVEN_HOME, &quot;repository&quot;);</span>
-<span class="fc" id="L71">    private static final File DEFAULT_GLOBAL_SETTINGS_FILE =</span>
-<span class="fc" id="L72">            new File(System.getProperty(&quot;maven.home&quot;, Objects.requireNonNullElse(ENV_M2_HOME, &quot;&quot;)), &quot;conf/settings.xml&quot;);</span>
+<span class="fc" id="L67">    private static final String USER_HOME = System.getProperty(&quot;user.home&quot;);</span>
+<span class="fc" id="L68">    private static final File USER_MAVEN_HOME = new File(USER_HOME, &quot;.m2&quot;);</span>
+<span class="fc" id="L69">    private static final String ENV_M2_HOME = System.getenv(&quot;M2_HOME&quot;);</span>
+
+<span class="fc" id="L71">    private static final File DEFAULT_USER_SETTINGS_FILE = new File(USER_MAVEN_HOME, &quot;settings.xml&quot;);</span>
+<span class="fc" id="L72">    private static final File DEFAULT_USER_REPOSITORY = new File(USER_MAVEN_HOME, &quot;repository&quot;);</span>
+<span class="fc" id="L73">    private static final File DEFAULT_GLOBAL_SETTINGS_FILE =</span>
+<span class="fc" id="L74">            new File(System.getProperty(&quot;maven.home&quot;, Objects.requireNonNullElse(ENV_M2_HOME, &quot;&quot;)), &quot;conf/settings.xml&quot;);</span>
 
     private final RepositorySystem repositorySystem;
     private final RepositorySystemSession mavenSession;
     private final List&lt;RemoteRepository&gt; remoteRepositories;
 
-<span class="fc" id="L78">    MavenArtifactLoader() {</span>
+<span class="fc" id="L80">    MavenArtifactLoader() {</span>
         @SuppressWarnings(&quot;deprecation&quot;)
-<span class="fc" id="L80">        ServiceLocator serviceLocator = createServiceLocator();</span>
-<span class="fc" id="L81">        this.repositorySystem = serviceLocator.getService(RepositorySystem.class);</span>
+<span class="fc" id="L82">        ServiceLocator serviceLocator = createServiceLocator();</span>
+<span class="fc" id="L83">        this.repositorySystem = serviceLocator.getService(RepositorySystem.class);</span>
 
         try {
-<span class="fc" id="L84">            Settings settings = createSettings();</span>
-<span class="pc bpc" id="L85" title="1 of 2 branches missed.">            File localRepositoryLocation = settings.getLocalRepository() != null ? new File(settings.getLocalRepository()) : DEFAULT_USER_REPOSITORY;</span>
-<span class="fc" id="L86">            LocalRepository localRepository = new LocalRepository(localRepositoryLocation);</span>
-<span class="fc" id="L87">            this.remoteRepositories = extractRemoteRepositories(settings);</span>
+<span class="fc" id="L86">            Settings settings = createSettings();</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">            File localRepositoryLocation = settings.getLocalRepository() != null ? new File(settings.getLocalRepository()) : DEFAULT_USER_REPOSITORY;</span>
+<span class="fc" id="L88">            LocalRepository localRepository = new LocalRepository(localRepositoryLocation);</span>
+<span class="fc" id="L89">            this.remoteRepositories = extractRemoteRepositories(settings);</span>
 
-<span class="fc" id="L89">            DefaultRepositorySystemSession mavenSession = MavenRepositorySystemUtils.newSession();</span>
+<span class="fc" id="L91">            DefaultRepositorySystemSession mavenSession = MavenRepositorySystemUtils.newSession();</span>
 
-<span class="fc" id="L91">            this.mavenSession = mavenSession.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(mavenSession, localRepository));</span>
+<span class="fc" id="L93">            this.mavenSession = mavenSession.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(mavenSession, localRepository));</span>
 
 
-<span class="nc" id="L94">        } catch (SettingsBuildingException e) {</span>
-<span class="nc" id="L95">            throw new IllegalStateException(&quot;Could not load maven settings:&quot;, e);</span>
-<span class="fc" id="L96">        }</span>
-<span class="fc" id="L97">    }</span>
+<span class="nc" id="L96">        } catch (SettingsBuildingException e) {</span>
+<span class="nc" id="L97">            throw new IllegalStateException(&quot;Could not load maven settings:&quot;, e);</span>
+<span class="fc" id="L98">        }</span>
+<span class="fc" id="L99">    }</span>
 
     File getArtifactFile(String groupId, String artifactId, String version) throws IOException {
 
-<span class="fc" id="L101">        ArtifactRequest artifactRequest = new ArtifactRequest();</span>
-<span class="fc" id="L102">        artifactRequest.setArtifact(new DefaultArtifact(groupId, artifactId, &quot;jar&quot;, version));</span>
-<span class="fc" id="L103">        artifactRequest.setRepositories(this.remoteRepositories);</span>
+<span class="fc" id="L103">        ArtifactRequest artifactRequest = new ArtifactRequest();</span>
+<span class="fc" id="L104">        artifactRequest.setArtifact(new DefaultArtifact(groupId, artifactId, &quot;jar&quot;, version));</span>
+<span class="fc" id="L105">        artifactRequest.setRepositories(this.remoteRepositories);</span>
         try {
-<span class="fc" id="L105">            ArtifactResult artifactResult = this.repositorySystem.resolveArtifact(mavenSession, artifactRequest);</span>
-<span class="fc" id="L106">            Artifact artifact = artifactResult.getArtifact();</span>
-<span class="fc" id="L107">            return artifact.getFile();</span>
-<span class="nc" id="L108">        } catch (RepositoryException e) {</span>
-<span class="nc" id="L109">            throw new IOException(e);</span>
+<span class="fc" id="L107">            ArtifactResult artifactResult = this.repositorySystem.resolveArtifact(mavenSession, artifactRequest);</span>
+<span class="fc" id="L108">            Artifact artifact = artifactResult.getArtifact();</span>
+<span class="fc" id="L109">            LOG.info(format(&quot;Using PostgreSQL version %s&quot;, version));</span>
+<span class="fc" id="L110">            return artifact.getFile();</span>
+<span class="nc" id="L111">        } catch (RepositoryException e) {</span>
+<span class="nc" id="L112">            throw new IOException(e);</span>
         }
     }
 
     String findLatestVersion(String groupId, String artifactId, String version) throws IOException {
 
-<span class="fc" id="L115">        Artifact artifact = new DefaultArtifact(groupId, artifactId, &quot;jar&quot;, &quot;[0,)&quot;);</span>
+<span class="fc" id="L118">        Artifact artifact = new DefaultArtifact(groupId, artifactId, &quot;jar&quot;, &quot;[0,)&quot;);</span>
 
-<span class="fc" id="L117">        VersionRangeRequest rangeRequest = new VersionRangeRequest();</span>
-<span class="fc" id="L118">        rangeRequest.setArtifact(artifact);</span>
-<span class="fc" id="L119">        rangeRequest.setRepositories(this.remoteRepositories);</span>
+<span class="fc" id="L120">        VersionRangeRequest rangeRequest = new VersionRangeRequest();</span>
+<span class="fc" id="L121">        rangeRequest.setArtifact(artifact);</span>
+<span class="fc" id="L122">        rangeRequest.setRepositories(this.remoteRepositories);</span>
 
         try {
-<span class="fc" id="L122">            VersionRangeResult rangeResult = this.repositorySystem.resolveVersionRange(mavenSession, rangeRequest);</span>
-<span class="fc" id="L123">            ImmutableSortedSet.Builder&lt;Version&gt; builder = ImmutableSortedSet.reverseOrder();</span>
-<span class="fc" id="L124">            List&lt;Version&gt; artifactVersions = rangeResult.getVersions();</span>
-<span class="pc bpc" id="L125" title="1 of 2 branches missed.">            if (artifactVersions != null) {</span>
-<span class="fc bfc" id="L126" title="All 2 branches covered.">                for (Version artifactVersion : artifactVersions) {</span>
-<span class="pc bpc" id="L127" title="1 of 4 branches missed.">                    if (artifactVersion.toString().equals(version) || artifactVersion.toString().startsWith(version + '.')) {</span>
-<span class="fc" id="L128">                        builder.add(artifactVersion);</span>
+<span class="fc" id="L125">            VersionRangeResult rangeResult = this.repositorySystem.resolveVersionRange(mavenSession, rangeRequest);</span>
+<span class="fc" id="L126">            ImmutableSortedSet.Builder&lt;Version&gt; builder = ImmutableSortedSet.reverseOrder();</span>
+<span class="fc" id="L127">            List&lt;Version&gt; artifactVersions = rangeResult.getVersions();</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">            if (artifactVersions != null) {</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">                for (Version artifactVersion : artifactVersions) {</span>
+<span class="pc bpc" id="L130" title="1 of 4 branches missed.">                    if (artifactVersion.toString().equals(version) || artifactVersion.toString().startsWith(version + '.')) {</span>
+<span class="fc" id="L131">                        builder.add(artifactVersion);</span>
                     }
-<span class="fc" id="L130">                }</span>
+<span class="fc" id="L133">                }</span>
             }
-<span class="fc" id="L132">            ImmutableSortedSet&lt;Version&gt; candiates = builder.build();</span>
-<span class="pc bpc" id="L133" title="1 of 2 branches missed.">            checkState(!candiates.isEmpty(), &quot;No suitable candidate for %s:%s:%s found!&quot;, groupId, artifactId, version);</span>
-<span class="fc" id="L134">            return candiates.first().toString();</span>
-<span class="nc" id="L135">        } catch (VersionRangeResolutionException e) {</span>
-<span class="nc" id="L136">            throw new IOException(format(&quot;Could not resolve version range: %s&quot;, rangeRequest), e);</span>
+<span class="fc" id="L135">            ImmutableSortedSet&lt;Version&gt; candiates = builder.build();</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">            checkState(!candiates.isEmpty(), &quot;No suitable candidate for %s:%s:%s found!&quot;, groupId, artifactId, version);</span>
+<span class="fc" id="L137">            return candiates.first().toString();</span>
+<span class="nc" id="L138">        } catch (VersionRangeResolutionException e) {</span>
+<span class="nc" id="L139">            throw new IOException(format(&quot;Could not resolve version range: %s&quot;, rangeRequest), e);</span>
         }
     }
 
     @SuppressWarnings(&quot;deprecation&quot;)
     private static ServiceLocator createServiceLocator() {
-<span class="fc" id="L142">        DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();</span>
+<span class="fc" id="L145">        DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();</span>
 
-<span class="fc" id="L144">        locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);</span>
-<span class="fc" id="L145">        locator.addService(TransporterFactory.class, FileTransporterFactory.class);</span>
-<span class="fc" id="L146">        locator.addService(TransporterFactory.class, HttpTransporterFactory.class);</span>
+<span class="fc" id="L147">        locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);</span>
+<span class="fc" id="L148">        locator.addService(TransporterFactory.class, FileTransporterFactory.class);</span>
+<span class="fc" id="L149">        locator.addService(TransporterFactory.class, HttpTransporterFactory.class);</span>
 
-<span class="fc" id="L148">        locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {</span>
+<span class="fc" id="L151">        locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {</span>
             @Override
             public void serviceCreationFailed(Class&lt;?&gt; type, Class&lt;?&gt; impl, Throwable e) {
-<span class="nc" id="L151">                LOG.error(format(&quot;Could not create instance of %s (implementation %s): &quot;, type.getSimpleName(), impl.getSimpleName()), e);</span>
-<span class="nc" id="L152">            }</span>
+<span class="nc" id="L154">                LOG.error(format(&quot;Could not create instance of %s (implementation %s): &quot;, type.getSimpleName(), impl.getSimpleName()), e);</span>
+<span class="nc" id="L155">            }</span>
         });
 
-<span class="fc" id="L155">        return locator;</span>
+<span class="fc" id="L158">        return locator;</span>
     }
 
     private static Settings createSettings() throws SettingsBuildingException {
-<span class="fc" id="L159">        SettingsBuildingRequest settingsBuildingRequest = new DefaultSettingsBuildingRequest()</span>
-<span class="fc" id="L160">                .setSystemProperties(System.getProperties())</span>
-<span class="fc" id="L161">                .setUserSettingsFile(DEFAULT_USER_SETTINGS_FILE)</span>
-<span class="fc" id="L162">                .setGlobalSettingsFile(DEFAULT_GLOBAL_SETTINGS_FILE);</span>
+<span class="fc" id="L162">        SettingsBuildingRequest settingsBuildingRequest = new DefaultSettingsBuildingRequest()</span>
+<span class="fc" id="L163">                .setSystemProperties(System.getProperties())</span>
+<span class="fc" id="L164">                .setUserSettingsFile(DEFAULT_USER_SETTINGS_FILE)</span>
+<span class="fc" id="L165">                .setGlobalSettingsFile(DEFAULT_GLOBAL_SETTINGS_FILE);</span>
 
-<span class="fc" id="L164">        DefaultSettingsBuilderFactory settingBuilderFactory = new DefaultSettingsBuilderFactory();</span>
-<span class="fc" id="L165">        DefaultSettingsBuilder settingsBuilder = settingBuilderFactory.newInstance();</span>
-<span class="fc" id="L166">        SettingsBuildingResult settingsBuildingResult = settingsBuilder.build(settingsBuildingRequest);</span>
+<span class="fc" id="L167">        DefaultSettingsBuilderFactory settingBuilderFactory = new DefaultSettingsBuilderFactory();</span>
+<span class="fc" id="L168">        DefaultSettingsBuilder settingsBuilder = settingBuilderFactory.newInstance();</span>
+<span class="fc" id="L169">        SettingsBuildingResult settingsBuildingResult = settingsBuilder.build(settingsBuildingRequest);</span>
 
-<span class="fc" id="L168">        return settingsBuildingResult.getEffectiveSettings();</span>
+<span class="fc" id="L171">        return settingsBuildingResult.getEffectiveSettings();</span>
     }
 
     private static List&lt;RemoteRepository&gt; extractRemoteRepositories(Settings settings) {
-<span class="fc" id="L172">        Map&lt;String, Profile&gt; profiles = settings.getProfilesAsMap();</span>
-<span class="fc" id="L173">        ImmutableList.Builder&lt;RemoteRepository&gt; builder = ImmutableList.builder();</span>
+<span class="fc" id="L175">        Map&lt;String, Profile&gt; profiles = settings.getProfilesAsMap();</span>
+<span class="fc" id="L176">        ImmutableList.Builder&lt;RemoteRepository&gt; builder = ImmutableList.builder();</span>
 
-<span class="fc bfc" id="L175" title="All 2 branches covered.">        for (String profileName : settings.getActiveProfiles()) {</span>
-<span class="fc" id="L176">            Profile profile = profiles.get(profileName);</span>
-<span class="pc bpc" id="L177" title="1 of 2 branches missed.">            if (profile != null) {</span>
-<span class="fc" id="L178">                List&lt;Repository&gt; repositories = profile.getRepositories();</span>
-<span class="pc bpc" id="L179" title="1 of 2 branches missed.">                if (repositories != null) {</span>
-<span class="fc bfc" id="L180" title="All 2 branches covered.">                    for (Repository repo : repositories) {</span>
-<span class="fc" id="L181">                        builder.add(new RemoteRepository.Builder(repo.getId(), &quot;default&quot;, repo.getUrl()).build());</span>
-<span class="fc" id="L182">                    }</span>
+<span class="fc" id="L178">        boolean foundRepository = false;</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">        for (String profileName : settings.getActiveProfiles()) {</span>
+<span class="fc" id="L180">            Profile profile = profiles.get(profileName);</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">            if (profile != null) {</span>
+<span class="fc" id="L182">                List&lt;Repository&gt; repositories = profile.getRepositories();</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">                if (repositories != null) {</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">                    for (Repository repo : repositories) {</span>
+<span class="fc" id="L185">                        builder.add(new RemoteRepository.Builder(repo.getId(), &quot;default&quot;, repo.getUrl()).build());</span>
+<span class="fc" id="L186">                        foundRepository = true;</span>
+<span class="fc" id="L187">                    }</span>
                 }
             }
-<span class="fc" id="L185">        }</span>
+<span class="fc" id="L190">        }</span>
 
-<span class="fc" id="L187">        return builder.build();</span>
+<span class="pc bpc" id="L192" title="3 of 4 branches missed.">        if (!foundRepository &amp;&amp; !settings.isOffline()) {</span>
+<span class="nc" id="L193">            builder.add(CENTRAL_REPO);</span>
+        }
+
+<span class="fc" id="L196">        return builder.build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

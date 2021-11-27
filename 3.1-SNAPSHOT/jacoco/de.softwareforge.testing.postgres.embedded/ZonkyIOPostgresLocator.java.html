@@ -14,6 +14,7 @@
 
 package de.softwareforge.testing.postgres.embedded;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
@@ -22,12 +23,16 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.google.common.base.Suppliers;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,147 +42,166 @@ import org.slf4j.LoggerFactory;
  * &lt;p&gt;
  * See &lt;a href=&quot;https://github.com/zonkyio/embedded-postgres-binaries&quot;&gt;The Zonky IO github page&lt;/a&gt; for more details.
  */
-public final class ZonkyIOPostgresLocator implements Supplier&lt;InputStream&gt; {
+public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
 
     private static final String ZONKY_GROUP_ID = &quot;io.zonky.test.postgres&quot;;
     private static final String ZONKY_ARTIFACT_ID_TEMPLATE = &quot;embedded-postgres-binaries-%s-%s&quot;;
 
-<span class="fc" id="L45">    public static final Logger LOG = LoggerFactory.getLogger(ZonkyIOPostgresLocator.class);</span>
+<span class="fc" id="L50">    public static final Logger LOG = LoggerFactory.getLogger(ZonkyIOPostgresLocator.class);</span>
 
-<span class="fc" id="L47">    private static final boolean PREFER_NATIVE = Boolean.getBoolean(&quot;pg-embedded.prefer-native&quot;);</span>
+<span class="fc" id="L52">    private static final boolean PREFER_NATIVE = Boolean.getBoolean(&quot;pg-embedded.prefer-native&quot;);</span>
 
     private final String architecture;
     private final String os;
+    private final String serverVersion;
 
-<span class="fc" id="L52">    private final MavenArtifactLoader artifactLoader = new MavenArtifactLoader();</span>
+<span class="fc" id="L58">    private final MavenArtifactLoader artifactLoader = new MavenArtifactLoader();</span>
 
-<span class="fc" id="L54">    private final Supplier&lt;File&gt; fileSupplier = Suppliers.memoize(this::loadArtifact);</span>
+<span class="fc" id="L60">    private final Supplier&lt;File&gt; fileSupplier = Suppliers.memoize(this::loadArtifact);</span>
 
-<span class="fc" id="L56">    ZonkyIOPostgresLocator() {</span>
-<span class="fc" id="L57">        this.os = computeOS();</span>
-<span class="fc" id="L58">        this.architecture = computeTarXzArchitectureName();</span>
-<span class="fc" id="L59">        LOG.debug(format(&quot;Detected a %s %s system&quot;, architecture, os));</span>
-<span class="fc" id="L60">    }</span>
+<span class="fc" id="L62">    ZonkyIOPostgresLocator(String serverVersion) {</span>
+<span class="fc" id="L63">        this.serverVersion = checkNotNull(serverVersion, &quot;serverVersion is null&quot;);</span>
+
+<span class="fc" id="L65">        this.os = computeOS();</span>
+<span class="fc" id="L66">        this.architecture = computeTarXzArchitectureName();</span>
+<span class="fc" id="L67">        LOG.debug(format(&quot;Detected a %s %s system, using PostgreSQL version %s&quot;, architecture, os, serverVersion));</span>
+<span class="fc" id="L68">    }</span>
 
     @Override
-    public InputStream get() {
-<span class="fc" id="L64">        File artifactFile = fileSupplier.get();</span>
-<span class="fc" id="L65">        return createJarStream(artifactFile);</span>
+    public InputStream getInputStream() throws IOException {
+        try {
+<span class="nc" id="L73">            File artifactFile = fileSupplier.get();</span>
+<span class="nc" id="L74">            return createJarStream(artifactFile);</span>
+<span class="nc" id="L75">        } catch (UncheckedIOException e) {</span>
+<span class="nc" id="L76">            throw e.getCause();</span>
+        }
+    }
+
+    @Override
+    public String getIdentifier() throws IOException {
+        // the optimized identifier computation saves ~ 1% CPU according to the profiler
+        try {
+<span class="fc" id="L84">            File artifactFile = fileSupplier.get();</span>
+<span class="fc" id="L85">            HashCode hashCode = Hashing.murmur3_128().hashString(artifactFile.getAbsolutePath(), StandardCharsets.UTF_8);</span>
+<span class="fc" id="L86">            return INSTALL_DIRECTORY_PREFIX + BaseEncoding.base16().encode(hashCode.asBytes());</span>
+<span class="nc" id="L87">        } catch (UncheckedIOException e) {</span>
+<span class="nc" id="L88">            throw e.getCause();</span>
+        }
     }
 
     private File loadArtifact() {
         try {
-<span class="fc" id="L70">            String artifactId = format(ZONKY_ARTIFACT_ID_TEMPLATE, this.os, computeJarArchitectureName());</span>
+<span class="fc" id="L94">            String artifactId = format(ZONKY_ARTIFACT_ID_TEMPLATE, this.os, computeJarArchitectureName());</span>
 
             // alpine hack
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">            if (EmbeddedUtil.IS_ALPINE_LINUX) {</span>
-<span class="nc" id="L74">                artifactId += &quot;-alpine&quot;;</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            if (EmbeddedUtil.IS_ALPINE_LINUX) {</span>
+<span class="nc" id="L98">                artifactId += &quot;-alpine&quot;;</span>
             }
 
-<span class="fc" id="L77">            String version = artifactLoader.findLatestVersion(ZONKY_GROUP_ID, artifactId, EmbeddedPostgres.POSTGRES_VERSION);</span>
-<span class="fc" id="L78">            File file = artifactLoader.getArtifactFile(ZONKY_GROUP_ID, artifactId, version);</span>
-<span class="pc bpc" id="L79" title="2 of 4 branches missed.">            checkState(file != null &amp;&amp; file.exists(), &quot;Could not locate artifact file for %s:%s&quot;, artifactId, version);</span>
-<span class="fc" id="L80">            return file;</span>
-<span class="nc" id="L81">        } catch (IOException e) {</span>
-<span class="nc" id="L82">            throw new UncheckedIOException(e);</span>
+<span class="fc" id="L101">            String version = artifactLoader.findLatestVersion(ZONKY_GROUP_ID, artifactId, serverVersion);</span>
+<span class="fc" id="L102">            File file = artifactLoader.getArtifactFile(ZONKY_GROUP_ID, artifactId, version);</span>
+<span class="pc bpc" id="L103" title="2 of 4 branches missed.">            checkState(file != null &amp;&amp; file.exists(), &quot;Could not locate artifact file for %s:%s&quot;, artifactId, version);</span>
+<span class="fc" id="L104">            return file;</span>
+<span class="nc" id="L105">        } catch (IOException e) {</span>
+<span class="nc" id="L106">            throw new UncheckedIOException(e);</span>
         }
     }
 
     private InputStream createJarStream(File file) {
         try {
-<span class="fc" id="L88">            JarFile jar = new JarFile(file);</span>
-<span class="fc" id="L89">            String entryName = format(&quot;postgres-%s-%s&quot;, computeOS(), computeTarXzArchitectureName());</span>
+<span class="nc" id="L112">            JarFile jar = new JarFile(file);</span>
+<span class="nc" id="L113">            String entryName = format(&quot;postgres-%s-%s&quot;, computeOS(), computeTarXzArchitectureName());</span>
 
             // alpine hack
-<span class="pc bpc" id="L92" title="1 of 2 branches missed.">            if (EmbeddedUtil.IS_ALPINE_LINUX) {</span>
-<span class="nc" id="L93">                entryName += &quot;-alpine_linux&quot;;</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">            if (EmbeddedUtil.IS_ALPINE_LINUX) {</span>
+<span class="nc" id="L117">                entryName += &quot;-alpine_linux&quot;;</span>
             }
 
-<span class="fc" id="L96">            JarEntry jarEntry = jar.getJarEntry(entryName + &quot;.txz&quot;);</span>
-<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            checkState(jarEntry != null, &quot;Could not locate %s in the jar file (%s)&quot;, entryName, file.getAbsoluteFile());</span>
+<span class="nc" id="L120">            JarEntry jarEntry = jar.getJarEntry(entryName + &quot;.txz&quot;);</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            checkState(jarEntry != null, &quot;Could not locate %s in the jar file (%s)&quot;, entryName, file.getAbsoluteFile());</span>
 
             // When the input stream gets closed, close the jar file as well.
-<span class="fc" id="L100">            return new FilterInputStream(jar.getInputStream(jarEntry)) {</span>
+<span class="nc" id="L124">            return new FilterInputStream(jar.getInputStream(jarEntry)) {</span>
                 @Override
                 public void close() throws IOException {
                     try {
-<span class="fc" id="L104">                        super.close();</span>
+<span class="nc" id="L128">                        super.close();</span>
                     } finally {
-<span class="fc" id="L106">                        jar.close();</span>
+<span class="nc" id="L130">                        jar.close();</span>
                     }
-<span class="fc" id="L108">                }</span>
+<span class="nc" id="L132">                }</span>
             };
-<span class="nc" id="L110">        } catch (IOException e) {</span>
-<span class="nc" id="L111">            throw new UncheckedIOException(e);</span>
+<span class="nc" id="L134">        } catch (IOException e) {</span>
+<span class="nc" id="L135">            throw new UncheckedIOException(e);</span>
         }
     }
 
     @Override
     public String toString() {
-<span class="nc" id="L117">        return format(&quot;ZonkyIO Stream locator for PostgreSQL (arch: %s os: %s)&quot;, architecture, os);</span>
+<span class="nc" id="L141">        return format(&quot;ZonkyIO Stream locator for PostgreSQL (arch: %s os: %s, version: %s)&quot;, architecture, os, serverVersion);</span>
     }
 
     @Override
     public boolean equals(Object o) {
-<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (this == o) {</span>
-<span class="nc" id="L123">            return true;</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L147">            return true;</span>
         }
-<span class="pc bpc" id="L125" title="2 of 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L126">            return false;</span>
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">        if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L150">            return false;</span>
         }
-<span class="fc" id="L128">        ZonkyIOPostgresLocator that = (ZonkyIOPostgresLocator) o;</span>
-<span class="pc bpc" id="L129" title="2 of 4 branches missed.">        return architecture.equals(that.architecture) &amp;&amp; os.equals(that.os);</span>
+<span class="fc" id="L152">        ZonkyIOPostgresLocator that = (ZonkyIOPostgresLocator) o;</span>
+<span class="pc bpc" id="L153" title="3 of 6 branches missed.">        return architecture.equals(that.architecture) &amp;&amp; os.equals(that.os) &amp;&amp; serverVersion.equals(that.serverVersion);</span>
     }
 
     @Override
     public int hashCode() {
-<span class="fc" id="L134">        return Objects.hash(architecture, os);</span>
+<span class="fc" id="L158">        return Objects.hash(architecture, os, serverVersion);</span>
     }
 
     private static String computeTarXzArchitectureName() {
-<span class="fc" id="L138">        String architecture = EmbeddedUtil.OS_ARCH;</span>
-<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_ARCH_X86_64) {</span>
-<span class="fc" id="L140">            architecture = &quot;x86_64&quot;;  // Zonky uses x86_64</span>
-<span class="nc bnc" id="L141" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
-<span class="nc bnc" id="L142" title="All 4 branches missed.">            if (!PREFER_NATIVE &amp;&amp; EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="fc" id="L162">        String architecture = EmbeddedUtil.OS_ARCH;</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_ARCH_X86_64) {</span>
+<span class="fc" id="L164">            architecture = &quot;x86_64&quot;;  // Zonky uses x86_64</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
+<span class="nc bnc" id="L166" title="All 4 branches missed.">            if (!PREFER_NATIVE &amp;&amp; EmbeddedUtil.IS_OS_MAC) {</span>
                 // Mac binaries are fat binaries stored as x86_64
-<span class="nc" id="L144">                architecture = &quot;x86_64&quot;;</span>
+<span class="nc" id="L168">                architecture = &quot;x86_64&quot;;</span>
             } else {
-<span class="nc" id="L146">                architecture = &quot;arm_64&quot;;</span>
+<span class="nc" id="L170">                architecture = &quot;arm_64&quot;;</span>
             }
-<span class="nc bnc" id="L148" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH32) {</span>
-<span class="nc" id="L149">            architecture = &quot;arm_32&quot;;</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH32) {</span>
+<span class="nc" id="L173">            architecture = &quot;arm_32&quot;;</span>
         }
-<span class="fc" id="L151">        return architecture;</span>
+<span class="fc" id="L175">        return architecture;</span>
     }
 
     private static String computeJarArchitectureName() {
-<span class="fc" id="L155">        String architecture = EmbeddedUtil.OS_ARCH;</span>
-<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_ARCH_X86_64) {</span>
-<span class="fc" id="L157">            architecture = &quot;amd64&quot;;  // Zonky uses amd64 for the jar name</span>
-<span class="nc bnc" id="L158" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
-<span class="nc bnc" id="L159" title="All 4 branches missed.">            if (!PREFER_NATIVE &amp;&amp; EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="fc" id="L179">        String architecture = EmbeddedUtil.OS_ARCH;</span>
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_ARCH_X86_64) {</span>
+<span class="fc" id="L181">            architecture = &quot;amd64&quot;;  // Zonky uses amd64 for the jar name</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
+<span class="nc bnc" id="L183" title="All 4 branches missed.">            if (!PREFER_NATIVE &amp;&amp; EmbeddedUtil.IS_OS_MAC) {</span>
                 // Mac binaries are fat binaries stored as amd64
-<span class="nc" id="L161">                architecture = &quot;amd64&quot;;</span>
+<span class="nc" id="L185">                architecture = &quot;amd64&quot;;</span>
             } else {
-<span class="nc" id="L163">                architecture = &quot;arm64v8&quot;;</span>
+<span class="nc" id="L187">                architecture = &quot;arm64v8&quot;;</span>
             }
-<span class="nc bnc" id="L165" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH32) {</span>
-<span class="nc" id="L166">            architecture = &quot;arm32v7&quot;;</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH32) {</span>
+<span class="nc" id="L190">            architecture = &quot;arm32v7&quot;;</span>
         }
-<span class="fc" id="L168">        return architecture;</span>
+<span class="fc" id="L192">        return architecture;</span>
     }
 
     private static String computeOS() {
-<span class="fc" id="L172">        String os = EmbeddedUtil.OS_NAME;</span>
-<span class="pc bpc" id="L173" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_OS_LINUX) {</span>
-<span class="nc" id="L174">            os = &quot;linux&quot;;</span>
-<span class="pc bpc" id="L175" title="1 of 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
-<span class="fc" id="L176">            os = &quot;darwin&quot;;</span>
-<span class="nc bnc" id="L177" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_WINDOWS) {</span>
-<span class="nc" id="L178">            os = &quot;windows&quot;;</span>
+<span class="fc" id="L196">        String os = EmbeddedUtil.OS_NAME;</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_OS_LINUX) {</span>
+<span class="nc" id="L198">            os = &quot;linux&quot;;</span>
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="fc" id="L200">            os = &quot;darwin&quot;;</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_WINDOWS) {</span>
+<span class="nc" id="L202">            os = &quot;windows&quot;;</span>
         }
-<span class="fc" id="L180">        return os;</span>
+<span class="fc" id="L204">        return os;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

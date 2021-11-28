@@ -85,24 +85,24 @@
 <span class="source-line-no">072</span><span id="line-72">    /**</span>
 <span class="source-line-no">073</span><span id="line-73">     * Create a builder and register a {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} to set up the template database.</span>
 <span class="source-line-no">074</span><span id="line-74">     *</span>
-<span class="source-line-no">075</span><span id="line-75">     * @param dataSourcePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.</span>
+<span class="source-line-no">075</span><span id="line-75">     * @param databasePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.</span>
 <span class="source-line-no">076</span><span id="line-76">     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.</span>
 <span class="source-line-no">077</span><span id="line-77">     */</span>
 <span class="source-line-no">078</span><span id="line-78">    @NonNull</span>
-<span class="source-line-no">079</span><span id="line-79">    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {</span>
-<span class="source-line-no">080</span><span id="line-80">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer);</span>
+<span class="source-line-no">079</span><span id="line-79">    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {</span>
+<span class="source-line-no">080</span><span id="line-80">        return EmbeddedPgExtension.multiDatabase().withDatabasePreparer(databasePreparer);</span>
 <span class="source-line-no">081</span><span id="line-81">    }</span>
 <span class="source-line-no">082</span><span id="line-82"></span>
 <span class="source-line-no">083</span><span id="line-83">    /**</span>
 <span class="source-line-no">084</span><span id="line-84">     * Create a builder with standard initializations ({@link EmbeddedPostgres.Builder#withDefaults()}) applied and register a {@link</span>
 <span class="source-line-no">085</span><span id="line-85">     * EmbeddedPostgresPreparer&lt;DataSource&gt;} to set up the template database.</span>
 <span class="source-line-no">086</span><span id="line-86">     *</span>
-<span class="source-line-no">087</span><span id="line-87">     * @param dataSourcePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.</span>
+<span class="source-line-no">087</span><span id="line-87">     * @param databasePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.</span>
 <span class="source-line-no">088</span><span id="line-88">     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.</span>
 <span class="source-line-no">089</span><span id="line-89">     */</span>
 <span class="source-line-no">090</span><span id="line-90">    @NonNull</span>
-<span class="source-line-no">091</span><span id="line-91">    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; dataSourcePreparer) {</span>
-<span class="source-line-no">092</span><span id="line-92">        return EmbeddedPgExtension.multiDatabase().withDataSourcePreparer(dataSourcePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+<span class="source-line-no">091</span><span id="line-91">    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {</span>
+<span class="source-line-no">092</span><span id="line-92">        return EmbeddedPgExtension.multiDatabase().withDatabasePreparer(databasePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
 <span class="source-line-no">093</span><span id="line-93">    }</span>
 <span class="source-line-no">094</span><span id="line-94">}</span>
 

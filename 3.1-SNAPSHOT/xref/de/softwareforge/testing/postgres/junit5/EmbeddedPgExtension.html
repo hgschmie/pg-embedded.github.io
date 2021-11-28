@@ -75,8 +75,8 @@
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>      }
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>  
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>      <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>  <em class="jxr_javadoccomment">     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages the</em>
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>  <em class="jxr_javadoccomment">     * database server in multi-mode (creating multiple databases).</em>
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>  <em class="jxr_javadoccomment">     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages</em>
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>  <em class="jxr_javadoccomment">     * the database server in multi-mode (creating multiple databases).</em>
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>  <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>  <em class="jxr_javadoccomment">     * @return A {@link EmbeddedPgExtensionBuilder} instance. Never null.</em>
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>  <em class="jxr_javadoccomment">     */</em>
@@ -86,8 +86,8 @@
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>      }
 <a class="jxr_linenumber" name="L79" href="#L79">79</a>  
 <a class="jxr_linenumber" name="L80" href="#L80">80</a>      <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L81" href="#L81">81</a>  <em class="jxr_javadoccomment">     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages the</em>
-<a class="jxr_linenumber" name="L82" href="#L82">82</a>  <em class="jxr_javadoccomment">     * database server in single-mode (using a single database instance).</em>
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>  <em class="jxr_javadoccomment">     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages</em>
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>  <em class="jxr_javadoccomment">     * the database server in single-mode (using a single database instance).</em>
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>  <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>  <em class="jxr_javadoccomment">     * @return A {@link EmbeddedPgExtensionBuilder} instance. Never null.</em>
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>  <em class="jxr_javadoccomment">     */</em>
@@ -235,9 +235,9 @@
 <a class="jxr_linenumber" name="L227" href="#L227">227</a>         @NonNull
 <a class="jxr_linenumber" name="L228" href="#L228">228</a>         <strong class="jxr_keyword">public</strong> <a name="EmbeddedPgExtension" href="../../../../../de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html#EmbeddedPgExtension">EmbeddedPgExtension</a> build() {
 <a class="jxr_linenumber" name="L229" href="#L229">229</a>             DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder = <strong class="jxr_keyword">new</strong> DatabaseManagerBuilder(multiMode)
-<a class="jxr_linenumber" name="L230" href="#L230">230</a>                     .withDataSourcePreparers(dataSourcePreparers.build());
-<a class="jxr_linenumber" name="L231" href="#L231">231</a> 
-<a class="jxr_linenumber" name="L232" href="#L232">232</a>             instancePreparers.build().forEach(databaseManagerBuilder::withInstancePreparer);
+<a class="jxr_linenumber" name="L230" href="#L230">230</a>                     .withDatabasePreparers(databasePreparers.build())
+<a class="jxr_linenumber" name="L231" href="#L231">231</a>                     .withInstancePreparers(instancePreparers.build());
+<a class="jxr_linenumber" name="L232" href="#L232">232</a> 
 <a class="jxr_linenumber" name="L233" href="#L233">233</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a name="EmbeddedPgExtension" href="../../../../../de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html#EmbeddedPgExtension">EmbeddedPgExtension</a>(databaseManagerBuilder);
 <a class="jxr_linenumber" name="L234" href="#L234">234</a>         }
 <a class="jxr_linenumber" name="L235" href="#L235">235</a>     }

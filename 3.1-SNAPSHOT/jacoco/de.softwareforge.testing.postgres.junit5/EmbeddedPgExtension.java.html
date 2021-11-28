@@ -67,8 +67,8 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
 <span class="fc" id="L67">    }</span>
 
     /**
-     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages the
-     * database server in multi-mode (creating multiple databases).
+     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages
+     * the database server in multi-mode (creating multiple databases).
      *
      * @return A {@link EmbeddedPgExtensionBuilder} instance. Never null.
      */
@@ -78,8 +78,8 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
     }
 
     /**
-     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages the
-     * database server in single-mode (using a single database instance).
+     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages
+     * the database server in single-mode (using a single database instance).
      *
      * @return A {@link EmbeddedPgExtensionBuilder} instance. Never null.
      */
@@ -227,9 +227,9 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
         @NonNull
         public EmbeddedPgExtension build() {
 <span class="fc" id="L229">            DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder = new DatabaseManagerBuilder(multiMode)</span>
-<span class="fc" id="L230">                    .withDataSourcePreparers(dataSourcePreparers.build());</span>
+<span class="fc" id="L230">                    .withDatabasePreparers(databasePreparers.build())</span>
+<span class="fc" id="L231">                    .withInstancePreparers(instancePreparers.build());</span>
 
-<span class="fc" id="L232">            instancePreparers.build().forEach(databaseManagerBuilder::withInstancePreparer);</span>
 <span class="fc" id="L233">            return new EmbeddedPgExtension(databaseManagerBuilder);</span>
         }
     }

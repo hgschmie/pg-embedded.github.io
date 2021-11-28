@@ -10,7 +10,7 @@ pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager,5,186,3,9
 pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager.new CompletionHandler() {...},42,0,0,0,11,0,4,0,4,0
 pg-embedded,de.softwareforge.testing.postgres.embedded,MavenArtifactLoader.new DefaultServiceLocator.ErrorHandler() {...},18,3,0,0,2,1,1,1,1,1
 pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo,69,75,6,8,15,20,8,8,2,7
-pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.Builder,27,42,0,0,5,11,2,4,2,4
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.Builder,27,52,0,0,5,13,2,5,2,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres,236,860,28,30,46,171,25,41,3,34
 pg-embedded,de.softwareforge.testing.postgres.embedded,MavenArtifactLoader,41,316,9,15,7,71,8,11,0,7
 pg-embedded,de.softwareforge.testing.postgres.embedded,FlywayPreparer,4,58,0,0,1,15,1,6,1,6
@@ -24,6 +24,6 @@ pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres.Builder,
 pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgresPreparer,3,0,0,0,1,0,2,0,2,0
 pg-embedded,de.softwareforge.testing.postgres.junit5,EmbeddedPgExtension.TestMode,0,39,0,4,0,12,0,6,0,4
 pg-embedded,de.softwareforge.testing.postgres.junit5,SingleDatabaseBuilder,23,10,0,0,6,2,5,2,5,2
-pg-embedded,de.softwareforge.testing.postgres.junit5,EmbeddedPgExtension.EmbeddedPgExtensionBuilder,0,28,0,0,0,6,0,2,0,2
+pg-embedded,de.softwareforge.testing.postgres.junit5,EmbeddedPgExtension.EmbeddedPgExtensionBuilder,0,23,0,0,0,6,0,2,0,2
 pg-embedded,de.softwareforge.testing.postgres.junit5,EmbeddedPgExtension,14,223,5,13,4,49,5,20,0,16
 pg-embedded,de.softwareforge.testing.postgres.junit5,MultiDatabaseBuilder,23,10,0,0,6,2,5,2,5,2

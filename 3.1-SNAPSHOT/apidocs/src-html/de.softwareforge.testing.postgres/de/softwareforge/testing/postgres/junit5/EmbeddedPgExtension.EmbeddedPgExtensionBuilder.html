@@ -80,8 +80,8 @@
 <span class="source-line-no">067</span><span id="line-67">    }</span>
 <span class="source-line-no">068</span><span id="line-68"></span>
 <span class="source-line-no">069</span><span id="line-69">    /**</span>
-<span class="source-line-no">070</span><span id="line-70">     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages the</span>
-<span class="source-line-no">071</span><span id="line-71">     * database server in multi-mode (creating multiple databases).</span>
+<span class="source-line-no">070</span><span id="line-70">     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages</span>
+<span class="source-line-no">071</span><span id="line-71">     * the database server in multi-mode (creating multiple databases).</span>
 <span class="source-line-no">072</span><span id="line-72">     *</span>
 <span class="source-line-no">073</span><span id="line-73">     * @return A {@link EmbeddedPgExtensionBuilder} instance. Never null.</span>
 <span class="source-line-no">074</span><span id="line-74">     */</span>
@@ -91,8 +91,8 @@
 <span class="source-line-no">078</span><span id="line-78">    }</span>
 <span class="source-line-no">079</span><span id="line-79"></span>
 <span class="source-line-no">080</span><span id="line-80">    /**</span>
-<span class="source-line-no">081</span><span id="line-81">     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages the</span>
-<span class="source-line-no">082</span><span id="line-82">     * database server in single-mode (using a single database instance).</span>
+<span class="source-line-no">081</span><span id="line-81">     * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages</span>
+<span class="source-line-no">082</span><span id="line-82">     * the database server in single-mode (using a single database instance).</span>
 <span class="source-line-no">083</span><span id="line-83">     *</span>
 <span class="source-line-no">084</span><span id="line-84">     * @return A {@link EmbeddedPgExtensionBuilder} instance. Never null.</span>
 <span class="source-line-no">085</span><span id="line-85">     */</span>
@@ -240,9 +240,9 @@
 <span class="source-line-no">227</span><span id="line-227">        @NonNull</span>
 <span class="source-line-no">228</span><span id="line-228">        public EmbeddedPgExtension build() {</span>
 <span class="source-line-no">229</span><span id="line-229">            DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder = new DatabaseManagerBuilder(multiMode)</span>
-<span class="source-line-no">230</span><span id="line-230">                    .withDataSourcePreparers(dataSourcePreparers.build());</span>
-<span class="source-line-no">231</span><span id="line-231"></span>
-<span class="source-line-no">232</span><span id="line-232">            instancePreparers.build().forEach(databaseManagerBuilder::withInstancePreparer);</span>
+<span class="source-line-no">230</span><span id="line-230">                    .withDatabasePreparers(databasePreparers.build())</span>
+<span class="source-line-no">231</span><span id="line-231">                    .withInstancePreparers(instancePreparers.build());</span>
+<span class="source-line-no">232</span><span id="line-232"></span>
 <span class="source-line-no">233</span><span id="line-233">            return new EmbeddedPgExtension(databaseManagerBuilder);</span>
 <span class="source-line-no">234</span><span id="line-234">        }</span>
 <span class="source-line-no">235</span><span id="line-235">    }</span>

@@ -391,9 +391,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="fc bfc" id="L391" title="All 2 branches covered.">                if (verifyReady()) {</span>
 <span class="fc" id="L392">                    return true;</span>
                 }
-<span class="fc" id="L394">            } catch (final SQLException e) {</span>
-<span class="fc" id="L395">                lastCause = e;</span>
-<span class="fc" id="L396">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
+<span class="nc" id="L394">            } catch (final SQLException e) {</span>
+<span class="nc" id="L395">                lastCause = e;</span>
+<span class="nc" id="L396">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
 <span class="fc" id="L397">            }</span>
 
             try {
@@ -485,8 +485,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="nc" id="L485">            return;</span>
         }
 <span class="fc bfc" id="L487" title="All 2 branches covered.">        for (final File dir : children) {</span>
-<span class="pc bpc" id="L488" title="1 of 2 branches missed.">            if (!dir.isDirectory()) {</span>
-<span class="nc" id="L489">                continue;</span>
+<span class="fc bfc" id="L488" title="All 2 branches covered.">            if (!dir.isDirectory()) {</span>
+<span class="fc" id="L489">                continue;</span>
             }
 
             // only ever touch known data directories.
@@ -503,15 +503,15 @@ public final class EmbeddedPostgres implements AutoCloseable {
             // file must have a minimum age. This can not be the same check as
             // the exists b/c non-existent files return 0 (epoch) as lastModified so
             // they are considered &quot;ancient&quot;.
-<span class="pc bpc" id="L506" title="1 of 2 branches missed.">            if (System.currentTimeMillis() - lockFile.lastModified() &lt; MINIMUM_AGE_IN_MS) {</span>
+<span class="fc bfc" id="L506" title="All 2 branches covered.">            if (System.currentTimeMillis() - lockFile.lastModified() &lt; MINIMUM_AGE_IN_MS) {</span>
 <span class="fc" id="L507">                continue;</span>
             }
 
-<span class="nc" id="L510">            try (FileOutputStream fos = new FileOutputStream(lockFile);</span>
-<span class="nc" id="L511">                    FileLock lock = fos.getChannel().tryLock()) {</span>
-<span class="nc bnc" id="L512" title="All 2 branches missed.">                if (lock != null) {</span>
-<span class="nc" id="L513">                    logger.debug(format(&quot;found stale data directory %s&quot;, dir));</span>
-<span class="nc bnc" id="L514" title="All 2 branches missed.">                    if (new File(dir, &quot;postmaster.pid&quot;).exists()) {</span>
+<span class="fc" id="L510">            try (FileOutputStream fos = new FileOutputStream(lockFile);</span>
+<span class="fc" id="L511">                    FileLock lock = fos.getChannel().tryLock()) {</span>
+<span class="pc bpc" id="L512" title="1 of 2 branches missed.">                if (lock != null) {</span>
+<span class="fc" id="L513">                    logger.debug(format(&quot;found stale data directory %s&quot;, dir));</span>
+<span class="pc bpc" id="L514" title="1 of 2 branches missed.">                    if (new File(dir, &quot;postmaster.pid&quot;).exists()) {</span>
                         try {
 <span class="nc" id="L516">                            stopDatabase(dir);</span>
 <span class="nc" id="L517">                            logger.debug(&quot;shutting down orphaned database!&quot;);</span>
@@ -519,14 +519,14 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="nc" id="L519">                            logger.warn(format(&quot;failed to orphaned database in %s:&quot;, dir), e);</span>
 <span class="nc" id="L520">                        }</span>
                     }
-<span class="nc" id="L522">                    EmbeddedUtil.rmdirs(dir);</span>
+<span class="fc" id="L522">                    EmbeddedUtil.rmdirs(dir);</span>
                 }
 <span class="nc" id="L524">            } catch (final OverlappingFileLockException e) {</span>
                 // The directory belongs to another instance in this VM.
 <span class="nc" id="L526">                logger.trace(&quot;while cleaning old data directories:&quot;, e);</span>
 <span class="nc" id="L527">            } catch (final Exception e) {</span>
 <span class="nc" id="L528">                logger.warn(&quot;while cleaning old data directories:&quot;, e);</span>
-<span class="nc" id="L529">            }</span>
+<span class="pc" id="L529">            }</span>
         }
 <span class="fc" id="L531">    }</span>
 

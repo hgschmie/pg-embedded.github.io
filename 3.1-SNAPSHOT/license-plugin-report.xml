@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1638154024075">
+<licensePluginReport goal="CHECK" timestamp="1638165794905">
     <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="3.1-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -26,13 +26,16 @@
         <file path="src/test/java/de/softwareforge/testing/postgres/embedded/DatabaseInfoTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/embedded/DatabaseManagerTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/embedded/EmbeddedPostgresTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/embedded/FlywayPreparerTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/embedded/LocalDirectoryPostgresTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/junit5/ExtendWithTest.java" result="PRESENT"/>
-        <file path="src/test/java/de/softwareforge/testing/postgres/junit5/FlywayPreparerTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/junit5/IsolationTest.java" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/junit5/JUnit5FlywayTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/junit5/Junit5ClassMemberTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/junit5/Junit5InstanceMemberTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/junit5/Junit5NestedTest.java" result="PRESENT"/>
+        <file path="src/test/resources/db/broken/V1__create_foo.sql" result="PRESENT"/>
+        <file path="src/test/resources/db/broken/V2__insert_value.sql" result="PRESENT"/>
         <file path="src/test/resources/db/testing/V1__create_foo.sql" result="PRESENT"/>
         <file path="src/test/resources/db/testing/V2__insert_value.sql" result="PRESENT"/>
     </files>

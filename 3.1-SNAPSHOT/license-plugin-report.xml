@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1638165794905">
+<licensePluginReport goal="CHECK" timestamp="1638238783431">
     <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="3.1-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -22,6 +22,7 @@
         <file path="src/main/java/de/softwareforge/testing/postgres/junit5/SingleDatabaseBuilder.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/junit5/package-info.java" result="PRESENT"/>
         <file path="src/site/site.xml" result="PRESENT"/>
+        <file path="src/test/java/de/softwareforge/testing/postgres/embedded/ClasspathLocatorTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/embedded/ConnectConfigTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/embedded/DatabaseInfoTest.java" result="PRESENT"/>
         <file path="src/test/java/de/softwareforge/testing/postgres/embedded/DatabaseManagerTest.java" result="PRESENT"/>

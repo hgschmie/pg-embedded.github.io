@@ -66,9 +66,9 @@ import org.slf4j.LoggerFactory;
 public final class EmbeddedPostgres implements AutoCloseable {
 
     /**
-     * The version of postgres used if no more specific version has been given.
+     * The version of postgres used if no specific version has been given.
      */
-<span class="fc" id="L71">    public static final String POSTGRES_VERSION = System.getProperty(&quot;pg-embedded.postgres-version&quot;, &quot;13&quot;);</span>
+    public static final String DEFAULT_POSTGRES_VERSION = &quot;13&quot;;
 
 <span class="fc" id="L73">    static final String[] LOCALHOST_SERVER_NAMES = new String[]{&quot;localhost&quot;};</span>
 
@@ -485,8 +485,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="nc" id="L485">            return;</span>
         }
 <span class="fc bfc" id="L487" title="All 2 branches covered.">        for (final File dir : children) {</span>
-<span class="fc bfc" id="L488" title="All 2 branches covered.">            if (!dir.isDirectory()) {</span>
-<span class="fc" id="L489">                continue;</span>
+<span class="pc bpc" id="L488" title="1 of 2 branches missed.">            if (!dir.isDirectory()) {</span>
+<span class="nc" id="L489">                continue;</span>
             }
 
             // only ever touch known data directories.
@@ -503,15 +503,15 @@ public final class EmbeddedPostgres implements AutoCloseable {
             // file must have a minimum age. This can not be the same check as
             // the exists b/c non-existent files return 0 (epoch) as lastModified so
             // they are considered &quot;ancient&quot;.
-<span class="fc bfc" id="L506" title="All 2 branches covered.">            if (System.currentTimeMillis() - lockFile.lastModified() &lt; MINIMUM_AGE_IN_MS) {</span>
+<span class="pc bpc" id="L506" title="1 of 2 branches missed.">            if (System.currentTimeMillis() - lockFile.lastModified() &lt; MINIMUM_AGE_IN_MS) {</span>
 <span class="fc" id="L507">                continue;</span>
             }
 
-<span class="fc" id="L510">            try (FileOutputStream fos = new FileOutputStream(lockFile);</span>
-<span class="fc" id="L511">                    FileLock lock = fos.getChannel().tryLock()) {</span>
-<span class="pc bpc" id="L512" title="1 of 2 branches missed.">                if (lock != null) {</span>
-<span class="fc" id="L513">                    logger.debug(format(&quot;found stale data directory %s&quot;, dir));</span>
-<span class="pc bpc" id="L514" title="1 of 2 branches missed.">                    if (new File(dir, &quot;postmaster.pid&quot;).exists()) {</span>
+<span class="nc" id="L510">            try (FileOutputStream fos = new FileOutputStream(lockFile);</span>
+<span class="nc" id="L511">                    FileLock lock = fos.getChannel().tryLock()) {</span>
+<span class="nc bnc" id="L512" title="All 2 branches missed.">                if (lock != null) {</span>
+<span class="nc" id="L513">                    logger.debug(format(&quot;found stale data directory %s&quot;, dir));</span>
+<span class="nc bnc" id="L514" title="All 2 branches missed.">                    if (new File(dir, &quot;postmaster.pid&quot;).exists()) {</span>
                         try {
 <span class="nc" id="L516">                            stopDatabase(dir);</span>
 <span class="nc" id="L517">                            logger.debug(&quot;shutting down orphaned database!&quot;);</span>
@@ -519,14 +519,14 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="nc" id="L519">                            logger.warn(format(&quot;failed to orphaned database in %s:&quot;, dir), e);</span>
 <span class="nc" id="L520">                        }</span>
                     }
-<span class="fc" id="L522">                    EmbeddedUtil.rmdirs(dir);</span>
+<span class="nc" id="L522">                    EmbeddedUtil.rmdirs(dir);</span>
                 }
 <span class="nc" id="L524">            } catch (final OverlappingFileLockException e) {</span>
                 // The directory belongs to another instance in this VM.
 <span class="nc" id="L526">                logger.trace(&quot;while cleaning old data directories:&quot;, e);</span>
 <span class="nc" id="L527">            } catch (final Exception e) {</span>
 <span class="nc" id="L528">                logger.warn(&quot;while cleaning old data directories:&quot;, e);</span>
-<span class="pc" id="L529">            }</span>
+<span class="nc" id="L529">            }</span>
         }
 <span class="fc" id="L531">    }</span>
 
@@ -602,7 +602,7 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="fc" id="L602">        private final Map&lt;String, String&gt; localeConfiguration = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L603">        private boolean removeDataOnShutdown = true;</span>
 <span class="fc" id="L604">        private int port = 0;</span>
-<span class="fc" id="L605">        private String serverVersion = POSTGRES_VERSION;</span>
+<span class="fc" id="L605">        private String serverVersion = DEFAULT_POSTGRES_VERSION;</span>
 <span class="fc" id="L606">        private final Map&lt;String, String&gt; connectionProperties = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L607">        private NativeBinaryManager nativeBinaryManager = null;</span>
 <span class="fc" id="L608">        private Duration serverStartupWait = DEFAULT_PG_STARTUP_WAIT;</span>
@@ -798,11 +798,11 @@ public final class EmbeddedPostgres implements AutoCloseable {
         }
 
         /**
-         * Set the version of the PostgreSQL server. This value is passed to the default binary manager which will try to resolve
-         * this version from existing Maven artifacts. The value is ignored if {@link #setNativeBinaryManager(NativeBinaryManager)} is called.
-         *
-         * Not every PostgreSQL version is supported by pg-embedded. Some older versions lack the necessary options for the command
-         * line parameters and will fail at startup. Currently, every version 10 or newer should be working.
+         * Set the version of the PostgreSQL server. This value is passed to the default binary manager which will try to resolve this version from existing
+         * Maven artifacts. The value is ignored if {@link #setNativeBinaryManager(NativeBinaryManager)} is called.
+         * &lt;p&gt;
+         * Not every PostgreSQL version is supported by pg-embedded. Some older versions lack the necessary options for the command line parameters and will
+         * fail at startup. Currently, every version 10 or newer should be working.
          *
          * @param serverVersion A partial or full version. Valid values are e.g. &quot;12&quot; or &quot;11.3&quot;.
          */
@@ -885,30 +885,32 @@ public final class EmbeddedPostgres implements AutoCloseable {
 
 <span class="fc" id="L886">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
 <span class="fc bfc" id="L887" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
-                // Use the parent directory if no installation directory set.
-<span class="fc" id="L889">                File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
-<span class="fc" id="L890">                nativeBinaryManager = new TarXzCompressedBinaryManager(installationBaseDirectory,</span>
-                        EmbeddedPostgres.LOCK_FILE_NAME, new ZonkyIOPostgresLocator(serverVersion));
+<span class="fc" id="L888">                final String serverVersion = System.getProperty(&quot;pg-embedded.postgres-version&quot;, this.serverVersion);</span>
+<span class="fc" id="L889">                nativeBinaryManager = new TarXzCompressedBinaryManager(new ZonkyIOPostgresLocator(serverVersion));</span>
             }
+
+            // Use the parent directory if no installation directory set.
+<span class="fc" id="L893">            File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
+<span class="fc" id="L894">            nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);</span>
 
             // this is where the binary manager actually places the unpackaged postgres installation.
-<span class="fc" id="L895">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
+<span class="fc" id="L897">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
 
-<span class="fc" id="L897">            File dataDirectory = this.dataDirectory;</span>
-<span class="fc bfc" id="L898" title="All 2 branches covered.">            if (dataDirectory == null) {</span>
-<span class="fc" id="L899">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
+<span class="fc" id="L899">            File dataDirectory = this.dataDirectory;</span>
+<span class="fc bfc" id="L900" title="All 2 branches covered.">            if (dataDirectory == null) {</span>
+<span class="fc" id="L901">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
             }
 
-<span class="fc" id="L902">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
+<span class="fc" id="L904">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
                     removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,
                     port, errRedirector, outRedirector,
                     serverStartupWait);
 
-<span class="fc" id="L907">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
+<span class="fc" id="L909">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
 
-<span class="fc" id="L909">            embeddedPostgres.boot();</span>
+<span class="fc" id="L911">            embeddedPostgres.boot();</span>
 
-<span class="fc" id="L911">            return embeddedPostgres;</span>
+<span class="fc" id="L913">            return embeddedPostgres;</span>
         }
     }
 }

@@ -79,9 +79,9 @@
 <span class="source-line-no">066</span><span id="line-66">public final class EmbeddedPostgres implements AutoCloseable {</span>
 <span class="source-line-no">067</span><span id="line-67"></span>
 <span class="source-line-no">068</span><span id="line-68">    /**</span>
-<span class="source-line-no">069</span><span id="line-69">     * The version of postgres used if no more specific version has been given.</span>
+<span class="source-line-no">069</span><span id="line-69">     * The version of postgres used if no specific version has been given.</span>
 <span class="source-line-no">070</span><span id="line-70">     */</span>
-<span class="source-line-no">071</span><span id="line-71">    public static final String POSTGRES_VERSION = System.getProperty("pg-embedded.postgres-version", "13");</span>
+<span class="source-line-no">071</span><span id="line-71">    public static final String DEFAULT_POSTGRES_VERSION = "13";</span>
 <span class="source-line-no">072</span><span id="line-72"></span>
 <span class="source-line-no">073</span><span id="line-73">    static final String[] LOCALHOST_SERVER_NAMES = new String[]{"localhost"};</span>
 <span class="source-line-no">074</span><span id="line-74"></span>
@@ -615,7 +615,7 @@
 <span class="source-line-no">602</span><span id="line-602">        private final Map&lt;String, String&gt; localeConfiguration = new HashMap&lt;&gt;();</span>
 <span class="source-line-no">603</span><span id="line-603">        private boolean removeDataOnShutdown = true;</span>
 <span class="source-line-no">604</span><span id="line-604">        private int port = 0;</span>
-<span class="source-line-no">605</span><span id="line-605">        private String serverVersion = POSTGRES_VERSION;</span>
+<span class="source-line-no">605</span><span id="line-605">        private String serverVersion = DEFAULT_POSTGRES_VERSION;</span>
 <span class="source-line-no">606</span><span id="line-606">        private final Map&lt;String, String&gt; connectionProperties = new HashMap&lt;&gt;();</span>
 <span class="source-line-no">607</span><span id="line-607">        private NativeBinaryManager nativeBinaryManager = null;</span>
 <span class="source-line-no">608</span><span id="line-608">        private Duration serverStartupWait = DEFAULT_PG_STARTUP_WAIT;</span>
@@ -811,11 +811,11 @@
 <span class="source-line-no">798</span><span id="line-798">        }</span>
 <span class="source-line-no">799</span><span id="line-799"></span>
 <span class="source-line-no">800</span><span id="line-800">        /**</span>
-<span class="source-line-no">801</span><span id="line-801">         * Set the version of the PostgreSQL server. This value is passed to the default binary manager which will try to resolve</span>
-<span class="source-line-no">802</span><span id="line-802">         * this version from existing Maven artifacts. The value is ignored if {@link #setNativeBinaryManager(NativeBinaryManager)} is called.</span>
-<span class="source-line-no">803</span><span id="line-803">         *</span>
-<span class="source-line-no">804</span><span id="line-804">         * Not every PostgreSQL version is supported by pg-embedded. Some older versions lack the necessary options for the command</span>
-<span class="source-line-no">805</span><span id="line-805">         * line parameters and will fail at startup. Currently, every version 10 or newer should be working.</span>
+<span class="source-line-no">801</span><span id="line-801">         * Set the version of the PostgreSQL server. This value is passed to the default binary manager which will try to resolve this version from existing</span>
+<span class="source-line-no">802</span><span id="line-802">         * Maven artifacts. The value is ignored if {@link #setNativeBinaryManager(NativeBinaryManager)} is called.</span>
+<span class="source-line-no">803</span><span id="line-803">         * &lt;p&gt;</span>
+<span class="source-line-no">804</span><span id="line-804">         * Not every PostgreSQL version is supported by pg-embedded. Some older versions lack the necessary options for the command line parameters and will</span>
+<span class="source-line-no">805</span><span id="line-805">         * fail at startup. Currently, every version 10 or newer should be working.</span>
 <span class="source-line-no">806</span><span id="line-806">         *</span>
 <span class="source-line-no">807</span><span id="line-807">         * @param serverVersion A partial or full version. Valid values are e.g. "12" or "11.3".</span>
 <span class="source-line-no">808</span><span id="line-808">         */</span>
@@ -898,33 +898,35 @@
 <span class="source-line-no">885</span><span id="line-885"></span>
 <span class="source-line-no">886</span><span id="line-886">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
 <span class="source-line-no">887</span><span id="line-887">            if (nativeBinaryManager == null) {</span>
-<span class="source-line-no">888</span><span id="line-888">                // Use the parent directory if no installation directory set.</span>
-<span class="source-line-no">889</span><span id="line-889">                File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
-<span class="source-line-no">890</span><span id="line-890">                nativeBinaryManager = new TarXzCompressedBinaryManager(installationBaseDirectory,</span>
-<span class="source-line-no">891</span><span id="line-891">                        EmbeddedPostgres.LOCK_FILE_NAME, new ZonkyIOPostgresLocator(serverVersion));</span>
-<span class="source-line-no">892</span><span id="line-892">            }</span>
-<span class="source-line-no">893</span><span id="line-893"></span>
-<span class="source-line-no">894</span><span id="line-894">            // this is where the binary manager actually places the unpackaged postgres installation.</span>
-<span class="source-line-no">895</span><span id="line-895">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
-<span class="source-line-no">896</span><span id="line-896"></span>
-<span class="source-line-no">897</span><span id="line-897">            File dataDirectory = this.dataDirectory;</span>
-<span class="source-line-no">898</span><span id="line-898">            if (dataDirectory == null) {</span>
-<span class="source-line-no">899</span><span id="line-899">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
-<span class="source-line-no">900</span><span id="line-900">            }</span>
-<span class="source-line-no">901</span><span id="line-901"></span>
-<span class="source-line-no">902</span><span id="line-902">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
-<span class="source-line-no">903</span><span id="line-903">                    removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,</span>
-<span class="source-line-no">904</span><span id="line-904">                    port, errRedirector, outRedirector,</span>
-<span class="source-line-no">905</span><span id="line-905">                    serverStartupWait);</span>
-<span class="source-line-no">906</span><span id="line-906"></span>
-<span class="source-line-no">907</span><span id="line-907">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
+<span class="source-line-no">888</span><span id="line-888">                final String serverVersion = System.getProperty("pg-embedded.postgres-version", this.serverVersion);</span>
+<span class="source-line-no">889</span><span id="line-889">                nativeBinaryManager = new TarXzCompressedBinaryManager(new ZonkyIOPostgresLocator(serverVersion));</span>
+<span class="source-line-no">890</span><span id="line-890">            }</span>
+<span class="source-line-no">891</span><span id="line-891"></span>
+<span class="source-line-no">892</span><span id="line-892">            // Use the parent directory if no installation directory set.</span>
+<span class="source-line-no">893</span><span id="line-893">            File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
+<span class="source-line-no">894</span><span id="line-894">            nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);</span>
+<span class="source-line-no">895</span><span id="line-895"></span>
+<span class="source-line-no">896</span><span id="line-896">            // this is where the binary manager actually places the unpackaged postgres installation.</span>
+<span class="source-line-no">897</span><span id="line-897">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
+<span class="source-line-no">898</span><span id="line-898"></span>
+<span class="source-line-no">899</span><span id="line-899">            File dataDirectory = this.dataDirectory;</span>
+<span class="source-line-no">900</span><span id="line-900">            if (dataDirectory == null) {</span>
+<span class="source-line-no">901</span><span id="line-901">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
+<span class="source-line-no">902</span><span id="line-902">            }</span>
+<span class="source-line-no">903</span><span id="line-903"></span>
+<span class="source-line-no">904</span><span id="line-904">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
+<span class="source-line-no">905</span><span id="line-905">                    removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,</span>
+<span class="source-line-no">906</span><span id="line-906">                    port, errRedirector, outRedirector,</span>
+<span class="source-line-no">907</span><span id="line-907">                    serverStartupWait);</span>
 <span class="source-line-no">908</span><span id="line-908"></span>
-<span class="source-line-no">909</span><span id="line-909">            embeddedPostgres.boot();</span>
+<span class="source-line-no">909</span><span id="line-909">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
 <span class="source-line-no">910</span><span id="line-910"></span>
-<span class="source-line-no">911</span><span id="line-911">            return embeddedPostgres;</span>
-<span class="source-line-no">912</span><span id="line-912">        }</span>
-<span class="source-line-no">913</span><span id="line-913">    }</span>
-<span class="source-line-no">914</span><span id="line-914">}</span>
+<span class="source-line-no">911</span><span id="line-911">            embeddedPostgres.boot();</span>
+<span class="source-line-no">912</span><span id="line-912"></span>
+<span class="source-line-no">913</span><span id="line-913">            return embeddedPostgres;</span>
+<span class="source-line-no">914</span><span id="line-914">        }</span>
+<span class="source-line-no">915</span><span id="line-915">    }</span>
+<span class="source-line-no">916</span><span id="line-916">}</span>
 
 
 

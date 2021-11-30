@@ -44,14 +44,21 @@
   <ul class="nav nav-list">
    <li class="nav-header">Usage</li>
     <li class="active"><a href="#"><span class="none"></span>Overview</a></li>
-    <li><a href="using_database_manager.html" title="Using the DatabaseManager"><span class="none"></span>Using the DatabaseManager</a></li>
-    <li><a href="using_embedded_postgres.html" title="Using EmbeddedPostgres"><span class="none"></span>Using EmbeddedPostgres</a></li>
-    <li><a href="using_flyway.html" title="Database customization with Flyway"><span class="none"></span>Database customization with Flyway</a></li>
-    <li><a href="setting_postgres_version.html" title="Setting the PostgreSQL version"><span class="none"></span>Setting the PostgreSQL version</a></li>
+    <li><a href="using_database_manager.html" title="Using the DatabaseManager"><span class="icon-chevron-down"></span>Using the DatabaseManager</a>
+     <ul class="nav nav-list">
+      <li><a href="using_flyway.html" title="Database customization with Flyway"><span class="none"></span>Database customization with Flyway</a></li>
+     </ul></li>
+    <li><a href="using_embedded_postgres.html" title="Using EmbeddedPostgres"><span class="icon-chevron-down"></span>Using EmbeddedPostgres</a>
+     <ul class="nav nav-list">
+      <li><a href="setting_postgres_version.html" title="Setting the PostgreSQL version"><span class="none"></span>Setting the PostgreSQL version</a></li>
+     </ul></li>
     <li><a href="advanced_usage.html" title="Advanced Usage"><span class="none"></span>Advanced Usage</a></li>
    <li class="nav-header">Testing Frameworks</li>
     <li><a href="junit5.html" title="JUnit 5"><span class="none"></span>JUnit 5</a></li>
-   <li class="nav-header">Stuff</li>
+   <li class="nav-header">Links</li>
+    <li><a href="apidocs/index.html" title="Javadoc"><span class="none"></span>Javadoc</a></li>
+    <li><a href="building.html" title="Building the code"><span class="none"></span>Building the code</a></li>
+    <li><a href="contributing.html" title="Contributing"><span class="none"></span>Contributing</a></li>
     <li><a href="https://www.apache.org/licenses/LICENSE-2.0" class="externalLink" title="License"><span class="none"></span>License</a></li>
    <li class="nav-header">Project Documentation</li>
     <li><a href="project-info.html" title="Project Information"><span class="icon-chevron-down"></span>Project Information</a>
@@ -81,10 +88,10 @@
 <p>Start a PostgreSQL server for unit testing or local development.</p>
 <p>This library controls PostgreSQL server instances and gives easy access to one or more databases on the database server. Using <code>pg-embedded</code> makes unit and integration tests simple and allows easy development without having to install local binaries.</p><section>
 <h2><a name="How_it_works"></a>How it works</h2>
-<p>The library spins up one or more native PostgreSQL servers up and controls their lifecycle through <code>EmbeddedPostgres</code> instances. When an instance is closed, the database server is shut down.</p>
-<p><code>EmbeddedPostgres</code> class instances manage a PostgreSQL server. Each server is independent, multiple instances will manage multiple, independent servers. This allows testing of more complex systems that may use multiple databases.</p>
-<p><code>DatabaseManager</code> provides an API to manage one or more database instances on a PostgreSQL server. Each <code>DatabaseManager</code> manages a PostgreSQL server.</p>
-<p>pg-embedded supports the JUnit5 test framework directly through the <code>EmbeddedPgExtension</code>.</p></section><section>
+<p>The library spins up one or more PostgreSQL servers up and controls their lifecycle through <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> instances. When an instance is closed, the database server is shut down.</p>
+<p><a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> class instances manage a PostgreSQL server. Each server is independent, multiple instances will manage multiple, independent servers. This allows testing of more complex systems that may use multiple databases.</p>
+<p><a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/DatabaseManager.html">DatabaseManager</a> provides an API to manage one or more database instances on a PostgreSQL server. Each <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/DatabaseManager.html">DatabaseManager</a> manages a PostgreSQL server.</p>
+<p>pg-embedded supports the JUnit5 test framework directly through <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html">EmbeddedPgExtension</a>.</p></section><section>
 <h2><a name="How_to_use_it"></a>How to use it</h2>
 <ul>
 
@@ -94,53 +101,15 @@
 <h2><a name="Testing_with_pg-embedded"></a>Testing with pg-embedded</h2>
 <ul>
 
-<li>Using pg-embedded with JUnit 5</li>
+<li><a href="junit5.html">Using pg-embedded with JUnit 5</a></li>
 </ul></section><section>
 <h2><a name="Reference"></a>Reference</h2>
 <ul>
 
-<li><a href="apidocs/">Javadoc</a></li>
-<li>[Building the code]</li>
-<li>[Contributing]</li>
-</ul></section><section>
-<h2><a name="JUnit_5_usage"></a>JUnit 5 usage</h2>
-<p>Only JUnit 5 is supported!</p>
-
-<div class="source">
-<div class="source"><pre class="prettyprint linenums">@RegisterExtension
-EmbeddedPgExtension pg = SingleDatabaseBuilder.instance().build();
-
-@Test
-public void simpleTest() throws SQLException {
-    try (Connection c = pg.getDatabase().getConnection();
-        Statement s = c.createStatement()) {
-        try (ResultSet rs = s.executeQuery(&quot;SELECT 1&quot;)) {
-            assertTrue(rs.next();
-            assertEquals(1, return rs.getInt(1));
-        }
-    }
-}
-</pre></div></div>
-<section>
-<h3><a name="Features"></a>Features</h3>
-<ul>
-
-<li>class member (static) extension field reuses the same postgres instance for all test cases, instance member will use a new postgres instance for every test case.</li>
-<li><code>SingleDatabaseBuilder</code> will use the same database for all calls to <code>EmbeddedPgExtension#createDatabaseInfo()</code> and <code>EmbeddedPgExtension#createDataSource()</code>. <code>MultiDatabaseBuilder</code> will create a new database on every call.</li>
-<li><code>instance()</code> returns a builder that can be customized with preparer and customizers.</li>
-<li><code>instanceWithDefaults()</code> returns a builder with defaults applied that can be customized.</li>
-<li><code>preparedInstance()</code> takes a database preparer and returns a builder.</li>
-<li><code>preparedInstanceWithDefaults()</code> takes a database preparer, applies defaults and returns a builder.</li>
-</ul></section></section><section>
-<h2><a name="Migrators_.28Flyway.29"></a>Migrators (Flyway)</h2>
-
-<div class="source">
-<div class="source"><pre class="prettyprint linenums">@RegisterExtension
-public static EmbeddedPgExtension singleDatabase =
-    SingleDatabaseBuilder.preparedInstanceWithDefaults(
-        FlywayPreparer.forClasspathLocation(&quot;db/testing&quot;))
-    .build();
-</pre></div></div></section>
+<li><a href="apidocs/index.html">Javadoc</a></li>
+<li><a href="building.html">Building the code</a></li>
+<li><a href="contributing.html">Contributing</a></li>
+</ul></section>
         </main>
       </div>
     </div>

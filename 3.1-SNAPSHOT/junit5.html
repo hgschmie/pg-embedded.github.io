@@ -70,6 +70,54 @@
         </header>
         <main id="bodyColumn"  class="span10" >
 <h1>JUnit 5 Test Framework integration</h1>
+<p><code>pg-embedded</code> supports the <a class="externalLink" href="https://junit.org/">JUnit 5</a> framework through the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html">EmbeddedPgExtension</a> class.</p>
+<p>The following snipped creates a new extension programmatically:</p>
+
+<div class="source">
+<div class="source"><pre class="prettyprint linenums">@RegisterExtension
+public static EmbeddedPgExtension multiDatabase = MultiDatabaseBuilder.instanceWithDefaults().build();
+</pre></div></div>
+
+<p><a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html">EmbeddedPgExtension</a> supports registration as a static field or an instance field. If registered as a static field, the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> instance supporting the extension is started once per test class, otherwise a new instance is started and stopped for each test method.</p><section>
+<h2><a name="Creating_and_customizing_EmbeddedPgExtension"></a>Creating and customizing EmbeddedPgExtension</h2>
+<p>Programmatically created instances are the preferred way to use the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html">EmbeddedPgExtension</a>. They can be customized extensively using the builder classes:</p>
+<ul>
+
+<li><a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/MultiDatabaseBuilder.html">MultiDatabaseBuilder</a> creates an extension in <b>multi database</b> mode. Any invocation of <code>EmbeddedPgExtension.createDatabaseInfo()</code> or <code>EmbeddedPgExtension.createDataSource()</code> creates a new database.</li>
+<li><a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/SingleDatabaseBuilder.html">SingleDatabaseBuilder</a> creates an extension in <b>single database</b> mode. Any invocation of <code>EmbeddedPgExtension.createDatabaseInfo()</code> or <code>EmbeddedPgExtension.createDataSource()</code> accesses the default database.</li>
+</ul>
+<p>All builders have the same set static creation methods for simple, fluent configuration in test classes:</p>
+<ul>
+
+<li><code>instance()</code> returns a vanilla, not customized <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/DatabaseManager.Builder.html">Builder</a>.</li>
+<li><code>instanceWithDefaults()</code> returns a <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/DatabaseManager.Builder.html">Builder</a> with <code>Builder.withInstancePreparer(EmbeddedPostgres.Builder::withDefaults)</code> as an instance preparer.</li>
+<li><code>preparedInstance()</code> returns a <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/DatabaseManager.Builder.html">Builder</a> that registers the provided <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgresPreparer.html">EmbeddedPostgresPreparer</a> as a database preparer</li>
+<li><code>preparedInstanceWithDefaults()</code> returns a <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/DatabaseManager.Builder.html">Builder</a> that registers the provided <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgresPreparer.html">EmbeddedPostgresPreparer</a> as a database preparer and <code>Builder.withInstancePreparer(EmbeddedPostgres.Builder::withDefaults)</code> as an instance preparer.</li>
+</ul>
+<p>The methods to customize the <a href="using_database_manager.html#Customizing_the_DatabaseManager">DatabaseManager</a> are also available for <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html">EmbeddedPgExtension</a> customization.</p></section><section>
+<h2><a name="Declarative_use"></a>Declarative use</h2>
+<p>Tests can also use declarative registration of the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html">EmbeddedPgExtension</a> class.</p>
+
+<div class="source">
+<div class="source"><pre class="prettyprint linenums">@ExtendWith(EmbeddedPgExtension.class)
+public class DeclarativeTest {
+
+    @Test
+    public void testCode(DataSource dataSource) {
+      ...
+    }
+</pre></div></div>
+
+<p>Using the <code>@ExtendWith</code> annotation on the class declaration creates a per-class extension, registration on the method-level creates a per-method extension.</p></section><section>
+<h2><a name="Parameter_resolution"></a>Parameter resolution</h2>
+<p>When using declarative registration (and unambiguous programmatic registration), test methods can declare parameters which will be resolved at runtime.</p>
+<p>The <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/junit5/EmbeddedPgExtension.html">EmbeddedPgExtension</a> supports the following parameter types:</p>
+<ul>
+
+<li><a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> instance used by the extension</li>
+<li><a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/DatabaseInfo.html">DatabaseInfo</a>, the value is equivalent to calling <code>EmbeddedPgExtension.createDatabaseInfo()</code></li>
+<li><code>DataSource</code>, the value is equivalent to calling <code>EmbeddedPgExtension.createDataSource()</code>.</li>
+</ul></section>
         </main>
       </div>
     </div>

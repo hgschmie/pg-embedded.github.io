@@ -70,7 +70,7 @@
         </header>
         <main id="bodyColumn"  class="span10" >
 <h1>Using EmbeddedPostgres to control PostgreSQL server instances</h1>
-<p>Each EmbeddedPostgres instance manages a PostgreSQL server. It supports starting and stopping the server and basic configuration.</p>
+<p>Each <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> instance manages a PostgreSQL server. It supports starting and stopping the server and basic configuration.</p>
 <p>Minimal code to start a PostgreSQL server.</p>
 
 <div class="source">
@@ -86,8 +86,8 @@
 }
 </pre></div></div>
 
-<p>This code snippet starts a PostgreSQL server with default settings (see the <code>EmbeddedPostgres.Builder#withDefaults()</code> method for details). The instance will terminate when the <code>EmbeddedPostgres</code> class is closed, so it can be used with the try-with-resources construct.</p>
-<p>Further customization can be done using a builder:</p>
+<p>This code snippet starts a PostgreSQL server with default settings (see the <code>Builder.withDefaults()</code> method in the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.Builder.html">EmbeddedPostgres.Builder</a> class for details). The instance will terminate when the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> class is closed. It can be used with try-with-resources.</p>
+<p>Further customization is done with the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.Builder.html">EmbeddedPostgres.Builder</a> class:</p>
 
 <div class="source">
 <div class="source"><pre class="prettyprint linenums">try (EmbeddedPostgres pg = EmbeddedPostgres.builder()
@@ -111,20 +111,20 @@
 <h3><a name="Common_settings"></a>Common settings</h3>
 <ul>
 
-<li><code>addInitDbConfiguration</code> adds parameters for the <code>initdb</code> command that creates the initial configuration of the PostgreSQL server. Parameters that do not require a value can be added by using the empty string as value.</li>
-<li><code>addServerConfiguration</code> adds parameters for the <code>postgres</code> server command to start and stop the server.</li>
-<li><code>addConnectionProperty</code> adds parameters that are applied to every DataSource object created with the various DataSource creation methods on the <code>EmbeddedPostgres</code> class.</li>
+<li><code>Builder.addInitDbConfiguration()</code> adds parameters for the <code>initdb</code> command that creates the initial configuration of the PostgreSQL server. Parameters that do not require a value can be added by using the empty string as value.</li>
+<li><code>Builder.addServerConfiguration()</code> adds parameters for the <code>postgres</code> server command to start and stop the server.</li>
+<li><code>Builder.addConnectionProperty()</code> adds parameters that are applied to every DataSource object created with the various DataSource creation methods on the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> class.</li>
 </ul></section><section>
 <h3><a name="Controlling_the_Postgres_installation"></a>Controlling the Postgres installation</h3>
 <p>By default, pg-embedded will use an internal mechanism to resolve Postgres binaries and manage the data directories. There are a number of builder methods to influence this mechanism.</p>
 <ul>
 
-<li><code>setServerVersion</code> controls the version of PostgreSQL. By default, version &#x201c;13&#x201d; is used. This version is a partial or full version string and it is resolved against the available artifacts on Maven Central. Not all PostgreSQL versions are available and pg-embedded only supports version 10 or newer. Please see the &#x201c;choosing the postgres version&#x201d; page for more information on how pg-embedded selects a postgres version.</li>
-<li><code>setPort</code> changes the port allocation mechanism. By default, <code>pg-embedded</code> will choose a random, unallocated TCP port and start the server on that port. Calling the <code>setPort</code> method will use the specific TCP port. Please note that, if the port is not available, starting the server will fail.</li>
-<li><code>setServerStartupWait</code> sets the timeout to wait for the PostgreSQL server to start. The default is 10 seconds.</li>
-<li><code>setRemoveDataOnShutdown</code> controls whether pg-embedded cleans up its data directory. Sometimes it is desirable to reuse or inspect the state of the postgres data directories after the <code>EmbeddedPostgres</code> code has finished. Calling this method with <code>false</code> will preserve the data directory.</li>
-<li><code>setDataDirectory</code> controls the base path where data directories are created. Within this folder, each database instance will create its own data directory prefixed with <code>data-</code>. These folders are deleted when <code>EmbeddedPostgres</code> is shut down unless the <code>setRemoveDataOnShutdown</code> option has been set to false.</li>
-<li><code>setInstallationBaseDirectory</code> controls where the binary Postgres distributions are unpacked. Installations are prefixed with <code>bin-</code>. Postgres installation are only unpacked once.</li>
+<li><code>Builder.setServerVersion()</code> controls the version of PostgreSQL. By default, Postgres version <b>13</b> is used. This version is a partial or full version string and it is resolved against the available artifacts on Maven Central. Not all PostgreSQL versions are available and pg-embedded only supports version 10 or newer. Please see the &#x201c;choosing the postgres version&#x201d; page for more information on how pg-embedded selects a postgres version.</li>
+<li><code>Builder.setPort()</code> changes the port allocation mechanism. By default, <code>pg-embedded</code> will choose a random, unallocated TCP port and start the server on that port. Calling the <code>Builder.setPort()</code> method will use the specific TCP port. Please note that, if the port is not available, starting the server will fail.</li>
+<li><code>Builder.setServerStartupWait()</code> sets the timeout to wait for the PostgreSQL server to start. The default is 10 seconds.</li>
+<li><code>Builder.setRemoveDataOnShutdown()</code> controls whether pg-embedded cleans up its data directory. Sometimes it is desirable to reuse or inspect the state of the postgres data directories after the <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> code has finished. Calling this method with <code>false</code> will preserve the data directory.</li>
+<li><code>Builder.setDataDirectory()</code> controls the base path where data directories are created. Within this folder, each database instance will create its own data directory prefixed with <code>data-</code>. These folders are deleted when <a href="apidocs/de.softwareforge.testing.postgres/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html">EmbeddedPostgres</a> is shut down unless the <code>Builder.setRemoveDataOnShutdown()</code> option has been set to <code>false</code>.</li>
+<li><code>Builder.setInstallationBaseDirectory()</code> controls where the binary Postgres distributions are unpacked. Installations are prefixed with <code>bin-</code>. By default, each PostgreSQL installation are only unpacked once.</li>
 </ul>
 <p>Advanced uses including using a locally installed Postgres are documented on the <a href="advanced_usage.html">Advanced Usage</a> page.</p></section></section>
         </main>

@@ -43,8 +43,8 @@
 <span class="source-line-no">030</span><span id="line-30">    @Test</span>
 <span class="source-line-no">031</span><span id="line-31">    public void testClasspathLocator() throws Exception {</span>
 <span class="source-line-no">032</span><span id="line-32">        // this test only runs on Mac</span>
-<span class="source-line-no">033</span><span id="line-33">        Assumptions.assumeTrue(EmbeddedUtil.IS_OS_MAC, "Not on MacOS");</span>
-<span class="source-line-no">034</span><span id="line-34">        Assumptions.assumeTrue(EmbeddedUtil.IS_ARCH_X86_64 || EmbeddedUtil.IS_ARCH_AARCH64, "Not on MacOS x86 or aarch64");</span>
+<span class="source-line-no">033</span><span id="line-33">        Assumptions.assumeTrue(EmbeddedUtil.IS_OS_MAC);</span>
+<span class="source-line-no">034</span><span id="line-34">        Assumptions.assumeTrue(EmbeddedUtil.IS_ARCH_X86_64 || EmbeddedUtil.IS_ARCH_AARCH64);</span>
 <span class="source-line-no">035</span><span id="line-35"></span>
 <span class="source-line-no">036</span><span id="line-36">        try (EmbeddedPostgres pg = EmbeddedPostgres.builderWithDefaults()</span>
 <span class="source-line-no">037</span><span id="line-37">                .setNativeBinaryManager(new TarXzCompressedBinaryManager(new ClasspathLocator()))</span>

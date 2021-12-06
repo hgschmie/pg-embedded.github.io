@@ -15,6 +15,7 @@ package de.softwareforge.testing.postgres.embedded;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -22,9 +23,7 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 
 /**
- * Read standard output of process and write lines to given {@link Logger} as INFO; depends on {@link ProcessBuilder#redirectErrorStream(boolean)} being set to
- * {@code true} (since only stdout is read).
- *
+ * Read from an {@link InputStream} and send the information to the logger supplied.
  * &lt;p&gt;
  * The use of the input stream is thread safe since it's used only in a single thread&amp;mdash;the one launched by this code.
  */
@@ -33,33 +32,33 @@ final class ProcessOutputLogger implements Runnable {
     private final Logger logger;
     private final BufferedReader reader;
 
-<span class="fc" id="L36">    private ProcessOutputLogger(final Logger logger, final Process process) {</span>
-<span class="fc" id="L37">        this.logger = logger;</span>
-<span class="fc" id="L38">        this.reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));</span>
-<span class="fc" id="L39">    }</span>
+<span class="fc" id="L35">    private ProcessOutputLogger(final Logger logger, final InputStream stream) {</span>
+<span class="fc" id="L36">        this.logger = logger;</span>
+<span class="fc" id="L37">        this.reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));</span>
+<span class="fc" id="L38">    }</span>
 
     @Override
     public void run() {
         try {
             try {
-<span class="fc" id="L45">                reader.lines().forEach(logger::debug);</span>
-<span class="nc" id="L46">            } catch (final UncheckedIOException e) {</span>
-<span class="nc" id="L47">                logger.error(&quot;while reading output:&quot;, e);</span>
-<span class="fc" id="L48">            }</span>
+<span class="fc" id="L44">                reader.lines().forEach(logger::debug);</span>
+<span class="nc" id="L45">            } catch (final UncheckedIOException e) {</span>
+<span class="nc" id="L46">                logger.error(&quot;while reading output:&quot;, e);</span>
+<span class="fc" id="L47">            }</span>
         } finally {
             try {
-<span class="fc" id="L51">                reader.close();</span>
-<span class="nc" id="L52">            } catch (final IOException e) {</span>
-<span class="nc" id="L53">                logger.trace(&quot;while closing reader:&quot;, e);</span>
-<span class="fc" id="L54">            }</span>
+<span class="fc" id="L50">                reader.close();</span>
+<span class="nc" id="L51">            } catch (final IOException e) {</span>
+<span class="nc" id="L52">                logger.trace(&quot;while closing reader:&quot;, e);</span>
+<span class="fc" id="L53">            }</span>
         }
-<span class="fc" id="L56">    }</span>
+<span class="fc" id="L55">    }</span>
 
-    static void logOutput(final Logger logger, final String name, final Process process) {
-<span class="fc" id="L59">        final Thread t = new Thread(new ProcessOutputLogger(logger, process));</span>
-<span class="fc" id="L60">        t.setName(name);</span>
-<span class="fc" id="L61">        t.setDaemon(true);</span>
-<span class="fc" id="L62">        t.start();</span>
-<span class="fc" id="L63">    }</span>
+    static void logStream(final Logger logger, final String name, final InputStream stream) {
+<span class="fc" id="L58">        final Thread t = new Thread(new ProcessOutputLogger(logger, stream));</span>
+<span class="fc" id="L59">        t.setName(name);</span>
+<span class="fc" id="L60">        t.setDaemon(true);</span>
+<span class="fc" id="L61">        t.start();</span>
+<span class="fc" id="L62">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

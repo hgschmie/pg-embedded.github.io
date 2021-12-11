@@ -122,93 +122,95 @@ final class EmbeddedUtil {
 
     @SuppressFBWarnings(&quot;RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE&quot;)
     static void rmdirs(File dir) throws IOException {
-<span class="fc" id="L125">        try (Stream&lt;Path&gt; walk = Files.walk(dir.toPath())) {</span>
-<span class="fc" id="L126">            walk.sorted(Comparator.reverseOrder())</span>
-<span class="fc" id="L127">                    .map(Path::toFile)</span>
-<span class="fc" id="L128">                    .forEach(File::delete);</span>
+<span class="pc bpc" id="L125" title="1 of 4 branches missed.">        if (dir.exists() &amp;&amp; dir.isDirectory()) {</span>
+<span class="fc" id="L126">            try (Stream&lt;Path&gt; walk = Files.walk(dir.toPath())) {</span>
+<span class="fc" id="L127">                walk.sorted(Comparator.reverseOrder())</span>
+<span class="fc" id="L128">                        .map(Path::toFile)</span>
+<span class="fc" id="L129">                        .forEach(File::delete);</span>
+            }
         }
-<span class="fc" id="L130">    }</span>
+<span class="fc" id="L132">    }</span>
 
     static String formatDuration(Duration duration) {
-<span class="fc" id="L133">        long millis = duration.toMillis();</span>
+<span class="fc" id="L135">        long millis = duration.toMillis();</span>
         long hours;
         long minutes;
         long secs;
         long ms;
-<span class="fc" id="L138">        ImmutableList.Builder&lt;String&gt; builder = ImmutableList.builder();</span>
-<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if (millis == 0) {</span>
-<span class="nc" id="L140">            builder.add(&quot;0 ms&quot;);</span>
+<span class="fc" id="L140">        ImmutableList.Builder&lt;String&gt; builder = ImmutableList.builder();</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">        if (millis == 0) {</span>
+<span class="nc" id="L142">            builder.add(&quot;0 ms&quot;);</span>
         } else {
-<span class="fc" id="L142">            long seconds = millis / 1000L;</span>
-<span class="fc" id="L143">            hours = seconds / 3600L;</span>
-<span class="fc" id="L144">            minutes = (seconds % 3600L) / 60L;</span>
-<span class="fc" id="L145">            secs = (seconds % 60L);</span>
-<span class="fc" id="L146">            ms = millis % 1000L;</span>
+<span class="fc" id="L144">            long seconds = millis / 1000L;</span>
+<span class="fc" id="L145">            hours = seconds / 3600L;</span>
+<span class="fc" id="L146">            minutes = (seconds % 3600L) / 60L;</span>
+<span class="fc" id="L147">            secs = (seconds % 60L);</span>
+<span class="fc" id="L148">            ms = millis % 1000L;</span>
 
-<span class="pc bpc" id="L148" title="1 of 2 branches missed.">            if (hours != 0) {</span>
-<span class="nc" id="L149">                builder.add(hours + &quot; hours&quot;);</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">            if (hours != 0) {</span>
+<span class="nc" id="L151">                builder.add(hours + &quot; hours&quot;);</span>
             }
-<span class="pc bpc" id="L151" title="1 of 2 branches missed.">            if (minutes != 0) {</span>
-<span class="nc" id="L152">                builder.add(minutes + &quot; minutes&quot;);</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">            if (minutes != 0) {</span>
+<span class="nc" id="L154">                builder.add(minutes + &quot; minutes&quot;);</span>
             }
-<span class="fc bfc" id="L154" title="All 2 branches covered.">            if (secs != 0) {</span>
-<span class="fc" id="L155">                builder.add(secs + &quot; seconds&quot;);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">            if (secs != 0) {</span>
+<span class="fc" id="L157">                builder.add(secs + &quot; seconds&quot;);</span>
             }
-<span class="fc bfc" id="L157" title="All 2 branches covered.">            if (ms != 0) {</span>
-<span class="fc" id="L158">                builder.add(ms + &quot; ms&quot;);</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">            if (ms != 0) {</span>
+<span class="fc" id="L160">                builder.add(ms + &quot; ms&quot;);</span>
             }
         }
 
-<span class="fc" id="L162">        return Joiner.on(' ').join(builder.build());</span>
+<span class="fc" id="L164">        return Joiner.on(' ').join(builder.build());</span>
     }
 
     static int allocatePort() throws IOException {
-<span class="fc" id="L166">        try (ServerSocket socket = new ServerSocket(0)) {</span>
-<span class="pc bpc" id="L167" title="1 of 2 branches missed.">            while (!socket.isBound()) {</span>
-<span class="nc" id="L168">                Thread.sleep(50);</span>
+<span class="fc" id="L168">        try (ServerSocket socket = new ServerSocket(0)) {</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">            while (!socket.isBound()) {</span>
+<span class="nc" id="L170">                Thread.sleep(50);</span>
             }
-<span class="fc" id="L170">            return socket.getLocalPort();</span>
-<span class="nc" id="L171">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L172">            Thread.currentThread().interrupt();</span>
-<span class="nc" id="L173">            throw new IOException(&quot;Thread interrupted!&quot;, e);</span>
+<span class="fc" id="L172">            return socket.getLocalPort();</span>
+<span class="nc" id="L173">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L174">            Thread.currentThread().interrupt();</span>
+<span class="nc" id="L175">            throw new IOException(&quot;Thread interrupted!&quot;, e);</span>
         }
     }
 
     static String randomAlphaNumeric(int length) {
-<span class="fc" id="L178">        return randomString(ALPHANUM, length);</span>
+<span class="fc" id="L180">        return randomString(ALPHANUM, length);</span>
     }
 
     static String randomLowercase(int length) {
-<span class="fc" id="L182">        return randomString(LOWERCASE, length);</span>
+<span class="fc" id="L184">        return randomString(LOWERCASE, length);</span>
     }
 
     private static String sequence(char start, int count) {
-<span class="fc" id="L186">        StringBuilder sb = new StringBuilder();</span>
-<span class="fc bfc" id="L187" title="All 2 branches covered.">        for (int i = 0; i &lt; count; i++) {</span>
-<span class="fc" id="L188">            sb.append((char) (start + i));</span>
+<span class="fc" id="L188">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">        for (int i = 0; i &lt; count; i++) {</span>
+<span class="fc" id="L190">            sb.append((char) (start + i));</span>
         }
-<span class="fc" id="L190">        return sb.toString();</span>
+<span class="fc" id="L192">        return sb.toString();</span>
     }
 
     private static String randomString(String alphabet, int length) {
-<span class="fc" id="L194">        StringBuilder sb = new StringBuilder();</span>
-<span class="fc bfc" id="L195" title="All 2 branches covered.">        for (int i = 0; i &lt; length; i++) {</span>
-<span class="fc" id="L196">            int random = ThreadLocalRandom.current().nextInt(alphabet.length());</span>
-<span class="fc" id="L197">            sb.append(alphabet.charAt(random));</span>
+<span class="fc" id="L196">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">        for (int i = 0; i &lt; length; i++) {</span>
+<span class="fc" id="L198">            int random = ThreadLocalRandom.current().nextInt(alphabet.length());</span>
+<span class="fc" id="L199">            sb.append(alphabet.charAt(random));</span>
         }
-<span class="fc" id="L199">        return sb.toString();</span>
+<span class="fc" id="L201">        return sb.toString();</span>
     }
 
     private static String getSystemProperty(String propertyName) {
         try {
-<span class="fc" id="L204">            return Strings.nullToEmpty(System.getProperty(propertyName, &quot;&quot;));</span>
-<span class="nc" id="L205">        } catch (SecurityException e) {</span>
-<span class="nc" id="L206">            return &quot;&lt;unknown&gt;&quot;;</span>
+<span class="fc" id="L206">            return Strings.nullToEmpty(System.getProperty(propertyName, &quot;&quot;));</span>
+<span class="nc" id="L207">        } catch (SecurityException e) {</span>
+<span class="nc" id="L208">            return &quot;&lt;unknown&gt;&quot;;</span>
         }
     }
 
     private static boolean getOsMatchesName(final String osNamePrefix) {
-<span class="fc" id="L211">        return OS_NAME.toLowerCase(Locale.ROOT).startsWith(osNamePrefix.toLowerCase(Locale.ROOT));</span>
+<span class="fc" id="L213">        return OS_NAME.toLowerCase(Locale.ROOT).startsWith(osNamePrefix.toLowerCase(Locale.ROOT));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

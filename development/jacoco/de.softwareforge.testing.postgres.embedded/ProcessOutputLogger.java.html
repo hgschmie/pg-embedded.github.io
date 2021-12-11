@@ -14,12 +14,20 @@
 package de.softwareforge.testing.postgres.embedded;
 
 import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.Closeable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
+import com.google.common.io.Closeables;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 
 /**
@@ -27,38 +35,79 @@ import org.slf4j.Logger;
  * &lt;p&gt;
  * The use of the input stream is thread safe since it's used only in a single thread&amp;mdash;the one launched by this code.
  */
-final class ProcessOutputLogger implements Runnable {
+class ProcessOutputLogger implements Closeable {
 
-    private final Logger logger;
-    private final BufferedReader reader;
+    private final Logger errorLogger;
+    private final ListeningExecutorService executorService;
 
-<span class="fc" id="L35">    private ProcessOutputLogger(final Logger logger, final InputStream stream) {</span>
-<span class="fc" id="L36">        this.logger = logger;</span>
-<span class="fc" id="L37">        this.reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));</span>
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L43">    ProcessOutputLogger(final Logger errorLogger) {</span>
+<span class="fc" id="L44">        this.errorLogger = errorLogger;</span>
+<span class="fc" id="L45">        this.executorService = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(new ThreadFactoryBuilder()</span>
+<span class="fc" id="L46">                .setDaemon(true)</span>
+<span class="fc" id="L47">                .setNameFormat(&quot;logger-thread-%d&quot;)</span>
+<span class="fc" id="L48">                .build()));</span>
+<span class="fc" id="L49">    }</span>
 
     @Override
-    public void run() {
-        try {
-            try {
-<span class="fc" id="L44">                reader.lines().forEach(logger::debug);</span>
-<span class="nc" id="L45">            } catch (final UncheckedIOException e) {</span>
-<span class="nc" id="L46">                logger.error(&quot;while reading output:&quot;, e);</span>
-<span class="fc" id="L47">            }</span>
-        } finally {
-            try {
-<span class="fc" id="L50">                reader.close();</span>
-<span class="nc" id="L51">            } catch (final IOException e) {</span>
-<span class="nc" id="L52">                logger.trace(&quot;while closing reader:&quot;, e);</span>
-<span class="fc" id="L53">            }</span>
-        }
-<span class="fc" id="L55">    }</span>
+    public void close() {
+<span class="fc" id="L53">        this.executorService.shutdownNow();</span>
+<span class="fc" id="L54">    }</span>
 
-    static void logStream(final Logger logger, final String name, final InputStream stream) {
-<span class="fc" id="L58">        final Thread t = new Thread(new ProcessOutputLogger(logger, stream));</span>
-<span class="fc" id="L59">        t.setName(name);</span>
-<span class="fc" id="L60">        t.setDaemon(true);</span>
-<span class="fc" id="L61">        t.start();</span>
-<span class="fc" id="L62">    }</span>
+    StreamCapture captureStreamAsLog() {
+<span class="fc" id="L57">        return new StreamCapture(errorLogger::info);</span>
+    }
+
+    StreamCapture captureStreamAsConsumer(Consumer&lt;String&gt; consumer) {
+<span class="fc" id="L61">        return new StreamCapture(consumer);</span>
+    }
+
+
+    class StreamCapture implements BiConsumer&lt;String, InputStream&gt; {
+
+        private final Consumer&lt;String&gt; consumer;
+<span class="fc" id="L68">        private volatile Future&lt;?&gt; completionFuture = null;</span>
+
+<span class="fc" id="L70">        private StreamCapture(Consumer&lt;String&gt; consumer) {</span>
+<span class="fc" id="L71">            this.consumer = consumer;</span>
+<span class="fc" id="L72">        }</span>
+
+        @Override
+        public void accept(String name, InputStream inputStream) {
+<span class="fc" id="L76">            this.completionFuture = executorService.submit(new LogRunnable(name, inputStream, consumer));</span>
+<span class="fc" id="L77">        }</span>
+
+        public Future&lt;?&gt; getCompletion() {
+<span class="fc" id="L80">            return completionFuture;</span>
+        }
+    }
+
+    private class LogRunnable implements Runnable {
+
+        private final BufferedReader reader;
+        private final String name;
+        private final Consumer&lt;String&gt; consumer;
+
+<span class="fc" id="L90">        private LogRunnable(String name, InputStream inputStream, Consumer&lt;String&gt; consumer) {</span>
+<span class="fc" id="L91">            this.name = name;</span>
+<span class="fc" id="L92">            this.reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));</span>
+<span class="fc" id="L93">            this.consumer = consumer;</span>
+<span class="fc" id="L94">        }</span>
+
+        @Override
+        public void run() {
+<span class="fc" id="L98">            String oldName = Thread.currentThread().getName();</span>
+<span class="fc" id="L99">            Thread.currentThread().setName(name);</span>
+            try {
+                try {
+<span class="fc" id="L102">                    reader.lines().forEach(consumer::accept);</span>
+<span class="nc" id="L103">                } catch (final UncheckedIOException e) {</span>
+<span class="nc" id="L104">                    errorLogger.error(&quot;while reading output:&quot;, e);</span>
+<span class="fc" id="L105">                }</span>
+            } finally {
+<span class="fc" id="L107">                Closeables.closeQuietly(reader);</span>
+<span class="fc" id="L108">                Thread.currentThread().setName(oldName + &quot; (&quot; + name + &quot;)&quot;);</span>
+            }
+<span class="fc" id="L110">        }</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

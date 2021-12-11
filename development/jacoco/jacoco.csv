@@ -17,7 +17,7 @@ pg-embedded,de.softwareforge.testing.postgres.embedded,ProcessOutputLogger.Strea
 pg-embedded,de.softwareforge.testing.postgres.embedded,FlywayPreparer,14,71,0,0,4,20,2,7,2,7
 pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator.new FilterInputStream() {...},0,16,0,0,0,4,0,2,0,2
 pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator,94,255,34,14,29,45,25,11,1,11
-pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProviderPipeline,25,94,2,4,7,30,2,6,0,5
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProviderPipeline,19,100,1,5,6,31,1,7,0,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,NativeBinaryLocator,30,0,2,0,5,0,2,0,1,0
 pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager,73,319,13,27,10,66,13,13,1,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo.Builder,63,94,15,13,15,28,12,10,0,8

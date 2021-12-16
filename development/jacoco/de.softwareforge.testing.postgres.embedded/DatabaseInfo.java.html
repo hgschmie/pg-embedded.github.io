@@ -75,6 +75,7 @@ public abstract class DatabaseInfo {
      * PostgreSQL JDBC driver documentation&lt;/a&gt; for a comprehensive list.
      *
      * @return Map of key-value pairs representing data source connection properties.
+     * @since 3.0
      */
     @NonNull
     public abstract ImmutableMap&lt;String, String&gt; connectionProperties();
@@ -84,14 +85,14 @@ public abstract class DatabaseInfo {
 
     @NonNull
     static Builder builder() {
-<span class="fc" id="L87">        return new AutoValue_DatabaseInfo.Builder()</span>
-<span class="fc" id="L88">                .dbName(PG_DEFAULT_DB)</span>
-<span class="fc" id="L89">                .user(PG_DEFAULT_USER);</span>
+<span class="fc" id="L88">        return new AutoValue_DatabaseInfo.Builder()</span>
+<span class="fc" id="L89">                .dbName(PG_DEFAULT_DB)</span>
+<span class="fc" id="L90">                .user(PG_DEFAULT_USER);</span>
     }
 
     @NonNull
     static DatabaseInfo forException(SQLException e) {
-<span class="fc" id="L94">        return builder().exception(e).port(-1).build();</span>
+<span class="fc" id="L95">        return builder().exception(e).port(-1).build();</span>
     }
 
     /**
@@ -101,12 +102,12 @@ public abstract class DatabaseInfo {
      */
     @NonNull
     public String asJdbcUrl() {
-<span class="fc" id="L104">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
+<span class="fc" id="L105">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
 
-<span class="fc" id="L106">        String additionalParameters = connectionProperties().entrySet().stream()</span>
-<span class="fc" id="L107">                .map(e -&gt; format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
-<span class="fc" id="L108">                .collect(Collectors.joining());</span>
-<span class="fc" id="L109">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
+<span class="fc" id="L107">        String additionalParameters = connectionProperties().entrySet().stream()</span>
+<span class="fc" id="L108">                .map(e -&gt; format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
+<span class="fc" id="L109">                .collect(Collectors.joining());</span>
+<span class="fc" id="L110">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
     }
 
     /**
@@ -117,15 +118,15 @@ public abstract class DatabaseInfo {
      */
     @NonNull
     public DataSource asDataSource() throws SQLException {
-<span class="pc bpc" id="L120" title="1 of 2 branches missed.">        if (exception().isPresent()) {</span>
-<span class="nc" id="L121">            throw exception().get();</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (exception().isPresent()) {</span>
+<span class="nc" id="L122">            throw exception().get();</span>
         }
 
-<span class="fc" id="L124">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
+<span class="fc" id="L125">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
     }
 
     @AutoValue.Builder
-<span class="fc" id="L128">    abstract static class Builder {</span>
+<span class="fc" id="L129">    abstract static class Builder {</span>
 
         abstract Builder dbName(String dbName);
 
@@ -138,8 +139,8 @@ public abstract class DatabaseInfo {
         abstract ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder();
 
         final Builder addConnectionProperty(String key, String value) {
-<span class="fc" id="L141">            connectionPropertiesBuilder().put(key, value);</span>
-<span class="fc" id="L142">            return this;</span>
+<span class="fc" id="L142">            connectionPropertiesBuilder().put(key, value);</span>
+<span class="fc" id="L143">            return this;</span>
         }
 
         abstract Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties);

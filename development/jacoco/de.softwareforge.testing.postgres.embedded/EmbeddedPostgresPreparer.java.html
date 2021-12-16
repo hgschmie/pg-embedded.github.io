@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * Allows e.g. for preparation of data sources, postgres instances and other places where additional degrees of customization are needed.
  *
  * @param &lt;T&gt; The object type to be prepared.
+ * @since 3.0
  */
 @FunctionalInterface
 public interface EmbeddedPostgresPreparer&lt;T&gt; {
@@ -35,7 +36,7 @@ public interface EmbeddedPostgresPreparer&lt;T&gt; {
      * @return a Do-nothing preparer.
      */
     static &lt;U&gt; EmbeddedPostgresPreparer&lt;U&gt; noOp() {
-<span class="nc" id="L38">        return element -&gt; {};</span>
+<span class="nc" id="L39">        return element -&gt; {};</span>
     }
 
     /**

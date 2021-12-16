@@ -29,7 +29,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Locates a native binary on the Filesystem. If necessary, it should download the binary first from the network.
  * &lt;p&gt;
- * Implementations of this class &lt;b&gt;must&lt;/b&gt; implement {@link Object#hashCode()} and {@link Object#equals(Object)} and *should* implement {@link Object#toString()}.
+ * Implementations of this class &lt;b&gt;must&lt;/b&gt; implement {@link Object#hashCode()} and {@link Object#equals(Object)} and &lt;i&gt;should&lt;/i&gt; implement {@link
+ * Object#toString()}.
+ *
+ * @since 3.0
  */
 public interface NativeBinaryLocator {
 
@@ -59,11 +62,11 @@ public interface NativeBinaryLocator {
     @NonNull
     @SuppressFBWarnings(&quot;NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE&quot;) // false positive
     default String getIdentifier() throws IOException {
-<span class="nc" id="L62">        try (InputStream installationArchive = getInputStream()) {</span>
-<span class="nc bnc" id="L63" title="All 2 branches missed.">            checkState(installationArchive != null, &quot;Locator '%s' did not find a suitable archive to unpack!&quot;, toString());</span>
-<span class="nc" id="L64">            try (HashingInputStream hashStream = new HashingInputStream(Hashing.murmur3_128(), installationArchive)) {</span>
-<span class="nc" id="L65">                ByteStreams.exhaust(hashStream);</span>
-<span class="nc" id="L66">                return INSTALL_DIRECTORY_PREFIX + BaseEncoding.base16().encode(hashStream.hash().asBytes());</span>
+<span class="nc" id="L65">        try (InputStream installationArchive = getInputStream()) {</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">            checkState(installationArchive != null, &quot;Locator '%s' did not find a suitable archive to unpack!&quot;, toString());</span>
+<span class="nc" id="L67">            try (HashingInputStream hashStream = new HashingInputStream(Hashing.murmur3_128(), installationArchive)) {</span>
+<span class="nc" id="L68">                ByteStreams.exhaust(hashStream);</span>
+<span class="nc" id="L69">                return INSTALL_DIRECTORY_PREFIX + BaseEncoding.base16().encode(hashStream.hash().asBytes());</span>
             }
         }
     }

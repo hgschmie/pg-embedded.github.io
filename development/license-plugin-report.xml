@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1644719782503">
-    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="4.2-SNAPSHOT"/>
+<licensePluginReport goal="CHECK" timestamp="1645648736863">
+    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="4.3-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
-        <file path="src/build/repack-postgres.sh" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabaseInfo.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabaseManager.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabasePreparer.java" result="PRESENT"/>

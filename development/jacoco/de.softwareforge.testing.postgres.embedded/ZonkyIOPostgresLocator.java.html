@@ -74,8 +74,8 @@ public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
     @Override
     public InputStream getInputStream() throws IOException {
         try {
-<span class="nc" id="L77">            File artifactFile = fileSupplier.get();</span>
-<span class="nc" id="L78">            return createJarStream(artifactFile);</span>
+<span class="fc" id="L77">            File artifactFile = fileSupplier.get();</span>
+<span class="fc" id="L78">            return createJarStream(artifactFile);</span>
 <span class="nc" id="L79">        } catch (UncheckedIOException e) {</span>
 <span class="nc" id="L80">            throw e.getCause();</span>
         }
@@ -114,27 +114,27 @@ public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
 
     private InputStream createJarStream(File file) {
         try {
-<span class="nc" id="L117">            JarFile jar = new JarFile(file);</span>
-<span class="nc" id="L118">            String entryName = format(&quot;postgres-%s-%s&quot;, computeOS(), computeTarXzArchitectureName());</span>
+<span class="fc" id="L117">            JarFile jar = new JarFile(file);</span>
+<span class="fc" id="L118">            String entryName = format(&quot;postgres-%s-%s&quot;, computeOS(), computeTarXzArchitectureName());</span>
 
             // alpine hack
-<span class="nc bnc" id="L121" title="All 2 branches missed.">            if (EmbeddedUtil.IS_ALPINE_LINUX) {</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">            if (EmbeddedUtil.IS_ALPINE_LINUX) {</span>
 <span class="nc" id="L122">                entryName += &quot;-alpine_linux&quot;;</span>
             }
 
-<span class="nc" id="L125">            JarEntry jarEntry = jar.getJarEntry(entryName + &quot;.txz&quot;);</span>
-<span class="nc bnc" id="L126" title="All 2 branches missed.">            checkState(jarEntry != null, &quot;Could not locate %s in the jar file (%s)&quot;, entryName, file.getAbsoluteFile());</span>
+<span class="fc" id="L125">            JarEntry jarEntry = jar.getJarEntry(entryName + &quot;.txz&quot;);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">            checkState(jarEntry != null, &quot;Could not locate %s in the jar file (%s)&quot;, entryName, file.getAbsoluteFile());</span>
 
             // When the input stream gets closed, close the jar file as well.
-<span class="nc" id="L129">            return new FilterInputStream(jar.getInputStream(jarEntry)) {</span>
+<span class="fc" id="L129">            return new FilterInputStream(jar.getInputStream(jarEntry)) {</span>
                 @Override
                 public void close() throws IOException {
                     try {
-<span class="nc" id="L133">                        super.close();</span>
+<span class="fc" id="L133">                        super.close();</span>
                     } finally {
-<span class="nc" id="L135">                        jar.close();</span>
+<span class="fc" id="L135">                        jar.close();</span>
                     }
-<span class="nc" id="L137">                }</span>
+<span class="fc" id="L137">                }</span>
             };
 <span class="nc" id="L139">        } catch (IOException e) {</span>
 <span class="nc" id="L140">            throw new UncheckedIOException(e);</span>
@@ -200,9 +200,9 @@ public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
     private static String computeOS() {
 <span class="fc" id="L201">        String os = EmbeddedUtil.OS_NAME;</span>
 <span class="pc bpc" id="L202" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_OS_LINUX) {</span>
-<span class="nc" id="L203">            os = &quot;linux&quot;;</span>
-<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
-<span class="fc" id="L205">            os = &quot;darwin&quot;;</span>
+<span class="fc" id="L203">            os = &quot;linux&quot;;</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="nc" id="L205">            os = &quot;darwin&quot;;</span>
 <span class="nc bnc" id="L206" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_WINDOWS) {</span>
 <span class="nc" id="L207">            os = &quot;windows&quot;;</span>
         }

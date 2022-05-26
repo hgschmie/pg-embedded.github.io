@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"de.softwareforge.testing.postgres.embedded"},{"l":"de.softwareforge.testing.postgres.junit5"}];updateSearchResults();

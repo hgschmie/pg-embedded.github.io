@@ -119,10 +119,10 @@ public final class TarXzCompressedBinaryManager implements NativeBinaryManager {
 <span class="fc" id="L119">            final File unpackLockFile = new File(installationDirectory, lockFileName);</span>
 <span class="fc" id="L120">            final File installationExistsFile = new File(installationDirectory, &quot;.exists&quot;);</span>
 
-<span class="pc bpc" id="L122" title="1 of 2 branches missed.">            if (!installationExistsFile.exists()) {</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">            if (!installationExistsFile.exists()) {</span>
 <span class="fc" id="L123">                try (FileOutputStream lockStream = new FileOutputStream(unpackLockFile);</span>
 <span class="fc" id="L124">                        FileLock unpackLock = lockStream.getChannel().tryLock()) {</span>
-<span class="fc bfc" id="L125" title="All 2 branches covered.">                    if (unpackLock != null) {</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">                    if (unpackLock != null) {</span>
 <span class="pc bpc" id="L126" title="1 of 2 branches missed.">                        checkState(!installationExistsFile.exists(), &quot;unpack lock acquired but .exists file is present &quot; + installationExistsFile);</span>
 <span class="fc" id="L127">                        LOG.info(&quot;extracting archive...&quot;);</span>
 <span class="fc" id="L128">                        try (InputStream archiveStream = nativeBinaryLocator.getInputStream()) {</span>
@@ -131,14 +131,14 @@ public final class TarXzCompressedBinaryManager implements NativeBinaryManager {
                         }
                     } else {
                         // the other guy is unpacking for us.
-<span class="fc" id="L134">                        int maxAttempts = 60;</span>
-<span class="pc bpc" id="L135" title="1 of 4 branches missed.">                        while (!installationExistsFile.exists() &amp;&amp; --maxAttempts &gt; 0) { // NOPMD</span>
-<span class="fc" id="L136">                            Thread.sleep(1000L);</span>
+<span class="nc" id="L134">                        int maxAttempts = 60;</span>
+<span class="nc bnc" id="L135" title="All 4 branches missed.">                        while (!installationExistsFile.exists() &amp;&amp; --maxAttempts &gt; 0) { // NOPMD</span>
+<span class="nc" id="L136">                            Thread.sleep(1000L);</span>
                         }
-<span class="fc" id="L138">                        checkState(installationExistsFile.exists(), &quot;Waited 60 seconds for archive to be unpacked but it never finished!&quot;);</span>
+<span class="nc" id="L138">                        checkState(installationExistsFile.exists(), &quot;Waited 60 seconds for archive to be unpacked but it never finished!&quot;);</span>
                     }
                 } finally {
-<span class="pc bpc" id="L141" title="1 of 4 branches missed.">                    if (unpackLockFile.exists() &amp;&amp; !unpackLockFile.delete()) {</span>
+<span class="pc bpc" id="L141" title="2 of 4 branches missed.">                    if (unpackLockFile.exists() &amp;&amp; !unpackLockFile.delete()) {</span>
 <span class="nc" id="L142">                        LOG.error(format(&quot;could not remove lock file %s&quot;, unpackLockFile.getAbsolutePath()));</span>
                     }
                 }

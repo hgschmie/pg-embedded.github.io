@@ -459,9 +459,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="fc bfc" id="L459" title="All 2 branches covered.">                if (verifyReady()) {</span>
 <span class="fc" id="L460">                    return true;</span>
                 }
-<span class="fc" id="L462">            } catch (final SQLException e) {</span>
-<span class="fc" id="L463">                lastCause = e;</span>
-<span class="fc" id="L464">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
+<span class="nc" id="L462">            } catch (final SQLException e) {</span>
+<span class="nc" id="L463">                lastCause = e;</span>
+<span class="nc" id="L464">                logger.trace(&quot;while waiting for server startup:&quot;, e);</span>
 <span class="fc" id="L465">            }</span>
 
             try {
@@ -553,8 +553,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="nc" id="L553">            return;</span>
         }
 <span class="fc bfc" id="L555" title="All 2 branches covered.">        for (final File dir : children) {</span>
-<span class="pc bpc" id="L556" title="1 of 2 branches missed.">            if (!dir.isDirectory()) {</span>
-<span class="nc" id="L557">                continue;</span>
+<span class="fc bfc" id="L556" title="All 2 branches covered.">            if (!dir.isDirectory()) {</span>
+<span class="fc" id="L557">                continue;</span>
             }
 
             // only ever touch known data directories.
@@ -791,10 +791,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder addServerConfiguration(@NonNull String key, @NonNull String value) {
-<span class="nc" id="L794">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="nc" id="L795">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="nc" id="L796">            this.serverConfiguration.put(key, value);</span>
-<span class="nc" id="L797">            return this;</span>
+<span class="fc" id="L794">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="fc" id="L795">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="fc" id="L796">            this.serverConfiguration.put(key, value);</span>
+<span class="fc" id="L797">            return this;</span>
         }
 
         /**
@@ -932,8 +932,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setNativeBinaryManager(@NonNull NativeBinaryManager nativeBinaryManager) {
-<span class="nc" id="L935">            this.nativeBinaryManager = checkNotNull(nativeBinaryManager, &quot;nativeBinaryManager is null&quot;);</span>
-<span class="nc" id="L936">            return this;</span>
+<span class="fc" id="L935">            this.nativeBinaryManager = checkNotNull(nativeBinaryManager, &quot;nativeBinaryManager is null&quot;);</span>
+<span class="fc" id="L936">            return this;</span>
         }
 
         /**
@@ -948,9 +948,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder useLocalPostgresInstallation(@NonNull File directory) {
-<span class="nc" id="L951">            checkNotNull(directory, &quot;directory is null&quot;);</span>
-<span class="nc bnc" id="L952" title="All 4 branches missed.">            checkState(directory.exists() &amp;&amp; directory.isDirectory(), &quot;'%s' either does not exist or is not a directory!&quot;, directory);</span>
-<span class="nc" id="L953">            return setNativeBinaryManager(() -&gt; directory);</span>
+<span class="fc" id="L951">            checkNotNull(directory, &quot;directory is null&quot;);</span>
+<span class="pc bpc" id="L952" title="2 of 4 branches missed.">            checkState(directory.exists() &amp;&amp; directory.isDirectory(), &quot;'%s' either does not exist or is not a directory!&quot;, directory);</span>
+<span class="fc" id="L953">            return setNativeBinaryManager(() -&gt; directory);</span>
         }
 
         /**
@@ -971,7 +971,7 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="fc" id="L971">            EmbeddedUtil.mkdirs(parentDirectory);</span>
 
 <span class="fc" id="L973">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
-<span class="pc bpc" id="L974" title="1 of 2 branches missed.">            if (nativeBinaryManager == null) {</span>
+<span class="fc bfc" id="L974" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
 <span class="fc" id="L975">                final String serverVersion = System.getProperty(&quot;pg-embedded.postgres-version&quot;, this.serverVersion);</span>
 <span class="fc" id="L976">                nativeBinaryManager = new TarXzCompressedBinaryManager(new ZonkyIOPostgresLocator(serverVersion));</span>
             }

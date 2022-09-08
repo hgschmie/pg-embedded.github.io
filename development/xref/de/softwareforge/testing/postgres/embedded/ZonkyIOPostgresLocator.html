@@ -76,7 +76,7 @@
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>  
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>          <strong class="jxr_keyword">this</strong>.os = computeOS();
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>          <strong class="jxr_keyword">this</strong>.architecture = computeTarXzArchitectureName();
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>          LOG.debug(format(<span class="jxr_string">"Detected a %s %s system, using PostgreSQL version %s"</span>, architecture, os, serverVersion));
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>          LOG.debug(format(<span class="jxr_string">"Detected a %s %s system, using PostgreSQL version %s/%s"</span>, EmbeddedUtil.OS_ARCH, os, serverVersion, architecture));
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>      }
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>  
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>      @Override
@@ -113,7 +113,7 @@
 <a class="jxr_linenumber" name="L105" href="#L105">105</a>             String version = artifactLoader.findLatestVersion(ZONKY_GROUP_ID, artifactId, serverVersion);
 <a class="jxr_linenumber" name="L106" href="#L106">106</a>             File file = artifactLoader.getArtifactFile(ZONKY_GROUP_ID, artifactId, version);
 <a class="jxr_linenumber" name="L107" href="#L107">107</a>             checkState(file != <strong class="jxr_keyword">null</strong> &amp;&amp; file.exists(), <span class="jxr_string">"Could not locate artifact file for %s:%s"</span>, artifactId, version);
-<a class="jxr_linenumber" name="L108" href="#L108">108</a>             LOG.info(format(<span class="jxr_string">"Using PostgreSQL version %s"</span>, version));
+<a class="jxr_linenumber" name="L108" href="#L108">108</a>             LOG.info(format(<span class="jxr_string">"Using PostgreSQL version %s (%s)"</span>, version, architecture));
 <a class="jxr_linenumber" name="L109" href="#L109">109</a>             <strong class="jxr_keyword">return</strong> file;
 <a class="jxr_linenumber" name="L110" href="#L110">110</a>         } <strong class="jxr_keyword">catch</strong> (IOException e) {
 <a class="jxr_linenumber" name="L111" href="#L111">111</a>             <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> UncheckedIOException(e);
@@ -151,7 +151,7 @@
 <a class="jxr_linenumber" name="L143" href="#L143">143</a> 
 <a class="jxr_linenumber" name="L144" href="#L144">144</a>     @Override
 <a class="jxr_linenumber" name="L145" href="#L145">145</a>     <strong class="jxr_keyword">public</strong> String toString() {
-<a class="jxr_linenumber" name="L146" href="#L146">146</a>         <strong class="jxr_keyword">return</strong> format(<span class="jxr_string">"ZonkyIO Stream locator for PostgreSQL (arch: %s os: %s, version: %s)"</span>, architecture, os, serverVersion);
+<a class="jxr_linenumber" name="L146" href="#L146">146</a>         <strong class="jxr_keyword">return</strong> format(<span class="jxr_string">"ZonkyIO Stream locator for PostgreSQL (machine: %s os: %s, arch: %s, version: %s)"</span>, EmbeddedUtil.OS_ARCH, os, architecture, serverVersion);
 <a class="jxr_linenumber" name="L147" href="#L147">147</a>     }
 <a class="jxr_linenumber" name="L148" href="#L148">148</a> 
 <a class="jxr_linenumber" name="L149" href="#L149">149</a>     @Override

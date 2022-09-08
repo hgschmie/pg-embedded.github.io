@@ -62,11 +62,11 @@ public interface NativeBinaryLocator {
     @NonNull
     @SuppressFBWarnings(&quot;NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE&quot;) // false positive
     default String getIdentifier() throws IOException {
-<span class="fc" id="L65">        try (InputStream installationArchive = getInputStream()) {</span>
-<span class="pc bpc" id="L66" title="1 of 2 branches missed.">            checkState(installationArchive != null, &quot;Locator '%s' did not find a suitable archive to unpack!&quot;, toString());</span>
-<span class="fc" id="L67">            try (HashingInputStream hashStream = new HashingInputStream(Hashing.murmur3_128(), installationArchive)) {</span>
-<span class="fc" id="L68">                ByteStreams.exhaust(hashStream);</span>
-<span class="fc" id="L69">                return INSTALL_DIRECTORY_PREFIX + BaseEncoding.base16().encode(hashStream.hash().asBytes());</span>
+<span class="nc" id="L65">        try (InputStream installationArchive = getInputStream()) {</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">            checkState(installationArchive != null, &quot;Locator '%s' did not find a suitable archive to unpack!&quot;, toString());</span>
+<span class="nc" id="L67">            try (HashingInputStream hashStream = new HashingInputStream(Hashing.murmur3_128(), installationArchive)) {</span>
+<span class="nc" id="L68">                ByteStreams.exhaust(hashStream);</span>
+<span class="nc" id="L69">                return INSTALL_DIRECTORY_PREFIX + BaseEncoding.base16().encode(hashStream.hash().asBytes());</span>
             }
         }
     }

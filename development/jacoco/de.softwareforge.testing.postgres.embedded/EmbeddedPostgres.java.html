@@ -932,8 +932,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setNativeBinaryManager(@NonNull NativeBinaryManager nativeBinaryManager) {
-<span class="nc" id="L935">            this.nativeBinaryManager = checkNotNull(nativeBinaryManager, &quot;nativeBinaryManager is null&quot;);</span>
-<span class="nc" id="L936">            return this;</span>
+<span class="fc" id="L935">            this.nativeBinaryManager = checkNotNull(nativeBinaryManager, &quot;nativeBinaryManager is null&quot;);</span>
+<span class="fc" id="L936">            return this;</span>
         }
 
         /**
@@ -971,7 +971,7 @@ public final class EmbeddedPostgres implements AutoCloseable {
 <span class="fc" id="L971">            EmbeddedUtil.mkdirs(parentDirectory);</span>
 
 <span class="fc" id="L973">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
-<span class="pc bpc" id="L974" title="1 of 2 branches missed.">            if (nativeBinaryManager == null) {</span>
+<span class="fc bfc" id="L974" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
 <span class="fc" id="L975">                final String serverVersion = System.getProperty(&quot;pg-embedded.postgres-version&quot;, this.serverVersion);</span>
 <span class="fc" id="L976">                nativeBinaryManager = new TarXzCompressedBinaryManager(new ZonkyIOPostgresLocator(serverVersion));</span>
             }

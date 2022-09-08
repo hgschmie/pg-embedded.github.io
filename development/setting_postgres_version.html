@@ -121,17 +121,32 @@
 <td align="left">Linux</td>
 <td>aarch64</td>
 <td>Amazon Linux 2</td>
-<td>Graviton CPU</td></tr>
+<td>tested on AWS Graviton CPU</td></tr>
 <tr class="a">
+<td align="left">Linux</td>
+<td>aarch64</td>
+<td>RockyLinux 8</td>
+<td>tested on Raspberry Pi 4</td></tr>
+<tr class="b">
 <td align="left">Linux</td>
 <td>aarch32</td>
 <td>CentOS 7</td>
-<td>Raspberry Pi 3B+</td></tr>
-<tr class="b">
+<td>tested on Raspberry Pi 3B+</td></tr>
+<tr class="a">
 <td align="left">MacOS</td>
 <td>x86_64</td>
-<td>MacOS 11.6</td>
-<td> </td></tr></tbody>
+<td>MacOS 11.6+</td>
+<td> </td></tr>
+<tr class="b">
+<td align="left">MacOS</td>
+<td>aarch64</td>
+<td>MacOS 12.5.1 with Rosetta 2 installed</td>
+<td>All x86_64 binaries work as well, PostgreSQL 14 binaries contain both x86_64 and aarch64 variants.</td></tr>
+<tr class="a">
+<td align="left">MacOS</td>
+<td>aarch64</td>
+<td>MacOS 12.5.1 without Rosetta 2</td>
+<td>Requires fat binaries that contain aarch64 variants. Otherwise, set the <code>pg-embedded.prefer-native</code> system property to <code>true</code> to force the use of aarch64 artifacts. Currently, only the PostgreSQL 14 supports this.</td></tr></tbody>
 </table>
 </section><section>
 <h2><a name="Untested"></a>Untested</h2>
@@ -142,16 +157,6 @@
 <th>Architecture</th>
 <th>Variant</th>
 <th>Remarks</th></tr></thead><tbody>
-<tr class="b">
-<td align="left">MacOS</td>
-<td>aarch64</td>
-<td>(fat)</td>
-<td>the PostgreSQL binaries used do not yet support aarch64 natively, so the x86_64 binaries are used and executed through Rosetta. When fat binaries are available, they should be picked up and just work.</td></tr>
-<tr class="a">
-<td align="left">MacOS</td>
-<td>aarch64</td>
-<td>(native)</td>
-<td>When native aarch64 binaries are available, set the <code>pg-embedded.prefer-native</code> system property to <code>true</code> will enable pg-embedded to use those directly.</td></tr>
 <tr class="b">
 <td align="left">Windows</td>
 <td>x86_64</td>

@@ -24,29 +24,29 @@
 <span class="source-line-no">011</span><span id="line-11"> * See the License for the specific language governing permissions and</span>
 <span class="source-line-no">012</span><span id="line-12"> * limitations under the License.</span>
 <span class="source-line-no">013</span><span id="line-13"> */</span>
-<span class="source-line-no">014</span><span id="line-14">package de.softwareforge.testing.postgres.embedded;</span>
-<span class="source-line-no">015</span><span id="line-15"></span>
-<span class="source-line-no">016</span><span id="line-16">import static com.google.common.base.Preconditions.checkNotNull;</span>
-<span class="source-line-no">017</span><span id="line-17">import static com.google.common.base.Preconditions.checkState;</span>
-<span class="source-line-no">018</span><span id="line-18">import static de.softwareforge.testing.postgres.embedded.DatabaseInfo.PG_DEFAULT_USER;</span>
-<span class="source-line-no">019</span><span id="line-19">import static java.lang.String.format;</span>
-<span class="source-line-no">020</span><span id="line-20"></span>
-<span class="source-line-no">021</span><span id="line-21">import java.io.IOException;</span>
-<span class="source-line-no">022</span><span id="line-22">import java.sql.Connection;</span>
-<span class="source-line-no">023</span><span id="line-23">import java.sql.SQLException;</span>
-<span class="source-line-no">024</span><span id="line-24">import java.sql.Statement;</span>
-<span class="source-line-no">025</span><span id="line-25">import java.util.Set;</span>
-<span class="source-line-no">026</span><span id="line-26">import java.util.concurrent.ExecutorService;</span>
-<span class="source-line-no">027</span><span id="line-27">import java.util.concurrent.Executors;</span>
-<span class="source-line-no">028</span><span id="line-28">import java.util.concurrent.SynchronousQueue;</span>
-<span class="source-line-no">029</span><span id="line-29">import java.util.concurrent.atomic.AtomicBoolean;</span>
-<span class="source-line-no">030</span><span id="line-30">import java.util.function.Supplier;</span>
-<span class="source-line-no">031</span><span id="line-31">import javax.sql.DataSource;</span>
-<span class="source-line-no">032</span><span id="line-32"></span>
-<span class="source-line-no">033</span><span id="line-33">import com.google.common.collect.ImmutableSet;</span>
-<span class="source-line-no">034</span><span id="line-34">import com.google.common.util.concurrent.ThreadFactoryBuilder;</span>
-<span class="source-line-no">035</span><span id="line-35">import edu.umd.cs.findbugs.annotations.NonNull;</span>
-<span class="source-line-no">036</span><span id="line-36">import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;</span>
+<span class="source-line-no">014</span><span id="line-14"></span>
+<span class="source-line-no">015</span><span id="line-15">package de.softwareforge.testing.postgres.embedded;</span>
+<span class="source-line-no">016</span><span id="line-16"></span>
+<span class="source-line-no">017</span><span id="line-17">import static com.google.common.base.Preconditions.checkNotNull;</span>
+<span class="source-line-no">018</span><span id="line-18">import static com.google.common.base.Preconditions.checkState;</span>
+<span class="source-line-no">019</span><span id="line-19">import static de.softwareforge.testing.postgres.embedded.DatabaseInfo.PG_DEFAULT_USER;</span>
+<span class="source-line-no">020</span><span id="line-20">import static java.lang.String.format;</span>
+<span class="source-line-no">021</span><span id="line-21"></span>
+<span class="source-line-no">022</span><span id="line-22">import java.io.IOException;</span>
+<span class="source-line-no">023</span><span id="line-23">import java.sql.Connection;</span>
+<span class="source-line-no">024</span><span id="line-24">import java.sql.SQLException;</span>
+<span class="source-line-no">025</span><span id="line-25">import java.sql.Statement;</span>
+<span class="source-line-no">026</span><span id="line-26">import java.util.Set;</span>
+<span class="source-line-no">027</span><span id="line-27">import java.util.concurrent.ExecutorService;</span>
+<span class="source-line-no">028</span><span id="line-28">import java.util.concurrent.Executors;</span>
+<span class="source-line-no">029</span><span id="line-29">import java.util.concurrent.SynchronousQueue;</span>
+<span class="source-line-no">030</span><span id="line-30">import java.util.concurrent.atomic.AtomicBoolean;</span>
+<span class="source-line-no">031</span><span id="line-31">import java.util.function.Supplier;</span>
+<span class="source-line-no">032</span><span id="line-32">import javax.sql.DataSource;</span>
+<span class="source-line-no">033</span><span id="line-33"></span>
+<span class="source-line-no">034</span><span id="line-34">import com.google.common.collect.ImmutableSet;</span>
+<span class="source-line-no">035</span><span id="line-35">import com.google.common.util.concurrent.ThreadFactoryBuilder;</span>
+<span class="source-line-no">036</span><span id="line-36">import edu.umd.cs.findbugs.annotations.NonNull;</span>
 <span class="source-line-no">037</span><span id="line-37">import org.slf4j.Logger;</span>
 <span class="source-line-no">038</span><span id="line-38">import org.slf4j.LoggerFactory;</span>
 <span class="source-line-no">039</span><span id="line-39"></span>
@@ -88,8 +88,8 @@
 <span class="source-line-no">075</span><span id="line-75">    }</span>
 <span class="source-line-no">076</span><span id="line-76"></span>
 <span class="source-line-no">077</span><span id="line-77">    /**</span>
-<span class="source-line-no">078</span><span id="line-78">     * Creates a new {@link Builder&lt;DatabaseManager&gt;} instance that will return a connection to the same database on each call to {@link</span>
-<span class="source-line-no">079</span><span id="line-79">     * DatabaseManager#getDatabaseInfo()}.</span>
+<span class="source-line-no">078</span><span id="line-78">     * Creates a new {@link Builder&lt;DatabaseManager&gt;} instance that will return a connection to the same database on each call to</span>
+<span class="source-line-no">079</span><span id="line-79">     * {@link DatabaseManager#getDatabaseInfo()}.</span>
 <span class="source-line-no">080</span><span id="line-80">     *</span>
 <span class="source-line-no">081</span><span id="line-81">     * @return A builder instance.</span>
 <span class="source-line-no">082</span><span id="line-82">     */</span>
@@ -262,149 +262,148 @@
 <span class="source-line-no">249</span><span id="line-249">        }</span>
 <span class="source-line-no">250</span><span id="line-250">    }</span>
 <span class="source-line-no">251</span><span id="line-251"></span>
-<span class="source-line-no">252</span><span id="line-252">    @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")</span>
-<span class="source-line-no">253</span><span id="line-253">    private static void createDatabase(final DataSource dataSource, final String databaseName) throws SQLException {</span>
-<span class="source-line-no">254</span><span id="line-254">        try (Connection c = dataSource.getConnection();</span>
-<span class="source-line-no">255</span><span id="line-255">                Statement stmt = c.createStatement()) {</span>
-<span class="source-line-no">256</span><span id="line-256">            stmt.executeUpdate(format("CREATE DATABASE %s OWNER %s ENCODING = '%s'", databaseName, PG_DEFAULT_USER, PG_DEFAULT_ENCODING));</span>
-<span class="source-line-no">257</span><span id="line-257">        }</span>
-<span class="source-line-no">258</span><span id="line-258">    }</span>
-<span class="source-line-no">259</span><span id="line-259"></span>
-<span class="source-line-no">260</span><span id="line-260">    /**</span>
-<span class="source-line-no">261</span><span id="line-261">     * Builder template.</span>
-<span class="source-line-no">262</span><span id="line-262">     *</span>
-<span class="source-line-no">263</span><span id="line-263">     * @param &lt;T&gt; Object to create.</span>
-<span class="source-line-no">264</span><span id="line-264">     */</span>
-<span class="source-line-no">265</span><span id="line-265">    public abstract static class Builder&lt;T&gt; {</span>
-<span class="source-line-no">266</span><span id="line-266"></span>
-<span class="source-line-no">267</span><span id="line-267">        protected ImmutableSet.Builder&lt;EmbeddedPostgresPreparer&lt;DataSource&gt;&gt; databasePreparers = ImmutableSet.builder();</span>
-<span class="source-line-no">268</span><span id="line-268">        protected ImmutableSet.Builder&lt;EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;&gt; instancePreparers = ImmutableSet.builder();</span>
-<span class="source-line-no">269</span><span id="line-269">        protected final boolean multiMode;</span>
-<span class="source-line-no">270</span><span id="line-270"></span>
-<span class="source-line-no">271</span><span id="line-271">        /**</span>
-<span class="source-line-no">272</span><span id="line-272">         * Creates a new builder.</span>
-<span class="source-line-no">273</span><span id="line-273">         *</span>
-<span class="source-line-no">274</span><span id="line-274">         * @param multiMode True if the resulting object should be in multi mode (create multiple database instances) or single mode (use only one instance).</span>
-<span class="source-line-no">275</span><span id="line-275">         */</span>
-<span class="source-line-no">276</span><span id="line-276">        protected Builder(boolean multiMode) {</span>
-<span class="source-line-no">277</span><span id="line-277">            this.multiMode = multiMode;</span>
-<span class="source-line-no">278</span><span id="line-278">        }</span>
-<span class="source-line-no">279</span><span id="line-279"></span>
-<span class="source-line-no">280</span><span id="line-280">        /**</span>
-<span class="source-line-no">281</span><span id="line-281">         * @deprecated Use {@link DatabaseManager.Builder#withDatabasePreparer(EmbeddedPostgresPreparer)}.</span>
-<span class="source-line-no">282</span><span id="line-282">         */</span>
-<span class="source-line-no">283</span><span id="line-283">        @Deprecated</span>
-<span class="source-line-no">284</span><span id="line-284">        @NonNull</span>
-<span class="source-line-no">285</span><span id="line-285">        public Builder&lt;T&gt; withPreparer(@NonNull DatabasePreparer databasePreparer) {</span>
-<span class="source-line-no">286</span><span id="line-286">            checkNotNull(databasePreparer, "databasePreparer is null");</span>
-<span class="source-line-no">287</span><span id="line-287">            return withDatabasePreparer(databasePreparer::prepare);</span>
-<span class="source-line-no">288</span><span id="line-288">        }</span>
-<span class="source-line-no">289</span><span id="line-289"></span>
-<span class="source-line-no">290</span><span id="line-290">        /**</span>
-<span class="source-line-no">291</span><span id="line-291">         * Add a preparer for the template database. Each preparer is called once when the database manager starts to prepare the template database. This can be</span>
-<span class="source-line-no">292</span><span id="line-292">         * used to create tables, sequences etc. or preload the databases with information. In multi database mode, the template database is used and each</span>
-<span class="source-line-no">293</span><span id="line-293">         * created database will have this information cloned.</span>
-<span class="source-line-no">294</span><span id="line-294">         *</span>
-<span class="source-line-no">295</span><span id="line-295">         * @param databasePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.</span>
-<span class="source-line-no">296</span><span id="line-296">         * @return This object instance.</span>
-<span class="source-line-no">297</span><span id="line-297">         * @since 3.0</span>
-<span class="source-line-no">298</span><span id="line-298">         */</span>
-<span class="source-line-no">299</span><span id="line-299">        @NonNull</span>
-<span class="source-line-no">300</span><span id="line-300">        public Builder&lt;T&gt; withDatabasePreparer(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {</span>
-<span class="source-line-no">301</span><span id="line-301">            this.databasePreparers.add(checkNotNull(databasePreparer, "databasePreparer is null"));</span>
-<span class="source-line-no">302</span><span id="line-302">            return this;</span>
-<span class="source-line-no">303</span><span id="line-303">        }</span>
-<span class="source-line-no">304</span><span id="line-304"></span>
-<span class="source-line-no">305</span><span id="line-305">        /**</span>
-<span class="source-line-no">306</span><span id="line-306">         * Add preparers for the template database. Each preparer is called once when the database manager starts to prepare the template database. This can be</span>
-<span class="source-line-no">307</span><span id="line-307">         * used to create tables, sequences etc. or preload the databases with information. In multi database mode, the template database is used and each</span>
-<span class="source-line-no">308</span><span id="line-308">         * created database will have this information cloned.</span>
-<span class="source-line-no">309</span><span id="line-309">         *</span>
-<span class="source-line-no">310</span><span id="line-310">         * @param databasePreparers A set of {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instances. Must not be null.</span>
-<span class="source-line-no">311</span><span id="line-311">         * @return This object instance.</span>
-<span class="source-line-no">312</span><span id="line-312">         * @since 3.0</span>
-<span class="source-line-no">313</span><span id="line-313">         */</span>
-<span class="source-line-no">314</span><span id="line-314">        @NonNull</span>
-<span class="source-line-no">315</span><span id="line-315">        public Builder&lt;T&gt; withDatabasePreparers(@NonNull Set&lt;EmbeddedPostgresPreparer&lt;DataSource&gt;&gt; databasePreparers) {</span>
-<span class="source-line-no">316</span><span id="line-316">            this.databasePreparers.addAll(checkNotNull(databasePreparers, "databasePreparers is null"));</span>
-<span class="source-line-no">317</span><span id="line-317">            return this;</span>
-<span class="source-line-no">318</span><span id="line-318">        }</span>
-<span class="source-line-no">319</span><span id="line-319"></span>
-<span class="source-line-no">320</span><span id="line-320">        /**</span>
-<span class="source-line-no">321</span><span id="line-321">         * Add a preparer for the {@link EmbeddedPostgres.Builder} object. Each preparer is called once when the {@link EmbeddedPostgres} instance that manages</span>
-<span class="source-line-no">322</span><span id="line-322">         * the server is created.</span>
-<span class="source-line-no">323</span><span id="line-323">         *</span>
-<span class="source-line-no">324</span><span id="line-324">         * @param instancePreparer A {@link EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;} instance. Must not be null.</span>
-<span class="source-line-no">325</span><span id="line-325">         * @return This object instance.</span>
-<span class="source-line-no">326</span><span id="line-326">         * @since 3.0</span>
-<span class="source-line-no">327</span><span id="line-327">         */</span>
-<span class="source-line-no">328</span><span id="line-328">        @NonNull</span>
-<span class="source-line-no">329</span><span id="line-329">        public Builder&lt;T&gt; withInstancePreparer(@NonNull EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt; instancePreparer) {</span>
-<span class="source-line-no">330</span><span id="line-330">            this.instancePreparers.add(checkNotNull(instancePreparer, "instancePreparer is null"));</span>
-<span class="source-line-no">331</span><span id="line-331">            return this;</span>
-<span class="source-line-no">332</span><span id="line-332">        }</span>
-<span class="source-line-no">333</span><span id="line-333"></span>
-<span class="source-line-no">334</span><span id="line-334">        /**</span>
-<span class="source-line-no">335</span><span id="line-335">         * Add preparers for the {@link EmbeddedPostgres.Builder} object. Each preparer is called once when the {@link EmbeddedPostgres} instance that manages</span>
-<span class="source-line-no">336</span><span id="line-336">         * the server is created.</span>
-<span class="source-line-no">337</span><span id="line-337">         *</span>
-<span class="source-line-no">338</span><span id="line-338">         * @param instancePreparers A set of {@link EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;} instances. Must not be null.</span>
-<span class="source-line-no">339</span><span id="line-339">         * @return This object instance.</span>
-<span class="source-line-no">340</span><span id="line-340">         * @since 3.0</span>
-<span class="source-line-no">341</span><span id="line-341">         */</span>
-<span class="source-line-no">342</span><span id="line-342">        @NonNull</span>
-<span class="source-line-no">343</span><span id="line-343">        public Builder&lt;T&gt; withInstancePreparers(@NonNull Set&lt;EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;&gt; instancePreparers) {</span>
-<span class="source-line-no">344</span><span id="line-344">            this.instancePreparers.addAll(checkNotNull(instancePreparers, "instancePreparers is null"));</span>
-<span class="source-line-no">345</span><span id="line-345">            return this;</span>
-<span class="source-line-no">346</span><span id="line-346">        }</span>
-<span class="source-line-no">347</span><span id="line-347"></span>
-<span class="source-line-no">348</span><span id="line-348">        /**</span>
-<span class="source-line-no">349</span><span id="line-349">         * @deprecated Use {@link DatabaseManager.Builder#withInstancePreparer(EmbeddedPostgresPreparer)}.</span>
-<span class="source-line-no">350</span><span id="line-350">         */</span>
-<span class="source-line-no">351</span><span id="line-351">        @Deprecated</span>
-<span class="source-line-no">352</span><span id="line-352">        @NonNull</span>
-<span class="source-line-no">353</span><span id="line-353">        public Builder&lt;T&gt; withCustomizer(@NonNull EmbeddedPostgres.BuilderCustomizer customizer) {</span>
-<span class="source-line-no">354</span><span id="line-354">            checkNotNull(customizer, "customizer is null");</span>
-<span class="source-line-no">355</span><span id="line-355">            this.instancePreparers.add(customizer::customize);</span>
-<span class="source-line-no">356</span><span id="line-356">            return this;</span>
-<span class="source-line-no">357</span><span id="line-357">        }</span>
-<span class="source-line-no">358</span><span id="line-358"></span>
-<span class="source-line-no">359</span><span id="line-359">        /**</span>
-<span class="source-line-no">360</span><span id="line-360">         * Creates a new instance.</span>
-<span class="source-line-no">361</span><span id="line-361">         *</span>
-<span class="source-line-no">362</span><span id="line-362">         * @return The instance to create.</span>
-<span class="source-line-no">363</span><span id="line-363">         */</span>
-<span class="source-line-no">364</span><span id="line-364">        @NonNull</span>
-<span class="source-line-no">365</span><span id="line-365">        public abstract T build();</span>
-<span class="source-line-no">366</span><span id="line-366">    }</span>
-<span class="source-line-no">367</span><span id="line-367"></span>
-<span class="source-line-no">368</span><span id="line-368">    /**</span>
-<span class="source-line-no">369</span><span id="line-369">     * Create new {@link DatabaseManager} instances.</span>
-<span class="source-line-no">370</span><span id="line-370">     */</span>
-<span class="source-line-no">371</span><span id="line-371">    public static final class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {</span>
-<span class="source-line-no">372</span><span id="line-372"></span>
-<span class="source-line-no">373</span><span id="line-373">        /**</span>
-<span class="source-line-no">374</span><span id="line-374">         * Creates a new builder for {@link DatabaseManager} instances.</span>
-<span class="source-line-no">375</span><span id="line-375">         *</span>
-<span class="source-line-no">376</span><span id="line-376">         * @param multiMode True if the database manager should return a new database instance for every {@link DatabaseManager#getDatabaseInfo()}} call, false</span>
-<span class="source-line-no">377</span><span id="line-377">         *                  if it should return the same database instance.</span>
-<span class="source-line-no">378</span><span id="line-378">         */</span>
-<span class="source-line-no">379</span><span id="line-379">        public DatabaseManagerBuilder(boolean multiMode) {</span>
-<span class="source-line-no">380</span><span id="line-380">            super(multiMode);</span>
-<span class="source-line-no">381</span><span id="line-381">        }</span>
-<span class="source-line-no">382</span><span id="line-382"></span>
-<span class="source-line-no">383</span><span id="line-383">        /**</span>
-<span class="source-line-no">384</span><span id="line-384">         * Creates a new {@link DatabaseManager} instance from the builder.</span>
-<span class="source-line-no">385</span><span id="line-385">         *</span>
-<span class="source-line-no">386</span><span id="line-386">         * @return A database manager. Never null.</span>
-<span class="source-line-no">387</span><span id="line-387">         */</span>
-<span class="source-line-no">388</span><span id="line-388">        @Override</span>
-<span class="source-line-no">389</span><span id="line-389">        @NonNull</span>
-<span class="source-line-no">390</span><span id="line-390">        public DatabaseManager build() {</span>
-<span class="source-line-no">391</span><span id="line-391">            return new DatabaseManager(databasePreparers.build(), instancePreparers.build(), multiMode);</span>
-<span class="source-line-no">392</span><span id="line-392">        }</span>
-<span class="source-line-no">393</span><span id="line-393">    }</span>
-<span class="source-line-no">394</span><span id="line-394">}</span>
+<span class="source-line-no">252</span><span id="line-252">    private static void createDatabase(final DataSource dataSource, final String databaseName) throws SQLException {</span>
+<span class="source-line-no">253</span><span id="line-253">        try (Connection c = dataSource.getConnection();</span>
+<span class="source-line-no">254</span><span id="line-254">                Statement stmt = c.createStatement()) {</span>
+<span class="source-line-no">255</span><span id="line-255">            stmt.executeUpdate(format("CREATE DATABASE %s OWNER %s ENCODING = '%s'", databaseName, PG_DEFAULT_USER, PG_DEFAULT_ENCODING));</span>
+<span class="source-line-no">256</span><span id="line-256">        }</span>
+<span class="source-line-no">257</span><span id="line-257">    }</span>
+<span class="source-line-no">258</span><span id="line-258"></span>
+<span class="source-line-no">259</span><span id="line-259">    /**</span>
+<span class="source-line-no">260</span><span id="line-260">     * Builder template.</span>
+<span class="source-line-no">261</span><span id="line-261">     *</span>
+<span class="source-line-no">262</span><span id="line-262">     * @param &lt;T&gt; Object to create.</span>
+<span class="source-line-no">263</span><span id="line-263">     */</span>
+<span class="source-line-no">264</span><span id="line-264">    public abstract static class Builder&lt;T&gt; {</span>
+<span class="source-line-no">265</span><span id="line-265"></span>
+<span class="source-line-no">266</span><span id="line-266">        protected ImmutableSet.Builder&lt;EmbeddedPostgresPreparer&lt;DataSource&gt;&gt; databasePreparers = ImmutableSet.builder();</span>
+<span class="source-line-no">267</span><span id="line-267">        protected ImmutableSet.Builder&lt;EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;&gt; instancePreparers = ImmutableSet.builder();</span>
+<span class="source-line-no">268</span><span id="line-268">        protected final boolean multiMode;</span>
+<span class="source-line-no">269</span><span id="line-269"></span>
+<span class="source-line-no">270</span><span id="line-270">        /**</span>
+<span class="source-line-no">271</span><span id="line-271">         * Creates a new builder.</span>
+<span class="source-line-no">272</span><span id="line-272">         *</span>
+<span class="source-line-no">273</span><span id="line-273">         * @param multiMode True if the resulting object should be in multi mode (create multiple database instances) or single mode (use only one instance).</span>
+<span class="source-line-no">274</span><span id="line-274">         */</span>
+<span class="source-line-no">275</span><span id="line-275">        protected Builder(boolean multiMode) {</span>
+<span class="source-line-no">276</span><span id="line-276">            this.multiMode = multiMode;</span>
+<span class="source-line-no">277</span><span id="line-277">        }</span>
+<span class="source-line-no">278</span><span id="line-278"></span>
+<span class="source-line-no">279</span><span id="line-279">        /**</span>
+<span class="source-line-no">280</span><span id="line-280">         * @deprecated Use {@link DatabaseManager.Builder#withDatabasePreparer(EmbeddedPostgresPreparer)}.</span>
+<span class="source-line-no">281</span><span id="line-281">         */</span>
+<span class="source-line-no">282</span><span id="line-282">        @Deprecated</span>
+<span class="source-line-no">283</span><span id="line-283">        @NonNull</span>
+<span class="source-line-no">284</span><span id="line-284">        public Builder&lt;T&gt; withPreparer(@NonNull DatabasePreparer databasePreparer) {</span>
+<span class="source-line-no">285</span><span id="line-285">            checkNotNull(databasePreparer, "databasePreparer is null");</span>
+<span class="source-line-no">286</span><span id="line-286">            return withDatabasePreparer(databasePreparer::prepare);</span>
+<span class="source-line-no">287</span><span id="line-287">        }</span>
+<span class="source-line-no">288</span><span id="line-288"></span>
+<span class="source-line-no">289</span><span id="line-289">        /**</span>
+<span class="source-line-no">290</span><span id="line-290">         * Add a preparer for the template database. Each preparer is called once when the database manager starts to prepare the template database. This can be</span>
+<span class="source-line-no">291</span><span id="line-291">         * used to create tables, sequences etc. or preload the databases with information. In multi database mode, the template database is used and each</span>
+<span class="source-line-no">292</span><span id="line-292">         * created database will have this information cloned.</span>
+<span class="source-line-no">293</span><span id="line-293">         *</span>
+<span class="source-line-no">294</span><span id="line-294">         * @param databasePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.</span>
+<span class="source-line-no">295</span><span id="line-295">         * @return This object instance.</span>
+<span class="source-line-no">296</span><span id="line-296">         * @since 3.0</span>
+<span class="source-line-no">297</span><span id="line-297">         */</span>
+<span class="source-line-no">298</span><span id="line-298">        @NonNull</span>
+<span class="source-line-no">299</span><span id="line-299">        public Builder&lt;T&gt; withDatabasePreparer(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {</span>
+<span class="source-line-no">300</span><span id="line-300">            this.databasePreparers.add(checkNotNull(databasePreparer, "databasePreparer is null"));</span>
+<span class="source-line-no">301</span><span id="line-301">            return this;</span>
+<span class="source-line-no">302</span><span id="line-302">        }</span>
+<span class="source-line-no">303</span><span id="line-303"></span>
+<span class="source-line-no">304</span><span id="line-304">        /**</span>
+<span class="source-line-no">305</span><span id="line-305">         * Add preparers for the template database. Each preparer is called once when the database manager starts to prepare the template database. This can be</span>
+<span class="source-line-no">306</span><span id="line-306">         * used to create tables, sequences etc. or preload the databases with information. In multi database mode, the template database is used and each</span>
+<span class="source-line-no">307</span><span id="line-307">         * created database will have this information cloned.</span>
+<span class="source-line-no">308</span><span id="line-308">         *</span>
+<span class="source-line-no">309</span><span id="line-309">         * @param databasePreparers A set of {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instances. Must not be null.</span>
+<span class="source-line-no">310</span><span id="line-310">         * @return This object instance.</span>
+<span class="source-line-no">311</span><span id="line-311">         * @since 3.0</span>
+<span class="source-line-no">312</span><span id="line-312">         */</span>
+<span class="source-line-no">313</span><span id="line-313">        @NonNull</span>
+<span class="source-line-no">314</span><span id="line-314">        public Builder&lt;T&gt; withDatabasePreparers(@NonNull Set&lt;EmbeddedPostgresPreparer&lt;DataSource&gt;&gt; databasePreparers) {</span>
+<span class="source-line-no">315</span><span id="line-315">            this.databasePreparers.addAll(checkNotNull(databasePreparers, "databasePreparers is null"));</span>
+<span class="source-line-no">316</span><span id="line-316">            return this;</span>
+<span class="source-line-no">317</span><span id="line-317">        }</span>
+<span class="source-line-no">318</span><span id="line-318"></span>
+<span class="source-line-no">319</span><span id="line-319">        /**</span>
+<span class="source-line-no">320</span><span id="line-320">         * Add a preparer for the {@link EmbeddedPostgres.Builder} object. Each preparer is called once when the {@link EmbeddedPostgres} instance that manages</span>
+<span class="source-line-no">321</span><span id="line-321">         * the server is created.</span>
+<span class="source-line-no">322</span><span id="line-322">         *</span>
+<span class="source-line-no">323</span><span id="line-323">         * @param instancePreparer A {@link EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;} instance. Must not be null.</span>
+<span class="source-line-no">324</span><span id="line-324">         * @return This object instance.</span>
+<span class="source-line-no">325</span><span id="line-325">         * @since 3.0</span>
+<span class="source-line-no">326</span><span id="line-326">         */</span>
+<span class="source-line-no">327</span><span id="line-327">        @NonNull</span>
+<span class="source-line-no">328</span><span id="line-328">        public Builder&lt;T&gt; withInstancePreparer(@NonNull EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt; instancePreparer) {</span>
+<span class="source-line-no">329</span><span id="line-329">            this.instancePreparers.add(checkNotNull(instancePreparer, "instancePreparer is null"));</span>
+<span class="source-line-no">330</span><span id="line-330">            return this;</span>
+<span class="source-line-no">331</span><span id="line-331">        }</span>
+<span class="source-line-no">332</span><span id="line-332"></span>
+<span class="source-line-no">333</span><span id="line-333">        /**</span>
+<span class="source-line-no">334</span><span id="line-334">         * Add preparers for the {@link EmbeddedPostgres.Builder} object. Each preparer is called once when the {@link EmbeddedPostgres} instance that manages</span>
+<span class="source-line-no">335</span><span id="line-335">         * the server is created.</span>
+<span class="source-line-no">336</span><span id="line-336">         *</span>
+<span class="source-line-no">337</span><span id="line-337">         * @param instancePreparers A set of {@link EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;} instances. Must not be null.</span>
+<span class="source-line-no">338</span><span id="line-338">         * @return This object instance.</span>
+<span class="source-line-no">339</span><span id="line-339">         * @since 3.0</span>
+<span class="source-line-no">340</span><span id="line-340">         */</span>
+<span class="source-line-no">341</span><span id="line-341">        @NonNull</span>
+<span class="source-line-no">342</span><span id="line-342">        public Builder&lt;T&gt; withInstancePreparers(@NonNull Set&lt;EmbeddedPostgresPreparer&lt;EmbeddedPostgres.Builder&gt;&gt; instancePreparers) {</span>
+<span class="source-line-no">343</span><span id="line-343">            this.instancePreparers.addAll(checkNotNull(instancePreparers, "instancePreparers is null"));</span>
+<span class="source-line-no">344</span><span id="line-344">            return this;</span>
+<span class="source-line-no">345</span><span id="line-345">        }</span>
+<span class="source-line-no">346</span><span id="line-346"></span>
+<span class="source-line-no">347</span><span id="line-347">        /**</span>
+<span class="source-line-no">348</span><span id="line-348">         * @deprecated Use {@link DatabaseManager.Builder#withInstancePreparer(EmbeddedPostgresPreparer)}.</span>
+<span class="source-line-no">349</span><span id="line-349">         */</span>
+<span class="source-line-no">350</span><span id="line-350">        @Deprecated</span>
+<span class="source-line-no">351</span><span id="line-351">        @NonNull</span>
+<span class="source-line-no">352</span><span id="line-352">        public Builder&lt;T&gt; withCustomizer(@NonNull EmbeddedPostgres.BuilderCustomizer customizer) {</span>
+<span class="source-line-no">353</span><span id="line-353">            checkNotNull(customizer, "customizer is null");</span>
+<span class="source-line-no">354</span><span id="line-354">            this.instancePreparers.add(customizer::customize);</span>
+<span class="source-line-no">355</span><span id="line-355">            return this;</span>
+<span class="source-line-no">356</span><span id="line-356">        }</span>
+<span class="source-line-no">357</span><span id="line-357"></span>
+<span class="source-line-no">358</span><span id="line-358">        /**</span>
+<span class="source-line-no">359</span><span id="line-359">         * Creates a new instance.</span>
+<span class="source-line-no">360</span><span id="line-360">         *</span>
+<span class="source-line-no">361</span><span id="line-361">         * @return The instance to create.</span>
+<span class="source-line-no">362</span><span id="line-362">         */</span>
+<span class="source-line-no">363</span><span id="line-363">        @NonNull</span>
+<span class="source-line-no">364</span><span id="line-364">        public abstract T build();</span>
+<span class="source-line-no">365</span><span id="line-365">    }</span>
+<span class="source-line-no">366</span><span id="line-366"></span>
+<span class="source-line-no">367</span><span id="line-367">    /**</span>
+<span class="source-line-no">368</span><span id="line-368">     * Create new {@link DatabaseManager} instances.</span>
+<span class="source-line-no">369</span><span id="line-369">     */</span>
+<span class="source-line-no">370</span><span id="line-370">    public static final class DatabaseManagerBuilder extends Builder&lt;DatabaseManager&gt; {</span>
+<span class="source-line-no">371</span><span id="line-371"></span>
+<span class="source-line-no">372</span><span id="line-372">        /**</span>
+<span class="source-line-no">373</span><span id="line-373">         * Creates a new builder for {@link DatabaseManager} instances.</span>
+<span class="source-line-no">374</span><span id="line-374">         *</span>
+<span class="source-line-no">375</span><span id="line-375">         * @param multiMode True if the database manager should return a new database instance for every {@link DatabaseManager#getDatabaseInfo()}} call, false</span>
+<span class="source-line-no">376</span><span id="line-376">         *                  if it should return the same database instance.</span>
+<span class="source-line-no">377</span><span id="line-377">         */</span>
+<span class="source-line-no">378</span><span id="line-378">        public DatabaseManagerBuilder(boolean multiMode) {</span>
+<span class="source-line-no">379</span><span id="line-379">            super(multiMode);</span>
+<span class="source-line-no">380</span><span id="line-380">        }</span>
+<span class="source-line-no">381</span><span id="line-381"></span>
+<span class="source-line-no">382</span><span id="line-382">        /**</span>
+<span class="source-line-no">383</span><span id="line-383">         * Creates a new {@link DatabaseManager} instance from the builder.</span>
+<span class="source-line-no">384</span><span id="line-384">         *</span>
+<span class="source-line-no">385</span><span id="line-385">         * @return A database manager. Never null.</span>
+<span class="source-line-no">386</span><span id="line-386">         */</span>
+<span class="source-line-no">387</span><span id="line-387">        @Override</span>
+<span class="source-line-no">388</span><span id="line-388">        @NonNull</span>
+<span class="source-line-no">389</span><span id="line-389">        public DatabaseManager build() {</span>
+<span class="source-line-no">390</span><span id="line-390">            return new DatabaseManager(databasePreparers.build(), instancePreparers.build(), multiMode);</span>
+<span class="source-line-no">391</span><span id="line-391">        }</span>
+<span class="source-line-no">392</span><span id="line-392">    }</span>
+<span class="source-line-no">393</span><span id="line-393">}</span>
 
 
 

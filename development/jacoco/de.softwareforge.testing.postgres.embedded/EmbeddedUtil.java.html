@@ -15,6 +15,7 @@
 package de.softwareforge.testing.postgres.embedded;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,165 +52,179 @@ final class EmbeddedUtil {
     private static final String LOWERCASE;
 
     static {
-<span class="fc" id="L54">        OS_NAME = getSystemProperty(&quot;os.name&quot;);</span>
-<span class="fc" id="L55">        OS_ARCH = getSystemProperty(&quot;os.arch&quot;);</span>
+<span class="fc" id="L55">        OS_NAME = getSystemProperty(&quot;os.name&quot;);</span>
+<span class="fc" id="L56">        OS_ARCH = getSystemProperty(&quot;os.arch&quot;);</span>
 
-<span class="fc" id="L57">        IS_OS_WINDOWS = getOsMatchesName(&quot;Windows&quot;);</span>
-<span class="fc" id="L58">        IS_OS_LINUX = getOsMatchesName(&quot;Linux&quot;);</span>
-<span class="fc" id="L59">        IS_OS_MAC = getOsMatchesName(&quot;Mac&quot;);</span>
+<span class="fc" id="L58">        IS_OS_WINDOWS = getOsMatchesName(&quot;Windows&quot;);</span>
+<span class="fc" id="L59">        IS_OS_LINUX = getOsMatchesName(&quot;Linux&quot;);</span>
+<span class="fc" id="L60">        IS_OS_MAC = getOsMatchesName(&quot;Mac&quot;);</span>
 
-<span class="pc bpc" id="L61" title="2 of 4 branches missed.">        IS_ARCH_X86_64 = OS_ARCH.equals(&quot;x86_64&quot;) || OS_ARCH.equals(&quot;amd64&quot;);</span>
-<span class="fc" id="L62">        IS_ARCH_AARCH64 = OS_ARCH.equals(&quot;aarch64&quot;);</span>
-<span class="pc bpc" id="L63" title="2 of 4 branches missed.">        IS_ARCH_AARCH32 = OS_ARCH.equals(&quot;aarch32&quot;) || OS_ARCH.equals(&quot;arm&quot;);</span>
+<span class="pc bpc" id="L62" title="2 of 4 branches missed.">        IS_ARCH_X86_64 = OS_ARCH.equals(&quot;x86_64&quot;) || OS_ARCH.equals(&quot;amd64&quot;);</span>
+<span class="fc" id="L63">        IS_ARCH_AARCH64 = OS_ARCH.equals(&quot;aarch64&quot;);</span>
+<span class="pc bpc" id="L64" title="2 of 4 branches missed.">        IS_ARCH_AARCH32 = OS_ARCH.equals(&quot;aarch32&quot;) || OS_ARCH.equals(&quot;arm&quot;);</span>
 
         // this is a glorious hack
-<span class="fc" id="L66">        IS_ALPINE_LINUX = new File(&quot;/etc/alpine-release&quot;).exists();</span>
+<span class="fc" id="L67">        IS_ALPINE_LINUX = new File(&quot;/etc/alpine-release&quot;).exists();</span>
 
-<span class="fc" id="L68">        String numbers = sequence('0', 10);</span>
-<span class="fc" id="L69">        LOWERCASE = sequence('a', 26);</span>
-<span class="fc" id="L70">        String uppercase = sequence('A', 26);</span>
-<span class="fc" id="L71">        ALPHANUM = numbers + LOWERCASE + uppercase;</span>
-<span class="fc" id="L72">    }</span>
+<span class="fc" id="L69">        String numbers = sequence('0', 10);</span>
+<span class="fc" id="L70">        LOWERCASE = sequence('a', 26);</span>
+<span class="fc" id="L71">        String uppercase = sequence('A', 26);</span>
+<span class="fc" id="L72">        ALPHANUM = numbers + LOWERCASE + uppercase;</span>
+<span class="fc" id="L73">    }</span>
 
-<span class="nc" id="L74">    private EmbeddedUtil() {</span>
-<span class="nc" id="L75">        throw new AssertionError(&quot;EmbeddedUtil can not be instantiated&quot;);</span>
+<span class="nc" id="L75">    private EmbeddedUtil() {</span>
+<span class="nc" id="L76">        throw new AssertionError(&quot;EmbeddedUtil can not be instantiated&quot;);</span>
     }
 
     static File getWorkingDirectory() {
-<span class="fc" id="L79">        File tmpDir = new File(System.getProperty(&quot;java.io.tmpdir&quot;));</span>
+<span class="fc" id="L80">        File parent = new File(System.getProperty(&quot;java.io.tmpdir&quot;));</span>
         // personalize the unpack folder to allow systems with many users using the same tmp folder to work
-<span class="fc" id="L81">        return new File(tmpDir, &quot;embedded-pg-&quot; + Objects.requireNonNullElse(System.getProperty(&quot;user.name&quot;), &quot;unknown&quot;));</span>
+<span class="fc" id="L82">        File workDir = new File(parent, &quot;embedded-pg-&quot; + Objects.requireNonNullElse(System.getProperty(&quot;user.name&quot;), &quot;unknown&quot;));</span>
+
+<span class="fc" id="L84">        ensureDirectory(workDir);</span>
+
+<span class="fc" id="L86">        return workDir;</span>
     }
+
+    static void ensureDirectory(@NonNull File workDir) {
+
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (!workDir.exists()) {</span>
+<span class="fc" id="L92">            checkState(workDir.mkdirs(), &quot; Could not create directory '%s'&quot;, workDir);</span>
+        }
+
+<span class="fc" id="L95">        checkState(workDir.exists(), &quot;'%s' does not exist!&quot;, workDir);</span>
+<span class="fc" id="L96">        checkState(workDir.isDirectory(), &quot;'%s' exists but is not a directory!&quot;, workDir);</span>
+
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (!workDir.canWrite()) {</span>
+<span class="nc" id="L99">            checkState(workDir.setWritable(true, false), &quot;Could not make directory '%s' writeable!&quot;, workDir);</span>
+        }
+
+<span class="fc" id="L102">        checkState(workDir.canWrite(), &quot;'%s' is a directory but can not be written!&quot;, workDir);</span>
+<span class="fc" id="L103">    }</span>
 
     //
     // taken from apache commons io
     //
     static String getFileBaseName(final String fileName) {
-<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (fileName == null) {</span>
-<span class="nc" id="L89">            return null;</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (fileName == null) {</span>
+<span class="nc" id="L110">            return null;</span>
         }
-<span class="fc" id="L91">        failIfNullBytePresent(fileName);</span>
-<span class="fc" id="L92">        final int index = indexOfLastSeparator(fileName);</span>
-<span class="fc" id="L93">        return fileName.substring(index + 1);</span>
+<span class="fc" id="L112">        failIfNullBytePresent(fileName);</span>
+<span class="fc" id="L113">        final int index = indexOfLastSeparator(fileName);</span>
+<span class="fc" id="L114">        return fileName.substring(index + 1);</span>
     }
 
     private static void failIfNullBytePresent(final String path) {
-<span class="fc" id="L97">        final int len = path.length();</span>
-<span class="fc bfc" id="L98" title="All 2 branches covered.">        for (int i = 0; i &lt; len; i++) {</span>
-<span class="pc bpc" id="L99" title="1 of 2 branches missed.">            checkArgument(path.charAt(i) != 0,</span>
+<span class="fc" id="L118">        final int len = path.length();</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        for (int i = 0; i &lt; len; i++) {</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">            checkArgument(path.charAt(i) != 0,</span>
                     &quot;Null byte present in file/path name.&quot;);
         }
-<span class="fc" id="L102">    }</span>
+<span class="fc" id="L123">    }</span>
 
     private static int indexOfLastSeparator(final String fileName) {
-<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if (fileName == null) {</span>
-<span class="nc" id="L106">            return -1;</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if (fileName == null) {</span>
+<span class="nc" id="L127">            return -1;</span>
         }
-<span class="fc" id="L108">        final int lastUnixPos = fileName.lastIndexOf('/'); // unix</span>
-<span class="fc" id="L109">        final int lastWindowsPos = fileName.lastIndexOf('\\'); // windows</span>
-<span class="fc" id="L110">        return Math.max(lastUnixPos, lastWindowsPos);</span>
+<span class="fc" id="L129">        final int lastUnixPos = fileName.lastIndexOf('/'); // unix</span>
+<span class="fc" id="L130">        final int lastWindowsPos = fileName.lastIndexOf('\\'); // windows</span>
+<span class="fc" id="L131">        return Math.max(lastUnixPos, lastWindowsPos);</span>
     }
 
     //
     // taken from apache commons io
     //
 
-    static void mkdirs(@NonNull File dir) {
-<span class="pc bpc" id="L118" title="2 of 6 branches missed.">        if (!dir.mkdirs() &amp;&amp; !(dir.isDirectory() &amp;&amp; dir.exists())) {</span>
-<span class="nc" id="L119">            throw new IllegalStateException(&quot;could not create &quot; + dir);</span>
-        }
-<span class="fc" id="L121">    }</span>
-
     static void rmdirs(File dir) throws IOException {
-<span class="pc bpc" id="L124" title="1 of 4 branches missed.">        if (dir.exists() &amp;&amp; dir.isDirectory()) {</span>
-<span class="fc" id="L125">            try (Stream&lt;Path&gt; walk = Files.walk(dir.toPath())) {</span>
-<span class="fc" id="L126">                walk.sorted(Comparator.reverseOrder())</span>
-<span class="fc" id="L127">                        .map(Path::toFile)</span>
-<span class="fc" id="L128">                        .forEach(File::delete);</span>
+<span class="pc bpc" id="L139" title="1 of 4 branches missed.">        if (dir.exists() &amp;&amp; dir.isDirectory()) {</span>
+<span class="fc" id="L140">            try (Stream&lt;Path&gt; walk = Files.walk(dir.toPath())) {</span>
+<span class="fc" id="L141">                walk.sorted(Comparator.reverseOrder())</span>
+<span class="fc" id="L142">                        .map(Path::toFile)</span>
+<span class="fc" id="L143">                        .forEach(File::delete);</span>
             }
         }
-<span class="fc" id="L131">    }</span>
+<span class="fc" id="L146">    }</span>
 
     static String formatDuration(Duration duration) {
-<span class="fc" id="L134">        long millis = duration.toMillis();</span>
+<span class="fc" id="L149">        long millis = duration.toMillis();</span>
         long hours;
         long minutes;
         long secs;
         long ms;
-<span class="fc" id="L139">        ImmutableList.Builder&lt;String&gt; builder = ImmutableList.builder();</span>
-<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (millis == 0) {</span>
-<span class="nc" id="L141">            builder.add(&quot;0 ms&quot;);</span>
+<span class="fc" id="L154">        ImmutableList.Builder&lt;String&gt; builder = ImmutableList.builder();</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (millis == 0) {</span>
+<span class="nc" id="L156">            builder.add(&quot;0 ms&quot;);</span>
         } else {
-<span class="fc" id="L143">            long seconds = millis / 1000L;</span>
-<span class="fc" id="L144">            hours = seconds / 3600L;</span>
-<span class="fc" id="L145">            minutes = (seconds % 3600L) / 60L;</span>
-<span class="fc" id="L146">            secs = (seconds % 60L);</span>
-<span class="fc" id="L147">            ms = millis % 1000L;</span>
+<span class="fc" id="L158">            long seconds = millis / 1000L;</span>
+<span class="fc" id="L159">            hours = seconds / 3600L;</span>
+<span class="fc" id="L160">            minutes = (seconds % 3600L) / 60L;</span>
+<span class="fc" id="L161">            secs = (seconds % 60L);</span>
+<span class="fc" id="L162">            ms = millis % 1000L;</span>
 
-<span class="pc bpc" id="L149" title="1 of 2 branches missed.">            if (hours != 0) {</span>
-<span class="nc" id="L150">                builder.add(hours + &quot; hours&quot;);</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">            if (hours != 0) {</span>
+<span class="nc" id="L165">                builder.add(hours + &quot; hours&quot;);</span>
             }
-<span class="pc bpc" id="L152" title="1 of 2 branches missed.">            if (minutes != 0) {</span>
-<span class="nc" id="L153">                builder.add(minutes + &quot; minutes&quot;);</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">            if (minutes != 0) {</span>
+<span class="nc" id="L168">                builder.add(minutes + &quot; minutes&quot;);</span>
             }
-<span class="fc bfc" id="L155" title="All 2 branches covered.">            if (secs != 0) {</span>
-<span class="fc" id="L156">                builder.add(secs + &quot; seconds&quot;);</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">            if (secs != 0) {</span>
+<span class="fc" id="L171">                builder.add(secs + &quot; seconds&quot;);</span>
             }
-<span class="fc bfc" id="L158" title="All 2 branches covered.">            if (ms != 0) {</span>
-<span class="fc" id="L159">                builder.add(ms + &quot; ms&quot;);</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            if (ms != 0) {</span>
+<span class="fc" id="L174">                builder.add(ms + &quot; ms&quot;);</span>
             }
         }
 
-<span class="fc" id="L163">        return Joiner.on(' ').join(builder.build());</span>
+<span class="fc" id="L178">        return Joiner.on(' ').join(builder.build());</span>
     }
 
     static int allocatePort() throws IOException {
-<span class="fc" id="L167">        try (ServerSocket socket = new ServerSocket(0)) {</span>
-<span class="pc bpc" id="L168" title="1 of 2 branches missed.">            while (!socket.isBound()) {</span>
-<span class="nc" id="L169">                Thread.sleep(50);</span>
+<span class="fc" id="L182">        try (ServerSocket socket = new ServerSocket(0)) {</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">            while (!socket.isBound()) {</span>
+<span class="nc" id="L184">                Thread.sleep(50);</span>
             }
-<span class="fc" id="L171">            return socket.getLocalPort();</span>
-<span class="nc" id="L172">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L173">            Thread.currentThread().interrupt();</span>
-<span class="nc" id="L174">            throw new IOException(&quot;Thread interrupted!&quot;, e);</span>
+<span class="fc" id="L186">            return socket.getLocalPort();</span>
+<span class="nc" id="L187">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L188">            Thread.currentThread().interrupt();</span>
+<span class="nc" id="L189">            throw new IOException(&quot;Thread interrupted!&quot;, e);</span>
         }
     }
 
     static String randomAlphaNumeric(int length) {
-<span class="fc" id="L179">        return randomString(ALPHANUM, length);</span>
+<span class="fc" id="L194">        return randomString(ALPHANUM, length);</span>
     }
 
     static String randomLowercase(int length) {
-<span class="fc" id="L183">        return randomString(LOWERCASE, length);</span>
+<span class="fc" id="L198">        return randomString(LOWERCASE, length);</span>
     }
 
     private static String sequence(char start, int count) {
-<span class="fc" id="L187">        StringBuilder sb = new StringBuilder();</span>
-<span class="fc bfc" id="L188" title="All 2 branches covered.">        for (int i = 0; i &lt; count; i++) {</span>
-<span class="fc" id="L189">            sb.append((char) (start + i));</span>
+<span class="fc" id="L202">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        for (int i = 0; i &lt; count; i++) {</span>
+<span class="fc" id="L204">            sb.append((char) (start + i));</span>
         }
-<span class="fc" id="L191">        return sb.toString();</span>
+<span class="fc" id="L206">        return sb.toString();</span>
     }
 
     private static String randomString(String alphabet, int length) {
-<span class="fc" id="L195">        StringBuilder sb = new StringBuilder();</span>
-<span class="fc bfc" id="L196" title="All 2 branches covered.">        for (int i = 0; i &lt; length; i++) {</span>
-<span class="fc" id="L197">            int random = ThreadLocalRandom.current().nextInt(alphabet.length());</span>
-<span class="fc" id="L198">            sb.append(alphabet.charAt(random));</span>
+<span class="fc" id="L210">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">        for (int i = 0; i &lt; length; i++) {</span>
+<span class="fc" id="L212">            int random = ThreadLocalRandom.current().nextInt(alphabet.length());</span>
+<span class="fc" id="L213">            sb.append(alphabet.charAt(random));</span>
         }
-<span class="fc" id="L200">        return sb.toString();</span>
+<span class="fc" id="L215">        return sb.toString();</span>
     }
 
     private static String getSystemProperty(String propertyName) {
         try {
-<span class="fc" id="L205">            return Strings.nullToEmpty(System.getProperty(propertyName, &quot;&quot;));</span>
-<span class="nc" id="L206">        } catch (SecurityException e) {</span>
-<span class="nc" id="L207">            return &quot;&lt;unknown&gt;&quot;;</span>
+<span class="fc" id="L220">            return Strings.nullToEmpty(System.getProperty(propertyName, &quot;&quot;));</span>
+<span class="nc" id="L221">        } catch (SecurityException e) {</span>
+<span class="nc" id="L222">            return &quot;&lt;unknown&gt;&quot;;</span>
         }
     }
 
     private static boolean getOsMatchesName(final String osNamePrefix) {
-<span class="fc" id="L212">        return OS_NAME.toLowerCase(Locale.ROOT).startsWith(osNamePrefix.toLowerCase(Locale.ROOT));</span>
+<span class="fc" id="L227">        return OS_NAME.toLowerCase(Locale.ROOT).startsWith(osNamePrefix.toLowerCase(Locale.ROOT));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

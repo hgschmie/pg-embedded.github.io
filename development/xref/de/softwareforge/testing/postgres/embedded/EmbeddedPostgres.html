@@ -352,7 +352,7 @@
 <a class="jxr_linenumber" name="L344" href="#L344">344</a> 
 <a class="jxr_linenumber" name="L345" href="#L345">345</a> 
 <a class="jxr_linenumber" name="L346" href="#L346">346</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> boot() <strong class="jxr_keyword">throws</strong> IOException {
-<a class="jxr_linenumber" name="L347" href="#L347">347</a>         EmbeddedUtil.mkdirs(<strong class="jxr_keyword">this</strong>.dataDirectory);
+<a class="jxr_linenumber" name="L347" href="#L347">347</a>         EmbeddedUtil.ensureDirectory(<strong class="jxr_keyword">this</strong>.dataDirectory);
 <a class="jxr_linenumber" name="L348" href="#L348">348</a> 
 <a class="jxr_linenumber" name="L349" href="#L349">349</a>         <strong class="jxr_keyword">if</strong> (<strong class="jxr_keyword">this</strong>.removeDataOnShutdown || !<strong class="jxr_keyword">new</strong> File(<strong class="jxr_keyword">this</strong>.dataDirectory, <span class="jxr_string">"postgresql.conf"</span>).exists()) {
 <a class="jxr_linenumber" name="L350" href="#L350">350</a>             initDatabase();
@@ -976,43 +976,42 @@
 <a class="jxr_linenumber" name="L968" href="#L968">968</a> 
 <a class="jxr_linenumber" name="L969" href="#L969">969</a>             <em class="jxr_comment">// installation root if nothing has been set by the user.</em>
 <a class="jxr_linenumber" name="L970" href="#L970">970</a>             <strong class="jxr_keyword">final</strong> File parentDirectory = EmbeddedUtil.getWorkingDirectory();
-<a class="jxr_linenumber" name="L971" href="#L971">971</a>             EmbeddedUtil.mkdirs(parentDirectory);
-<a class="jxr_linenumber" name="L972" href="#L972">972</a> 
-<a class="jxr_linenumber" name="L973" href="#L973">973</a>             <a name="NativeBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/NativeBinaryManager.html#NativeBinaryManager">NativeBinaryManager</a> nativeBinaryManager = <strong class="jxr_keyword">this</strong>.nativeBinaryManager;
-<a class="jxr_linenumber" name="L974" href="#L974">974</a>             <strong class="jxr_keyword">if</strong> (nativeBinaryManager == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L975" href="#L975">975</a>                 <strong class="jxr_keyword">final</strong> String serverVersion = System.getProperty(<span class="jxr_string">"pg-embedded.postgres-version"</span>, <strong class="jxr_keyword">this</strong>.serverVersion);
-<a class="jxr_linenumber" name="L976" href="#L976">976</a>                 nativeBinaryManager = <strong class="jxr_keyword">new</strong> <a name="TarXzCompressedBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/TarXzCompressedBinaryManager.html#TarXzCompressedBinaryManager">TarXzCompressedBinaryManager</a>(<strong class="jxr_keyword">new</strong> <a name="ZonkyIOPostgresLocator" href="../../../../../de/softwareforge/testing/postgres/embedded/ZonkyIOPostgresLocator.html#ZonkyIOPostgresLocator">ZonkyIOPostgresLocator</a>(serverVersion));
-<a class="jxr_linenumber" name="L977" href="#L977">977</a>             }
-<a class="jxr_linenumber" name="L978" href="#L978">978</a> 
-<a class="jxr_linenumber" name="L979" href="#L979">979</a>             <em class="jxr_comment">// Use the parent directory if no installation directory set.</em>
-<a class="jxr_linenumber" name="L980" href="#L980">980</a>             File installationBaseDirectory = Objects.requireNonNullElse(<strong class="jxr_keyword">this</strong>.installationBaseDirectory, parentDirectory);
-<a class="jxr_linenumber" name="L981" href="#L981">981</a>             nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);
-<a class="jxr_linenumber" name="L982" href="#L982">982</a> 
-<a class="jxr_linenumber" name="L983" href="#L983">983</a>             <em class="jxr_comment">// this is where the binary manager actually places the unpackaged postgres installation.</em>
-<a class="jxr_linenumber" name="L984" href="#L984">984</a>             <strong class="jxr_keyword">final</strong> File postgresInstallDirectory = nativeBinaryManager.getLocation();
-<a class="jxr_linenumber" name="L985" href="#L985">985</a> 
-<a class="jxr_linenumber" name="L986" href="#L986">986</a>             File dataDirectory = <strong class="jxr_keyword">this</strong>.dataDirectory;
-<a class="jxr_linenumber" name="L987" href="#L987">987</a>             <strong class="jxr_keyword">if</strong> (dataDirectory == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L988" href="#L988">988</a>                 dataDirectory = <strong class="jxr_keyword">new</strong> File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);
-<a class="jxr_linenumber" name="L989" href="#L989">989</a>             }
-<a class="jxr_linenumber" name="L990" href="#L990">990</a> 
-<a class="jxr_linenumber" name="L991" href="#L991">991</a>             <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a> embeddedPostgres = <strong class="jxr_keyword">new</strong> <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a>(instanceId, postgresInstallDirectory, dataDirectory,
-<a class="jxr_linenumber" name="L992" href="#L992">992</a>                     removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,
-<a class="jxr_linenumber" name="L993" href="#L993">993</a>                     port, errorRedirector, outputRedirector,
-<a class="jxr_linenumber" name="L994" href="#L994">994</a>                     serverStartupWait);
-<a class="jxr_linenumber" name="L995" href="#L995">995</a> 
-<a class="jxr_linenumber" name="L996" href="#L996">996</a>             embeddedPostgres.cleanOldDataDirectories(parentDirectory);
-<a class="jxr_linenumber" name="L997" href="#L997">997</a> 
-<a class="jxr_linenumber" name="L998" href="#L998">998</a>             <em class="jxr_comment">// for version checking (calling getPostgresVersion(), the instance does not need to run</em>
-<a class="jxr_linenumber" name="L999" href="#L999">999</a>             <em class="jxr_comment">// this is a special case to make the version check run faster for unit test selection.</em>
-<a class="jxr_linenumber" name="L1000" href="#L1000">1000</a>             <strong class="jxr_keyword">if</strong> (bootInstance) {
-<a class="jxr_linenumber" name="L1001" href="#L1001">1001</a>                 embeddedPostgres.boot();
-<a class="jxr_linenumber" name="L1002" href="#L1002">1002</a>             }
-<a class="jxr_linenumber" name="L1003" href="#L1003">1003</a> 
-<a class="jxr_linenumber" name="L1004" href="#L1004">1004</a>             <strong class="jxr_keyword">return</strong> embeddedPostgres;
-<a class="jxr_linenumber" name="L1005" href="#L1005">1005</a>         }
-<a class="jxr_linenumber" name="L1006" href="#L1006">1006</a>     }
-<a class="jxr_linenumber" name="L1007" href="#L1007">1007</a> }
+<a class="jxr_linenumber" name="L971" href="#L971">971</a> 
+<a class="jxr_linenumber" name="L972" href="#L972">972</a>             <a name="NativeBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/NativeBinaryManager.html#NativeBinaryManager">NativeBinaryManager</a> nativeBinaryManager = <strong class="jxr_keyword">this</strong>.nativeBinaryManager;
+<a class="jxr_linenumber" name="L973" href="#L973">973</a>             <strong class="jxr_keyword">if</strong> (nativeBinaryManager == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L974" href="#L974">974</a>                 <strong class="jxr_keyword">final</strong> String serverVersion = System.getProperty(<span class="jxr_string">"pg-embedded.postgres-version"</span>, <strong class="jxr_keyword">this</strong>.serverVersion);
+<a class="jxr_linenumber" name="L975" href="#L975">975</a>                 nativeBinaryManager = <strong class="jxr_keyword">new</strong> <a name="TarXzCompressedBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/TarXzCompressedBinaryManager.html#TarXzCompressedBinaryManager">TarXzCompressedBinaryManager</a>(<strong class="jxr_keyword">new</strong> <a name="ZonkyIOPostgresLocator" href="../../../../../de/softwareforge/testing/postgres/embedded/ZonkyIOPostgresLocator.html#ZonkyIOPostgresLocator">ZonkyIOPostgresLocator</a>(serverVersion));
+<a class="jxr_linenumber" name="L976" href="#L976">976</a>             }
+<a class="jxr_linenumber" name="L977" href="#L977">977</a> 
+<a class="jxr_linenumber" name="L978" href="#L978">978</a>             <em class="jxr_comment">// Use the parent directory if no installation directory set.</em>
+<a class="jxr_linenumber" name="L979" href="#L979">979</a>             File installationBaseDirectory = Objects.requireNonNullElse(<strong class="jxr_keyword">this</strong>.installationBaseDirectory, parentDirectory);
+<a class="jxr_linenumber" name="L980" href="#L980">980</a>             nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);
+<a class="jxr_linenumber" name="L981" href="#L981">981</a> 
+<a class="jxr_linenumber" name="L982" href="#L982">982</a>             <em class="jxr_comment">// this is where the binary manager actually places the unpackaged postgres installation.</em>
+<a class="jxr_linenumber" name="L983" href="#L983">983</a>             <strong class="jxr_keyword">final</strong> File postgresInstallDirectory = nativeBinaryManager.getLocation();
+<a class="jxr_linenumber" name="L984" href="#L984">984</a> 
+<a class="jxr_linenumber" name="L985" href="#L985">985</a>             File dataDirectory = <strong class="jxr_keyword">this</strong>.dataDirectory;
+<a class="jxr_linenumber" name="L986" href="#L986">986</a>             <strong class="jxr_keyword">if</strong> (dataDirectory == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L987" href="#L987">987</a>                 dataDirectory = <strong class="jxr_keyword">new</strong> File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);
+<a class="jxr_linenumber" name="L988" href="#L988">988</a>             }
+<a class="jxr_linenumber" name="L989" href="#L989">989</a> 
+<a class="jxr_linenumber" name="L990" href="#L990">990</a>             <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a> embeddedPostgres = <strong class="jxr_keyword">new</strong> <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a>(instanceId, postgresInstallDirectory, dataDirectory,
+<a class="jxr_linenumber" name="L991" href="#L991">991</a>                     removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,
+<a class="jxr_linenumber" name="L992" href="#L992">992</a>                     port, errorRedirector, outputRedirector,
+<a class="jxr_linenumber" name="L993" href="#L993">993</a>                     serverStartupWait);
+<a class="jxr_linenumber" name="L994" href="#L994">994</a> 
+<a class="jxr_linenumber" name="L995" href="#L995">995</a>             embeddedPostgres.cleanOldDataDirectories(parentDirectory);
+<a class="jxr_linenumber" name="L996" href="#L996">996</a> 
+<a class="jxr_linenumber" name="L997" href="#L997">997</a>             <em class="jxr_comment">// for version checking (calling getPostgresVersion(), the instance does not need to run</em>
+<a class="jxr_linenumber" name="L998" href="#L998">998</a>             <em class="jxr_comment">// this is a special case to make the version check run faster for unit test selection.</em>
+<a class="jxr_linenumber" name="L999" href="#L999">999</a>             <strong class="jxr_keyword">if</strong> (bootInstance) {
+<a class="jxr_linenumber" name="L1000" href="#L1000">1000</a>                 embeddedPostgres.boot();
+<a class="jxr_linenumber" name="L1001" href="#L1001">1001</a>             }
+<a class="jxr_linenumber" name="L1002" href="#L1002">1002</a> 
+<a class="jxr_linenumber" name="L1003" href="#L1003">1003</a>             <strong class="jxr_keyword">return</strong> embeddedPostgres;
+<a class="jxr_linenumber" name="L1004" href="#L1004">1004</a>         }
+<a class="jxr_linenumber" name="L1005" href="#L1005">1005</a>     }
+<a class="jxr_linenumber" name="L1006" href="#L1006">1006</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2021&#x2013;2023 <a href="https://github.com/hgschmie">Henning Schmiedehausen</a>. All rights reserved.</div>

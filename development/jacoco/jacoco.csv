@@ -1,5 +1,5 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedUtil,51,300,14,28,14,67,15,22,1,15
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedUtil,52,321,13,27,14,74,14,22,1,15
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabasePreparer,4,0,0,0,1,0,2,0,2,0
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProvider,0,2,0,0,0,2,0,2,0,2
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.DatabaseManagerBuilder,0,16,0,0,0,3,0,2,0,2
@@ -19,9 +19,9 @@ pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator.ne
 pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator,98,264,34,14,29,45,25,11,1,11
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProviderPipeline,25,94,2,4,7,30,2,6,0,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,NativeBinaryLocator,1,29,1,1,0,5,1,1,0,1
-pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager,88,304,18,22,14,62,16,10,1,5
+pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager,88,286,18,22,14,60,16,10,1,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo.Builder,65,100,15,13,15,28,12,10,0,8
-pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres.Builder,144,215,11,7,32,54,18,12,12,9
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres.Builder,144,213,11,7,32,53,18,12,12,9
 pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgresPreparer,3,0,0,0,1,0,2,0,2,0
 pg-embedded,de.softwareforge.testing.postgres.junit5,EmbeddedPgExtension.TestMode,0,39,0,4,0,12,0,6,0,4
 pg-embedded,de.softwareforge.testing.postgres.junit5,AutoValue_PostgresVersionCondition_Version,63,21,10,0,16,8,7,4,2,4

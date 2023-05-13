@@ -344,7 +344,7 @@ public final class EmbeddedPostgres implements AutoCloseable {
 
 
     private void boot() throws IOException {
-<span class="fc" id="L347">        EmbeddedUtil.mkdirs(this.dataDirectory);</span>
+<span class="fc" id="L347">        EmbeddedUtil.ensureDirectory(this.dataDirectory);</span>
 
 <span class="pc bpc" id="L349" title="3 of 4 branches missed.">        if (this.removeDataOnShutdown || !new File(this.dataDirectory, &quot;postgresql.conf&quot;).exists()) {</span>
 <span class="fc" id="L350">            initDatabase();</span>
@@ -968,40 +968,39 @@ public final class EmbeddedPostgres implements AutoCloseable {
 
             // installation root if nothing has been set by the user.
 <span class="fc" id="L970">            final File parentDirectory = EmbeddedUtil.getWorkingDirectory();</span>
-<span class="fc" id="L971">            EmbeddedUtil.mkdirs(parentDirectory);</span>
 
-<span class="fc" id="L973">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
-<span class="fc bfc" id="L974" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
-<span class="fc" id="L975">                final String serverVersion = System.getProperty(&quot;pg-embedded.postgres-version&quot;, this.serverVersion);</span>
-<span class="fc" id="L976">                nativeBinaryManager = new TarXzCompressedBinaryManager(new ZonkyIOPostgresLocator(serverVersion));</span>
+<span class="fc" id="L972">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
+<span class="fc bfc" id="L973" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
+<span class="fc" id="L974">                final String serverVersion = System.getProperty(&quot;pg-embedded.postgres-version&quot;, this.serverVersion);</span>
+<span class="fc" id="L975">                nativeBinaryManager = new TarXzCompressedBinaryManager(new ZonkyIOPostgresLocator(serverVersion));</span>
             }
 
             // Use the parent directory if no installation directory set.
-<span class="fc" id="L980">            File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
-<span class="fc" id="L981">            nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);</span>
+<span class="fc" id="L979">            File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
+<span class="fc" id="L980">            nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);</span>
 
             // this is where the binary manager actually places the unpackaged postgres installation.
-<span class="fc" id="L984">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
+<span class="fc" id="L983">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
 
-<span class="fc" id="L986">            File dataDirectory = this.dataDirectory;</span>
-<span class="fc bfc" id="L987" title="All 2 branches covered.">            if (dataDirectory == null) {</span>
-<span class="fc" id="L988">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
+<span class="fc" id="L985">            File dataDirectory = this.dataDirectory;</span>
+<span class="fc bfc" id="L986" title="All 2 branches covered.">            if (dataDirectory == null) {</span>
+<span class="fc" id="L987">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
             }
 
-<span class="fc" id="L991">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
+<span class="fc" id="L990">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
                     removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,
                     port, errorRedirector, outputRedirector,
                     serverStartupWait);
 
-<span class="fc" id="L996">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
+<span class="fc" id="L995">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
 
             // for version checking (calling getPostgresVersion(), the instance does not need to run
             // this is a special case to make the version check run faster for unit test selection.
-<span class="fc bfc" id="L1000" title="All 2 branches covered.">            if (bootInstance) {</span>
-<span class="fc" id="L1001">                embeddedPostgres.boot();</span>
+<span class="fc bfc" id="L999" title="All 2 branches covered.">            if (bootInstance) {</span>
+<span class="fc" id="L1000">                embeddedPostgres.boot();</span>
             }
 
-<span class="fc" id="L1004">            return embeddedPostgres;</span>
+<span class="fc" id="L1003">            return embeddedPostgres;</span>
         }
     }
 }

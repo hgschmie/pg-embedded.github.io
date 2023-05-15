@@ -1,0 +1,33 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedUtil,53,320,13,27,14,74,14,22,1,15
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProvider,0,2,0,0,0,2,0,2,0,2
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabasePreparer,4,0,0,0,1,0,2,0,2,0
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.DatabaseManagerBuilder,0,16,0,0,0,3,0,2,0,2
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseInfo.Builder,0,11,0,0,0,3,0,2,0,2
+pg-embedded,de.softwareforge.testing.postgres.embedded,ProcessOutputLogger,0,40,0,0,0,11,0,4,0,4
+pg-embedded,de.softwareforge.testing.postgres.embedded,ProcessOutputLogger.LogRunnable,7,50,0,0,2,12,0,2,0,2
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseInfo,5,87,1,1,1,13,1,6,0,6
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager,5,186,3,9,1,43,3,13,0,10
+pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager.new CompletionHandler() {...},42,0,0,0,11,0,4,0,4,0
+pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo,69,75,6,8,15,20,8,8,2,7
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.Builder,27,52,0,0,5,13,2,5,2,5
+pg-embedded,de.softwareforge.testing.postgres.embedded,NativeBinaryManager,1,0,0,0,1,0,1,0,1,0
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres,283,977,30,34,53,192,26,45,3,36
+pg-embedded,de.softwareforge.testing.postgres.embedded,ProcessOutputLogger.StreamCapture,0,31,0,0,0,7,0,3,0,3
+pg-embedded,de.softwareforge.testing.postgres.embedded,FlywayPreparer,14,71,0,0,4,20,2,7,2,7
+pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator.new FilterInputStream() {...},16,0,0,0,4,0,2,0,2,0
+pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator,136,226,29,19,32,42,27,9,3,9
+pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProviderPipeline,25,94,2,4,7,30,2,6,0,5
+pg-embedded,de.softwareforge.testing.postgres.embedded,NativeBinaryLocator,1,29,1,1,0,5,1,1,0,1
+pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager,271,103,36,4,50,24,21,5,2,4
+pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo.Builder,65,100,15,13,15,28,12,10,0,8
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres.Builder,144,213,11,7,32,53,18,12,12,9
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgresPreparer,3,0,0,0,1,0,2,0,2,0
+pg-embedded,de.softwareforge.testing.postgres.junit5,EmbeddedPgExtension.TestMode,0,39,0,4,0,12,0,6,0,4
+pg-embedded,de.softwareforge.testing.postgres.junit5,SingleDatabaseBuilder,23,10,0,0,6,2,5,2,5,2
+pg-embedded,de.softwareforge.testing.postgres.junit5,AutoValue_PostgresVersionCondition_Version,63,21,10,0,16,8,7,4,2,4
+pg-embedded,de.softwareforge.testing.postgres.junit5,PostgresVersionCondition.Version,3,98,2,10,2,18,2,10,0,6
+pg-embedded,de.softwareforge.testing.postgres.junit5,EmbeddedPgExtension.EmbeddedPgExtensionBuilder,0,23,0,0,0,6,0,2,0,2
+pg-embedded,de.softwareforge.testing.postgres.junit5,PostgresVersionCondition,56,62,12,4,7,13,8,3,0,3
+pg-embedded,de.softwareforge.testing.postgres.junit5,EmbeddedPgExtension,14,223,5,13,4,49,5,20,0,16
+pg-embedded,de.softwareforge.testing.postgres.junit5,MultiDatabaseBuilder,23,10,0,0,6,2,5,2,5,2

@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"de.softwareforge.testing.postgres"}];updateSearchResults();

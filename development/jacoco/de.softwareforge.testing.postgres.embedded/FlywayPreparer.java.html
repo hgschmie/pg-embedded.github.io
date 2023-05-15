@@ -90,31 +90,22 @@ public final class FlywayPreparer implements EmbeddedPostgresPreparer&lt;DataSou
 <span class="nc" id="L90">        return this;</span>
     }
 
-    /**
-     * @deprecated Use {@link FlywayPreparer#addCustomizer(Consumer)}.
-     */
-    @Deprecated
-    @NonNull
-    public FlywayPreparer customize(@NonNull Consumer&lt;FluentConfiguration&gt; customizer) {
-<span class="nc" id="L99">        return addCustomizer(customizer);</span>
-    }
-
     @Override
     public void prepare(@NonNull DataSource dataSource) throws IOException {
-<span class="fc" id="L104">        checkNotNull(dataSource, &quot;dataSource is null&quot;);</span>
+<span class="fc" id="L95">        checkNotNull(dataSource, &quot;dataSource is null&quot;);</span>
 
         try {
-<span class="fc" id="L107">            final FluentConfiguration config = Flyway.configure();</span>
+<span class="fc" id="L98">            final FluentConfiguration config = Flyway.configure();</span>
 
-<span class="fc" id="L109">            customizers.build().forEach(c -&gt; c.accept(config));</span>
+<span class="fc" id="L100">            customizers.build().forEach(c -&gt; c.accept(config));</span>
 
-<span class="fc" id="L111">            config.dataSource(dataSource);</span>
-<span class="fc" id="L112">            Flyway flyway = config.load();</span>
-<span class="fc" id="L113">            flyway.migrate();</span>
+<span class="fc" id="L102">            config.dataSource(dataSource);</span>
+<span class="fc" id="L103">            Flyway flyway = config.load();</span>
+<span class="fc" id="L104">            flyway.migrate();</span>
 
-<span class="fc" id="L115">        } catch (FlywayException e) {</span>
-<span class="fc" id="L116">            throw new IOException(e);</span>
-<span class="fc" id="L117">        }</span>
-<span class="fc" id="L118">    }</span>
+<span class="fc" id="L106">        } catch (FlywayException e) {</span>
+<span class="fc" id="L107">            throw new IOException(e);</span>
+<span class="fc" id="L108">        }</span>
+<span class="fc" id="L109">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

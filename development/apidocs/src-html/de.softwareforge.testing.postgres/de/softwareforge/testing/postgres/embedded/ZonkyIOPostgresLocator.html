@@ -66,7 +66,7 @@
 <span class="source-line-no">053</span><span id="line-53"></span>
 <span class="source-line-no">054</span><span id="line-54">    public static final Logger LOG = LoggerFactory.getLogger(ZonkyIOPostgresLocator.class);</span>
 <span class="source-line-no">055</span><span id="line-55"></span>
-<span class="source-line-no">056</span><span id="line-56">    private static final boolean PREFER_NATIVE = Boolean.getBoolean("pg-embedded.prefer-native");</span>
+<span class="source-line-no">056</span><span id="line-56">    private static final boolean PREFER_NATIVE = Boolean.parseBoolean(System.getProperty("pg-embedded.prefer-native", "true"));</span>
 <span class="source-line-no">057</span><span id="line-57"></span>
 <span class="source-line-no">058</span><span id="line-58">    private final String architecture;</span>
 <span class="source-line-no">059</span><span id="line-59">    private final String os;</span>

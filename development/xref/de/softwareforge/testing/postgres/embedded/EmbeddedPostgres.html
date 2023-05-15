@@ -653,365 +653,334 @@
 <a class="jxr_linenumber" name="L645" href="#L645">645</a>     }
 <a class="jxr_linenumber" name="L646" href="#L646">646</a> 
 <a class="jxr_linenumber" name="L647" href="#L647">647</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L648" href="#L648">648</a> <em class="jxr_javadoccomment">     * Callback interface to customize a builder during creation.</em>
-<a class="jxr_linenumber" name="L649" href="#L649">649</a> <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L650" href="#L650">650</a> <em class="jxr_javadoccomment">     * @deprecated Use {@link EmbeddedPostgresPreparer} with {@link Builder} as type parameter.</em>
-<a class="jxr_linenumber" name="L651" href="#L651">651</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L652" href="#L652">652</a>     @Deprecated
-<a class="jxr_linenumber" name="L653" href="#L653">653</a>     @FunctionalInterface
-<a class="jxr_linenumber" name="L654" href="#L654">654</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> BuilderCustomizer {
-<a class="jxr_linenumber" name="L655" href="#L655">655</a> 
-<a class="jxr_linenumber" name="L656" href="#L656">656</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L657" href="#L657">657</a> <em class="jxr_javadoccomment">         * Callback to customize a given {@link Builder}.</em>
-<a class="jxr_linenumber" name="L658" href="#L658">658</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L659" href="#L659">659</a> <em class="jxr_javadoccomment">         * @param builder The builder instance. Any method on the builder can be called.</em>
-<a class="jxr_linenumber" name="L660" href="#L660">660</a> <em class="jxr_javadoccomment">         * @throws SQLException For any SQL related problems.</em>
-<a class="jxr_linenumber" name="L661" href="#L661">661</a> <em class="jxr_javadoccomment">         * @throws IOException  For any IO related problem.</em>
-<a class="jxr_linenumber" name="L662" href="#L662">662</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L663" href="#L663">663</a>         <strong class="jxr_keyword">void</strong> customize(@NonNull Builder builder) <strong class="jxr_keyword">throws</strong> IOException, SQLException;
-<a class="jxr_linenumber" name="L664" href="#L664">664</a>     }
-<a class="jxr_linenumber" name="L665" href="#L665">665</a> 
-<a class="jxr_linenumber" name="L666" href="#L666">666</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L667" href="#L667">667</a> <em class="jxr_javadoccomment">     * Creates a new {@link EmbeddedPostgres} instance and starts it.</em>
-<a class="jxr_linenumber" name="L668" href="#L668">668</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L669" href="#L669">669</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> Builder {
-<a class="jxr_linenumber" name="L670" href="#L670">670</a> 
-<a class="jxr_linenumber" name="L671" href="#L671">671</a>         <strong class="jxr_keyword">private</strong> File installationBaseDirectory = <strong class="jxr_keyword">null</strong>;
-<a class="jxr_linenumber" name="L672" href="#L672">672</a>         <strong class="jxr_keyword">private</strong> File dataDirectory = <strong class="jxr_keyword">null</strong>;
-<a class="jxr_linenumber" name="L673" href="#L673">673</a> 
-<a class="jxr_linenumber" name="L674" href="#L674">674</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Map&lt;String, String&gt; serverConfiguration = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
-<a class="jxr_linenumber" name="L675" href="#L675">675</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Map&lt;String, String&gt; localeConfiguration = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
-<a class="jxr_linenumber" name="L676" href="#L676">676</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> removeDataOnShutdown = <strong class="jxr_keyword">true</strong>;
-<a class="jxr_linenumber" name="L677" href="#L677">677</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">int</strong> port = 0;
-<a class="jxr_linenumber" name="L678" href="#L678">678</a>         <strong class="jxr_keyword">private</strong> String serverVersion = DEFAULT_POSTGRES_VERSION;
-<a class="jxr_linenumber" name="L679" href="#L679">679</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Map&lt;String, String&gt; connectionProperties = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
-<a class="jxr_linenumber" name="L680" href="#L680">680</a>         <strong class="jxr_keyword">private</strong> <a name="NativeBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/NativeBinaryManager.html#NativeBinaryManager">NativeBinaryManager</a> nativeBinaryManager = <strong class="jxr_keyword">null</strong>;
-<a class="jxr_linenumber" name="L681" href="#L681">681</a>         <strong class="jxr_keyword">private</strong> Duration serverStartupWait = DEFAULT_PG_STARTUP_WAIT;
-<a class="jxr_linenumber" name="L682" href="#L682">682</a> 
-<a class="jxr_linenumber" name="L683" href="#L683">683</a>         <strong class="jxr_keyword">private</strong> ProcessBuilder.Redirect errorRedirector = ProcessBuilder.Redirect.PIPE;
-<a class="jxr_linenumber" name="L684" href="#L684">684</a>         <strong class="jxr_keyword">private</strong> ProcessBuilder.Redirect outputRedirector = ProcessBuilder.Redirect.PIPE;
-<a class="jxr_linenumber" name="L685" href="#L685">685</a> 
-<a class="jxr_linenumber" name="L686" href="#L686">686</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> bootInstance;
-<a class="jxr_linenumber" name="L687" href="#L687">687</a> 
-<a class="jxr_linenumber" name="L688" href="#L688">688</a>         <strong class="jxr_keyword">private</strong> Builder(<strong class="jxr_keyword">boolean</strong> bootInstance) {
-<a class="jxr_linenumber" name="L689" href="#L689">689</a>             <strong class="jxr_keyword">this</strong>.bootInstance = bootInstance;
-<a class="jxr_linenumber" name="L690" href="#L690">690</a>         }
-<a class="jxr_linenumber" name="L691" href="#L691">691</a> 
-<a class="jxr_linenumber" name="L692" href="#L692">692</a>         Builder() {
-<a class="jxr_linenumber" name="L693" href="#L693">693</a>             <strong class="jxr_keyword">this</strong>(<strong class="jxr_keyword">true</strong>);
-<a class="jxr_linenumber" name="L694" href="#L694">694</a>         }
-<a class="jxr_linenumber" name="L695" href="#L695">695</a> 
-<a class="jxr_linenumber" name="L696" href="#L696">696</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L697" href="#L697">697</a> <em class="jxr_javadoccomment">         * Apply a set of defaults to the database server:</em>
-<a class="jxr_linenumber" name="L698" href="#L698">698</a> <em class="jxr_javadoccomment">         * &lt;ul&gt;</em>
-<a class="jxr_linenumber" name="L699" href="#L699">699</a> <em class="jxr_javadoccomment">         *     &lt;li&gt;timezone: UTC&lt;/li&gt;</em>
-<a class="jxr_linenumber" name="L700" href="#L700">700</a> <em class="jxr_javadoccomment">         *     &lt;li&gt;synchronous_commit: off&lt;/li&gt;</em>
-<a class="jxr_linenumber" name="L701" href="#L701">701</a> <em class="jxr_javadoccomment">         *     &lt;li&gt;max_connections: 300&lt;/li&gt;</em>
-<a class="jxr_linenumber" name="L702" href="#L702">702</a> <em class="jxr_javadoccomment">         * &lt;/ul&gt;</em>
-<a class="jxr_linenumber" name="L703" href="#L703">703</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L704" href="#L704">704</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L705" href="#L705">705</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L706" href="#L706">706</a>         @NonNull
-<a class="jxr_linenumber" name="L707" href="#L707">707</a>         <strong class="jxr_keyword">public</strong> Builder withDefaults() {
-<a class="jxr_linenumber" name="L708" href="#L708">708</a>             serverConfiguration.put(<span class="jxr_string">"timezone"</span>, <span class="jxr_string">"UTC"</span>);
-<a class="jxr_linenumber" name="L709" href="#L709">709</a>             serverConfiguration.put(<span class="jxr_string">"synchronous_commit"</span>, <span class="jxr_string">"off"</span>);
-<a class="jxr_linenumber" name="L710" href="#L710">710</a>             serverConfiguration.put(<span class="jxr_string">"max_connections"</span>, <span class="jxr_string">"300"</span>);
-<a class="jxr_linenumber" name="L711" href="#L711">711</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L712" href="#L712">712</a>         }
-<a class="jxr_linenumber" name="L713" href="#L713">713</a> 
-<a class="jxr_linenumber" name="L714" href="#L714">714</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L715" href="#L715">715</a> <em class="jxr_javadoccomment">         * Sets the time that the builder will wait for the PostgreSQL server instance to start. Default is 10 seconds.</em>
-<a class="jxr_linenumber" name="L716" href="#L716">716</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L717" href="#L717">717</a> <em class="jxr_javadoccomment">         * @param serverStartupWait Startup wait time. Must not be null or negative.</em>
-<a class="jxr_linenumber" name="L718" href="#L718">718</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L719" href="#L719">719</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L720" href="#L720">720</a>         @NonNull
-<a class="jxr_linenumber" name="L721" href="#L721">721</a>         <strong class="jxr_keyword">public</strong> Builder setServerStartupWait(@NonNull Duration serverStartupWait) {
-<a class="jxr_linenumber" name="L722" href="#L722">722</a>             checkNotNull(serverStartupWait, <span class="jxr_string">"serverStartupWait is null"</span>);
-<a class="jxr_linenumber" name="L723" href="#L723">723</a>             checkArgument(!serverStartupWait.isNegative(), <span class="jxr_string">"Negative durations are not permitted."</span>);
-<a class="jxr_linenumber" name="L724" href="#L724">724</a> 
-<a class="jxr_linenumber" name="L725" href="#L725">725</a>             <strong class="jxr_keyword">this</strong>.serverStartupWait = serverStartupWait;
-<a class="jxr_linenumber" name="L726" href="#L726">726</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L727" href="#L727">727</a>         }
-<a class="jxr_linenumber" name="L728" href="#L728">728</a> 
-<a class="jxr_linenumber" name="L729" href="#L729">729</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L730" href="#L730">730</a> <em class="jxr_javadoccomment">         * Whether to remove the data directory on server shutdown. If true, the contents of the data directory are deleted when the {@link EmbeddedPostgres}</em>
-<a class="jxr_linenumber" name="L731" href="#L731">731</a> <em class="jxr_javadoccomment">         * instance is closed. Default is true.</em>
-<a class="jxr_linenumber" name="L732" href="#L732">732</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L733" href="#L733">733</a> <em class="jxr_javadoccomment">         * @param removeDataOnShutdown True removes the contents of the data directory on shutdown.</em>
-<a class="jxr_linenumber" name="L734" href="#L734">734</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L735" href="#L735">735</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L736" href="#L736">736</a>         @NonNull
-<a class="jxr_linenumber" name="L737" href="#L737">737</a>         <strong class="jxr_keyword">public</strong> Builder setRemoveDataOnShutdown(<strong class="jxr_keyword">boolean</strong> removeDataOnShutdown) {
-<a class="jxr_linenumber" name="L738" href="#L738">738</a>             <strong class="jxr_keyword">this</strong>.removeDataOnShutdown = removeDataOnShutdown;
-<a class="jxr_linenumber" name="L739" href="#L739">739</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L740" href="#L740">740</a>         }
-<a class="jxr_linenumber" name="L741" href="#L741">741</a> 
-<a class="jxr_linenumber" name="L742" href="#L742">742</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L743" href="#L743">743</a> <em class="jxr_javadoccomment">         * Explicitly set the location of the data directory. Default is using a managed directory.</em>
-<a class="jxr_linenumber" name="L744" href="#L744">744</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L745" href="#L745">745</a> <em class="jxr_javadoccomment">         * @param dataDirectory The directory to use. Must not be null. If it exists, the current user must be able to access the directory for reading and</em>
-<a class="jxr_linenumber" name="L746" href="#L746">746</a> <em class="jxr_javadoccomment">         *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.</em>
-<a class="jxr_linenumber" name="L747" href="#L747">747</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L748" href="#L748">748</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L749" href="#L749">749</a>         @NonNull
-<a class="jxr_linenumber" name="L750" href="#L750">750</a>         <strong class="jxr_keyword">public</strong> Builder setDataDirectory(@NonNull Path dataDirectory) {
-<a class="jxr_linenumber" name="L751" href="#L751">751</a>             checkNotNull(dataDirectory, <span class="jxr_string">"dataDirectory is null"</span>);
-<a class="jxr_linenumber" name="L752" href="#L752">752</a>             <strong class="jxr_keyword">return</strong> setDataDirectory(dataDirectory.toFile());
-<a class="jxr_linenumber" name="L753" href="#L753">753</a>         }
-<a class="jxr_linenumber" name="L754" href="#L754">754</a> 
-<a class="jxr_linenumber" name="L755" href="#L755">755</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L756" href="#L756">756</a> <em class="jxr_javadoccomment">         * Explicitly set the location of the data directory. Default is using a managed directory.</em>
-<a class="jxr_linenumber" name="L757" href="#L757">757</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L758" href="#L758">758</a> <em class="jxr_javadoccomment">         * @param dataDirectory The directory to use. Must not be null. If it exists, the current user must be able to access the directory for reading and</em>
-<a class="jxr_linenumber" name="L759" href="#L759">759</a> <em class="jxr_javadoccomment">         *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.</em>
-<a class="jxr_linenumber" name="L760" href="#L760">760</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L761" href="#L761">761</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L762" href="#L762">762</a>         @NonNull
-<a class="jxr_linenumber" name="L763" href="#L763">763</a>         <strong class="jxr_keyword">public</strong> Builder setDataDirectory(@NonNull String dataDirectory) {
-<a class="jxr_linenumber" name="L764" href="#L764">764</a>             checkNotNull(dataDirectory, <span class="jxr_string">"dataDirectory is null"</span>);
-<a class="jxr_linenumber" name="L765" href="#L765">765</a>             <strong class="jxr_keyword">return</strong> setDataDirectory(<strong class="jxr_keyword">new</strong> File(dataDirectory));
-<a class="jxr_linenumber" name="L766" href="#L766">766</a>         }
-<a class="jxr_linenumber" name="L767" href="#L767">767</a> 
-<a class="jxr_linenumber" name="L768" href="#L768">768</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L769" href="#L769">769</a> <em class="jxr_javadoccomment">         * Explicitly set the location of the data directory. Default is using a managed directory.</em>
-<a class="jxr_linenumber" name="L770" href="#L770">770</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L771" href="#L771">771</a> <em class="jxr_javadoccomment">         * @param dataDirectory The directory to use. Must not be null. If it exists, the current user must be able to access the directory for reading and</em>
-<a class="jxr_linenumber" name="L772" href="#L772">772</a> <em class="jxr_javadoccomment">         *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.</em>
-<a class="jxr_linenumber" name="L773" href="#L773">773</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L774" href="#L774">774</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L775" href="#L775">775</a>         @NonNull
-<a class="jxr_linenumber" name="L776" href="#L776">776</a>         <strong class="jxr_keyword">public</strong> Builder setDataDirectory(@NonNull File dataDirectory) {
-<a class="jxr_linenumber" name="L777" href="#L777">777</a>             <strong class="jxr_keyword">this</strong>.dataDirectory = checkNotNull(dataDirectory, <span class="jxr_string">"dataDirectory is null"</span>);
+<a class="jxr_linenumber" name="L648" href="#L648">648</a> <em class="jxr_javadoccomment">     * Creates a new {@link EmbeddedPostgres} instance and starts it.</em>
+<a class="jxr_linenumber" name="L649" href="#L649">649</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L650" href="#L650">650</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> Builder {
+<a class="jxr_linenumber" name="L651" href="#L651">651</a> 
+<a class="jxr_linenumber" name="L652" href="#L652">652</a>         <strong class="jxr_keyword">private</strong> File installationBaseDirectory = <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L653" href="#L653">653</a>         <strong class="jxr_keyword">private</strong> File dataDirectory = <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L654" href="#L654">654</a> 
+<a class="jxr_linenumber" name="L655" href="#L655">655</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Map&lt;String, String&gt; serverConfiguration = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
+<a class="jxr_linenumber" name="L656" href="#L656">656</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Map&lt;String, String&gt; localeConfiguration = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
+<a class="jxr_linenumber" name="L657" href="#L657">657</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> removeDataOnShutdown = <strong class="jxr_keyword">true</strong>;
+<a class="jxr_linenumber" name="L658" href="#L658">658</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">int</strong> port = 0;
+<a class="jxr_linenumber" name="L659" href="#L659">659</a>         <strong class="jxr_keyword">private</strong> String serverVersion = DEFAULT_POSTGRES_VERSION;
+<a class="jxr_linenumber" name="L660" href="#L660">660</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Map&lt;String, String&gt; connectionProperties = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
+<a class="jxr_linenumber" name="L661" href="#L661">661</a>         <strong class="jxr_keyword">private</strong> <a name="NativeBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/NativeBinaryManager.html#NativeBinaryManager">NativeBinaryManager</a> nativeBinaryManager = <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L662" href="#L662">662</a>         <strong class="jxr_keyword">private</strong> Duration serverStartupWait = DEFAULT_PG_STARTUP_WAIT;
+<a class="jxr_linenumber" name="L663" href="#L663">663</a> 
+<a class="jxr_linenumber" name="L664" href="#L664">664</a>         <strong class="jxr_keyword">private</strong> ProcessBuilder.Redirect errorRedirector = ProcessBuilder.Redirect.PIPE;
+<a class="jxr_linenumber" name="L665" href="#L665">665</a>         <strong class="jxr_keyword">private</strong> ProcessBuilder.Redirect outputRedirector = ProcessBuilder.Redirect.PIPE;
+<a class="jxr_linenumber" name="L666" href="#L666">666</a> 
+<a class="jxr_linenumber" name="L667" href="#L667">667</a>         <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> bootInstance;
+<a class="jxr_linenumber" name="L668" href="#L668">668</a> 
+<a class="jxr_linenumber" name="L669" href="#L669">669</a>         <strong class="jxr_keyword">private</strong> Builder(<strong class="jxr_keyword">boolean</strong> bootInstance) {
+<a class="jxr_linenumber" name="L670" href="#L670">670</a>             <strong class="jxr_keyword">this</strong>.bootInstance = bootInstance;
+<a class="jxr_linenumber" name="L671" href="#L671">671</a>         }
+<a class="jxr_linenumber" name="L672" href="#L672">672</a> 
+<a class="jxr_linenumber" name="L673" href="#L673">673</a>         Builder() {
+<a class="jxr_linenumber" name="L674" href="#L674">674</a>             <strong class="jxr_keyword">this</strong>(<strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L675" href="#L675">675</a>         }
+<a class="jxr_linenumber" name="L676" href="#L676">676</a> 
+<a class="jxr_linenumber" name="L677" href="#L677">677</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L678" href="#L678">678</a> <em class="jxr_javadoccomment">         * Apply a set of defaults to the database server:</em>
+<a class="jxr_linenumber" name="L679" href="#L679">679</a> <em class="jxr_javadoccomment">         * &lt;ul&gt;</em>
+<a class="jxr_linenumber" name="L680" href="#L680">680</a> <em class="jxr_javadoccomment">         *     &lt;li&gt;timezone: UTC&lt;/li&gt;</em>
+<a class="jxr_linenumber" name="L681" href="#L681">681</a> <em class="jxr_javadoccomment">         *     &lt;li&gt;synchronous_commit: off&lt;/li&gt;</em>
+<a class="jxr_linenumber" name="L682" href="#L682">682</a> <em class="jxr_javadoccomment">         *     &lt;li&gt;max_connections: 300&lt;/li&gt;</em>
+<a class="jxr_linenumber" name="L683" href="#L683">683</a> <em class="jxr_javadoccomment">         * &lt;/ul&gt;</em>
+<a class="jxr_linenumber" name="L684" href="#L684">684</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L685" href="#L685">685</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L686" href="#L686">686</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L687" href="#L687">687</a>         @NonNull
+<a class="jxr_linenumber" name="L688" href="#L688">688</a>         <strong class="jxr_keyword">public</strong> Builder withDefaults() {
+<a class="jxr_linenumber" name="L689" href="#L689">689</a>             serverConfiguration.put(<span class="jxr_string">"timezone"</span>, <span class="jxr_string">"UTC"</span>);
+<a class="jxr_linenumber" name="L690" href="#L690">690</a>             serverConfiguration.put(<span class="jxr_string">"synchronous_commit"</span>, <span class="jxr_string">"off"</span>);
+<a class="jxr_linenumber" name="L691" href="#L691">691</a>             serverConfiguration.put(<span class="jxr_string">"max_connections"</span>, <span class="jxr_string">"300"</span>);
+<a class="jxr_linenumber" name="L692" href="#L692">692</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L693" href="#L693">693</a>         }
+<a class="jxr_linenumber" name="L694" href="#L694">694</a> 
+<a class="jxr_linenumber" name="L695" href="#L695">695</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L696" href="#L696">696</a> <em class="jxr_javadoccomment">         * Sets the time that the builder will wait for the PostgreSQL server instance to start. Default is 10 seconds.</em>
+<a class="jxr_linenumber" name="L697" href="#L697">697</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L698" href="#L698">698</a> <em class="jxr_javadoccomment">         * @param serverStartupWait Startup wait time. Must not be null or negative.</em>
+<a class="jxr_linenumber" name="L699" href="#L699">699</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L700" href="#L700">700</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L701" href="#L701">701</a>         @NonNull
+<a class="jxr_linenumber" name="L702" href="#L702">702</a>         <strong class="jxr_keyword">public</strong> Builder setServerStartupWait(@NonNull Duration serverStartupWait) {
+<a class="jxr_linenumber" name="L703" href="#L703">703</a>             checkNotNull(serverStartupWait, <span class="jxr_string">"serverStartupWait is null"</span>);
+<a class="jxr_linenumber" name="L704" href="#L704">704</a>             checkArgument(!serverStartupWait.isNegative(), <span class="jxr_string">"Negative durations are not permitted."</span>);
+<a class="jxr_linenumber" name="L705" href="#L705">705</a> 
+<a class="jxr_linenumber" name="L706" href="#L706">706</a>             <strong class="jxr_keyword">this</strong>.serverStartupWait = serverStartupWait;
+<a class="jxr_linenumber" name="L707" href="#L707">707</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L708" href="#L708">708</a>         }
+<a class="jxr_linenumber" name="L709" href="#L709">709</a> 
+<a class="jxr_linenumber" name="L710" href="#L710">710</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L711" href="#L711">711</a> <em class="jxr_javadoccomment">         * Whether to remove the data directory on server shutdown. If true, the contents of the data directory are deleted when the {@link EmbeddedPostgres}</em>
+<a class="jxr_linenumber" name="L712" href="#L712">712</a> <em class="jxr_javadoccomment">         * instance is closed. Default is true.</em>
+<a class="jxr_linenumber" name="L713" href="#L713">713</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L714" href="#L714">714</a> <em class="jxr_javadoccomment">         * @param removeDataOnShutdown True removes the contents of the data directory on shutdown.</em>
+<a class="jxr_linenumber" name="L715" href="#L715">715</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L716" href="#L716">716</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L717" href="#L717">717</a>         @NonNull
+<a class="jxr_linenumber" name="L718" href="#L718">718</a>         <strong class="jxr_keyword">public</strong> Builder setRemoveDataOnShutdown(<strong class="jxr_keyword">boolean</strong> removeDataOnShutdown) {
+<a class="jxr_linenumber" name="L719" href="#L719">719</a>             <strong class="jxr_keyword">this</strong>.removeDataOnShutdown = removeDataOnShutdown;
+<a class="jxr_linenumber" name="L720" href="#L720">720</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L721" href="#L721">721</a>         }
+<a class="jxr_linenumber" name="L722" href="#L722">722</a> 
+<a class="jxr_linenumber" name="L723" href="#L723">723</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L724" href="#L724">724</a> <em class="jxr_javadoccomment">         * Explicitly set the location of the data directory. Default is using a managed directory.</em>
+<a class="jxr_linenumber" name="L725" href="#L725">725</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L726" href="#L726">726</a> <em class="jxr_javadoccomment">         * @param dataDirectory The directory to use. Must not be null. If it exists, the current user must be able to access the directory for reading and</em>
+<a class="jxr_linenumber" name="L727" href="#L727">727</a> <em class="jxr_javadoccomment">         *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.</em>
+<a class="jxr_linenumber" name="L728" href="#L728">728</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L729" href="#L729">729</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L730" href="#L730">730</a>         @NonNull
+<a class="jxr_linenumber" name="L731" href="#L731">731</a>         <strong class="jxr_keyword">public</strong> Builder setDataDirectory(@NonNull Path dataDirectory) {
+<a class="jxr_linenumber" name="L732" href="#L732">732</a>             checkNotNull(dataDirectory, <span class="jxr_string">"dataDirectory is null"</span>);
+<a class="jxr_linenumber" name="L733" href="#L733">733</a>             <strong class="jxr_keyword">return</strong> setDataDirectory(dataDirectory.toFile());
+<a class="jxr_linenumber" name="L734" href="#L734">734</a>         }
+<a class="jxr_linenumber" name="L735" href="#L735">735</a> 
+<a class="jxr_linenumber" name="L736" href="#L736">736</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L737" href="#L737">737</a> <em class="jxr_javadoccomment">         * Explicitly set the location of the data directory. Default is using a managed directory.</em>
+<a class="jxr_linenumber" name="L738" href="#L738">738</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L739" href="#L739">739</a> <em class="jxr_javadoccomment">         * @param dataDirectory The directory to use. Must not be null. If it exists, the current user must be able to access the directory for reading and</em>
+<a class="jxr_linenumber" name="L740" href="#L740">740</a> <em class="jxr_javadoccomment">         *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.</em>
+<a class="jxr_linenumber" name="L741" href="#L741">741</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L742" href="#L742">742</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L743" href="#L743">743</a>         @NonNull
+<a class="jxr_linenumber" name="L744" href="#L744">744</a>         <strong class="jxr_keyword">public</strong> Builder setDataDirectory(@NonNull String dataDirectory) {
+<a class="jxr_linenumber" name="L745" href="#L745">745</a>             checkNotNull(dataDirectory, <span class="jxr_string">"dataDirectory is null"</span>);
+<a class="jxr_linenumber" name="L746" href="#L746">746</a>             <strong class="jxr_keyword">return</strong> setDataDirectory(<strong class="jxr_keyword">new</strong> File(dataDirectory));
+<a class="jxr_linenumber" name="L747" href="#L747">747</a>         }
+<a class="jxr_linenumber" name="L748" href="#L748">748</a> 
+<a class="jxr_linenumber" name="L749" href="#L749">749</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L750" href="#L750">750</a> <em class="jxr_javadoccomment">         * Explicitly set the location of the data directory. Default is using a managed directory.</em>
+<a class="jxr_linenumber" name="L751" href="#L751">751</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L752" href="#L752">752</a> <em class="jxr_javadoccomment">         * @param dataDirectory The directory to use. Must not be null. If it exists, the current user must be able to access the directory for reading and</em>
+<a class="jxr_linenumber" name="L753" href="#L753">753</a> <em class="jxr_javadoccomment">         *                      writing. If the directory does not exist then the current user must be able to create it for reading and writing.</em>
+<a class="jxr_linenumber" name="L754" href="#L754">754</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L755" href="#L755">755</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L756" href="#L756">756</a>         @NonNull
+<a class="jxr_linenumber" name="L757" href="#L757">757</a>         <strong class="jxr_keyword">public</strong> Builder setDataDirectory(@NonNull File dataDirectory) {
+<a class="jxr_linenumber" name="L758" href="#L758">758</a>             <strong class="jxr_keyword">this</strong>.dataDirectory = checkNotNull(dataDirectory, <span class="jxr_string">"dataDirectory is null"</span>);
+<a class="jxr_linenumber" name="L759" href="#L759">759</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L760" href="#L760">760</a>         }
+<a class="jxr_linenumber" name="L761" href="#L761">761</a> 
+<a class="jxr_linenumber" name="L762" href="#L762">762</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L763" href="#L763">763</a> <em class="jxr_javadoccomment">         * Adds a server configuration parameter. All parameters are passed to the PostgreSQL server a startup using the &lt;code&gt;postgres&lt;/code&gt; command.</em>
+<a class="jxr_linenumber" name="L764" href="#L764">764</a> <em class="jxr_javadoccomment">         * &lt;p&gt;</em>
+<a class="jxr_linenumber" name="L765" href="#L765">765</a> <em class="jxr_javadoccomment">         * Values and their function are specific to the PostgreSQL version selected.</em>
+<a class="jxr_linenumber" name="L766" href="#L766">766</a> <em class="jxr_javadoccomment">         * &lt;p&gt;</em>
+<a class="jxr_linenumber" name="L767" href="#L767">767</a> <em class="jxr_javadoccomment">         * See &lt;a href="<a href="https://www.postgresql.org/docs/13/runtime-config.html" target="alexandria_uri">https://www.postgresql.org/docs/13/runtime-config.html</a>"&gt;the PostgreSQL runtime configuration&lt;/a&gt; for more information.</em>
+<a class="jxr_linenumber" name="L768" href="#L768">768</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L769" href="#L769">769</a> <em class="jxr_javadoccomment">         * @param key   Configuration parameter name. Must not be null.</em>
+<a class="jxr_linenumber" name="L770" href="#L770">770</a> <em class="jxr_javadoccomment">         * @param value Configuration parameter value. Must not be null.</em>
+<a class="jxr_linenumber" name="L771" href="#L771">771</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L772" href="#L772">772</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L773" href="#L773">773</a>         @NonNull
+<a class="jxr_linenumber" name="L774" href="#L774">774</a>         <strong class="jxr_keyword">public</strong> Builder addServerConfiguration(@NonNull String key, @NonNull String value) {
+<a class="jxr_linenumber" name="L775" href="#L775">775</a>             checkNotNull(key, <span class="jxr_string">"key is null"</span>);
+<a class="jxr_linenumber" name="L776" href="#L776">776</a>             checkNotNull(value, <span class="jxr_string">"value is null"</span>);
+<a class="jxr_linenumber" name="L777" href="#L777">777</a>             <strong class="jxr_keyword">this</strong>.serverConfiguration.put(key, value);
 <a class="jxr_linenumber" name="L778" href="#L778">778</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
 <a class="jxr_linenumber" name="L779" href="#L779">779</a>         }
 <a class="jxr_linenumber" name="L780" href="#L780">780</a> 
 <a class="jxr_linenumber" name="L781" href="#L781">781</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L782" href="#L782">782</a> <em class="jxr_javadoccomment">         * Adds a server configuration parameter. All parameters are passed to the PostgreSQL server a startup using the &lt;code&gt;postgres&lt;/code&gt; command.</em>
+<a class="jxr_linenumber" name="L782" href="#L782">782</a> <em class="jxr_javadoccomment">         * Adds a configuration parameters for the &lt;code&gt;initdb&lt;/code&gt; command. The &lt;code&gt;initdb&lt;/code&gt; command is used to create the PostgreSQL server.</em>
 <a class="jxr_linenumber" name="L783" href="#L783">783</a> <em class="jxr_javadoccomment">         * &lt;p&gt;</em>
-<a class="jxr_linenumber" name="L784" href="#L784">784</a> <em class="jxr_javadoccomment">         * Values and their function are specific to the PostgreSQL version selected.</em>
+<a class="jxr_linenumber" name="L784" href="#L784">784</a> <em class="jxr_javadoccomment">         * Each value is added as a command line parameter to the command.</em>
 <a class="jxr_linenumber" name="L785" href="#L785">785</a> <em class="jxr_javadoccomment">         * &lt;p&gt;</em>
-<a class="jxr_linenumber" name="L786" href="#L786">786</a> <em class="jxr_javadoccomment">         * See &lt;a href="<a href="https://www.postgresql.org/docs/13/runtime-config.html" target="alexandria_uri">https://www.postgresql.org/docs/13/runtime-config.html</a>"&gt;the PostgreSQL runtime configuration&lt;/a&gt; for more information.</em>
+<a class="jxr_linenumber" name="L786" href="#L786">786</a> <em class="jxr_javadoccomment">         * See the &lt;a href="<a href="https://www.postgresql.org/docs/13/app-initdb.html" target="alexandria_uri">https://www.postgresql.org/docs/13/app-initdb.html</a>"&gt;PostgreSQL initdb documentation&lt;/a&gt; for an overview of possible values.</em>
 <a class="jxr_linenumber" name="L787" href="#L787">787</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L788" href="#L788">788</a> <em class="jxr_javadoccomment">         * @param key   Configuration parameter name. Must not be null.</em>
-<a class="jxr_linenumber" name="L789" href="#L789">789</a> <em class="jxr_javadoccomment">         * @param value Configuration parameter value. Must not be null.</em>
-<a class="jxr_linenumber" name="L790" href="#L790">790</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L791" href="#L791">791</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L792" href="#L792">792</a>         @NonNull
-<a class="jxr_linenumber" name="L793" href="#L793">793</a>         <strong class="jxr_keyword">public</strong> Builder addServerConfiguration(@NonNull String key, @NonNull String value) {
-<a class="jxr_linenumber" name="L794" href="#L794">794</a>             checkNotNull(key, <span class="jxr_string">"key is null"</span>);
-<a class="jxr_linenumber" name="L795" href="#L795">795</a>             checkNotNull(value, <span class="jxr_string">"value is null"</span>);
-<a class="jxr_linenumber" name="L796" href="#L796">796</a>             <strong class="jxr_keyword">this</strong>.serverConfiguration.put(key, value);
-<a class="jxr_linenumber" name="L797" href="#L797">797</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L798" href="#L798">798</a>         }
-<a class="jxr_linenumber" name="L799" href="#L799">799</a> 
-<a class="jxr_linenumber" name="L800" href="#L800">800</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L801" href="#L801">801</a> <em class="jxr_javadoccomment">         * @deprecated Use {@link Builder#addInitDbConfiguration(String, String)}.</em>
-<a class="jxr_linenumber" name="L802" href="#L802">802</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L803" href="#L803">803</a>         @Deprecated
-<a class="jxr_linenumber" name="L804" href="#L804">804</a>         @NonNull
-<a class="jxr_linenumber" name="L805" href="#L805">805</a>         <strong class="jxr_keyword">public</strong> Builder addLocaleConfiguration(@NonNull String key, @NonNull String value) {
-<a class="jxr_linenumber" name="L806" href="#L806">806</a>             checkNotNull(key, <span class="jxr_string">"key is null"</span>);
-<a class="jxr_linenumber" name="L807" href="#L807">807</a>             checkNotNull(value, <span class="jxr_string">"value is null"</span>);
-<a class="jxr_linenumber" name="L808" href="#L808">808</a>             <strong class="jxr_keyword">this</strong>.localeConfiguration.put(key, value);
-<a class="jxr_linenumber" name="L809" href="#L809">809</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L810" href="#L810">810</a>         }
-<a class="jxr_linenumber" name="L811" href="#L811">811</a> 
-<a class="jxr_linenumber" name="L812" href="#L812">812</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L813" href="#L813">813</a> <em class="jxr_javadoccomment">         * Adds a configuration parameters for the &lt;code&gt;initdb&lt;/code&gt; command. The &lt;code&gt;initdb&lt;/code&gt; command is used to create the PostgreSQL server.</em>
-<a class="jxr_linenumber" name="L814" href="#L814">814</a> <em class="jxr_javadoccomment">         * &lt;p&gt;</em>
-<a class="jxr_linenumber" name="L815" href="#L815">815</a> <em class="jxr_javadoccomment">         * Each value is added as a command line parameter to the command.</em>
-<a class="jxr_linenumber" name="L816" href="#L816">816</a> <em class="jxr_javadoccomment">         * &lt;p&gt;</em>
-<a class="jxr_linenumber" name="L817" href="#L817">817</a> <em class="jxr_javadoccomment">         * See the &lt;a href="<a href="https://www.postgresql.org/docs/13/app-initdb.html" target="alexandria_uri">https://www.postgresql.org/docs/13/app-initdb.html</a>"&gt;PostgreSQL initdb documentation&lt;/a&gt; for an overview of possible values.</em>
-<a class="jxr_linenumber" name="L818" href="#L818">818</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L819" href="#L819">819</a> <em class="jxr_javadoccomment">         * @param key   initdb parameter name. Must not be null.</em>
-<a class="jxr_linenumber" name="L820" href="#L820">820</a> <em class="jxr_javadoccomment">         * @param value initdb parameter value. Must not be null. When the empty string is used as the value, the resulting command line parameter will not have</em>
-<a class="jxr_linenumber" name="L821" href="#L821">821</a> <em class="jxr_javadoccomment">         *              a equal sign and a value assigned.</em>
-<a class="jxr_linenumber" name="L822" href="#L822">822</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L823" href="#L823">823</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
-<a class="jxr_linenumber" name="L824" href="#L824">824</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L825" href="#L825">825</a>         @NonNull
-<a class="jxr_linenumber" name="L826" href="#L826">826</a>         <strong class="jxr_keyword">public</strong> Builder addInitDbConfiguration(@NonNull String key, @NonNull String value) {
-<a class="jxr_linenumber" name="L827" href="#L827">827</a>             checkNotNull(key, <span class="jxr_string">"key is null"</span>);
-<a class="jxr_linenumber" name="L828" href="#L828">828</a>             checkNotNull(value, <span class="jxr_string">"value is null"</span>);
-<a class="jxr_linenumber" name="L829" href="#L829">829</a>             <strong class="jxr_keyword">this</strong>.localeConfiguration.put(key, value);
-<a class="jxr_linenumber" name="L830" href="#L830">830</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L831" href="#L831">831</a>         }
-<a class="jxr_linenumber" name="L832" href="#L832">832</a> 
-<a class="jxr_linenumber" name="L833" href="#L833">833</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L834" href="#L834">834</a> <em class="jxr_javadoccomment">         * Adds a connection property. These properties are set on every connection handed out by the data source. See</em>
-<a class="jxr_linenumber" name="L835" href="#L835">835</a> <em class="jxr_javadoccomment">         * &lt;a href="<a href="https://jdbc.postgresql.org/documentation/head/connect.html" target="alexandria_uri">https://jdbc.postgresql.org/documentation/head/connect.html</a>#connection-parameters"&gt;the</em>
-<a class="jxr_linenumber" name="L836" href="#L836">836</a> <em class="jxr_javadoccomment">         * PostgreSQL JDBC driver documentation&lt;/a&gt; for possible values.</em>
-<a class="jxr_linenumber" name="L837" href="#L837">837</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L838" href="#L838">838</a> <em class="jxr_javadoccomment">         * @param key   connection property name. Must not be null.</em>
-<a class="jxr_linenumber" name="L839" href="#L839">839</a> <em class="jxr_javadoccomment">         * @param value connection property value. Must not be null.</em>
-<a class="jxr_linenumber" name="L840" href="#L840">840</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L841" href="#L841">841</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L842" href="#L842">842</a>         @NonNull
-<a class="jxr_linenumber" name="L843" href="#L843">843</a>         <strong class="jxr_keyword">public</strong> Builder addConnectionProperty(@NonNull String key, @NonNull String value) {
-<a class="jxr_linenumber" name="L844" href="#L844">844</a>             checkNotNull(key, <span class="jxr_string">"key is null"</span>);
-<a class="jxr_linenumber" name="L845" href="#L845">845</a>             checkNotNull(value, <span class="jxr_string">"value is null"</span>);
-<a class="jxr_linenumber" name="L846" href="#L846">846</a>             <strong class="jxr_keyword">this</strong>.connectionProperties.put(key, value);
-<a class="jxr_linenumber" name="L847" href="#L847">847</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L848" href="#L848">848</a>         }
-<a class="jxr_linenumber" name="L849" href="#L849">849</a> 
-<a class="jxr_linenumber" name="L850" href="#L850">850</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L851" href="#L851">851</a> <em class="jxr_javadoccomment">         * Sets the directory where the PostgreSQL distribution is unpacked. Setting the installation base directory resets the {@link NativeBinaryManager} used</em>
-<a class="jxr_linenumber" name="L852" href="#L852">852</a> <em class="jxr_javadoccomment">         * to locate the postgres installation back to the default (which is to download the zonky.io Postgres archive and unpack it in the installation</em>
-<a class="jxr_linenumber" name="L853" href="#L853">853</a> <em class="jxr_javadoccomment">         * directory. The default is using a managed directory.</em>
-<a class="jxr_linenumber" name="L854" href="#L854">854</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L855" href="#L855">855</a> <em class="jxr_javadoccomment">         * @param installationBaseDirectory The directory to unpack the postgres distribution. The current user must be able to create and write this directory.</em>
-<a class="jxr_linenumber" name="L856" href="#L856">856</a> <em class="jxr_javadoccomment">         *                                  Must not be null.</em>
-<a class="jxr_linenumber" name="L857" href="#L857">857</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L858" href="#L858">858</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
-<a class="jxr_linenumber" name="L859" href="#L859">859</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L860" href="#L860">860</a>         @NonNull
-<a class="jxr_linenumber" name="L861" href="#L861">861</a>         <strong class="jxr_keyword">public</strong> Builder setInstallationBaseDirectory(@NonNull File installationBaseDirectory) {
-<a class="jxr_linenumber" name="L862" href="#L862">862</a>             checkNotNull(installationBaseDirectory, <span class="jxr_string">"installationBaseDirectory is null"</span>);
-<a class="jxr_linenumber" name="L863" href="#L863">863</a>             <strong class="jxr_keyword">this</strong>.installationBaseDirectory = installationBaseDirectory;
-<a class="jxr_linenumber" name="L864" href="#L864">864</a>             <strong class="jxr_keyword">this</strong>.nativeBinaryManager = <strong class="jxr_keyword">null</strong>;
-<a class="jxr_linenumber" name="L865" href="#L865">865</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L866" href="#L866">866</a>         }
-<a class="jxr_linenumber" name="L867" href="#L867">867</a> 
-<a class="jxr_linenumber" name="L868" href="#L868">868</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L869" href="#L869">869</a> <em class="jxr_javadoccomment">         * Explicitly set the TCP port for the PostgreSQL server. If the port is not available, starting the server will fail. Default is to find and use an</em>
-<a class="jxr_linenumber" name="L870" href="#L870">870</a> <em class="jxr_javadoccomment">         * available TCP port.</em>
+<a class="jxr_linenumber" name="L788" href="#L788">788</a> <em class="jxr_javadoccomment">         * @param key   initdb parameter name. Must not be null.</em>
+<a class="jxr_linenumber" name="L789" href="#L789">789</a> <em class="jxr_javadoccomment">         * @param value initdb parameter value. Must not be null. When the empty string is used as the value, the resulting command line parameter will not have</em>
+<a class="jxr_linenumber" name="L790" href="#L790">790</a> <em class="jxr_javadoccomment">         *              a equal sign and a value assigned.</em>
+<a class="jxr_linenumber" name="L791" href="#L791">791</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L792" href="#L792">792</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
+<a class="jxr_linenumber" name="L793" href="#L793">793</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L794" href="#L794">794</a>         @NonNull
+<a class="jxr_linenumber" name="L795" href="#L795">795</a>         <strong class="jxr_keyword">public</strong> Builder addInitDbConfiguration(@NonNull String key, @NonNull String value) {
+<a class="jxr_linenumber" name="L796" href="#L796">796</a>             checkNotNull(key, <span class="jxr_string">"key is null"</span>);
+<a class="jxr_linenumber" name="L797" href="#L797">797</a>             checkNotNull(value, <span class="jxr_string">"value is null"</span>);
+<a class="jxr_linenumber" name="L798" href="#L798">798</a>             <strong class="jxr_keyword">this</strong>.localeConfiguration.put(key, value);
+<a class="jxr_linenumber" name="L799" href="#L799">799</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L800" href="#L800">800</a>         }
+<a class="jxr_linenumber" name="L801" href="#L801">801</a> 
+<a class="jxr_linenumber" name="L802" href="#L802">802</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L803" href="#L803">803</a> <em class="jxr_javadoccomment">         * Adds a connection property. These properties are set on every connection handed out by the data source. See</em>
+<a class="jxr_linenumber" name="L804" href="#L804">804</a> <em class="jxr_javadoccomment">         * &lt;a href="<a href="https://jdbc.postgresql.org/documentation/head/connect.html" target="alexandria_uri">https://jdbc.postgresql.org/documentation/head/connect.html</a>#connection-parameters"&gt;the</em>
+<a class="jxr_linenumber" name="L805" href="#L805">805</a> <em class="jxr_javadoccomment">         * PostgreSQL JDBC driver documentation&lt;/a&gt; for possible values.</em>
+<a class="jxr_linenumber" name="L806" href="#L806">806</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L807" href="#L807">807</a> <em class="jxr_javadoccomment">         * @param key   connection property name. Must not be null.</em>
+<a class="jxr_linenumber" name="L808" href="#L808">808</a> <em class="jxr_javadoccomment">         * @param value connection property value. Must not be null.</em>
+<a class="jxr_linenumber" name="L809" href="#L809">809</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L810" href="#L810">810</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L811" href="#L811">811</a>         @NonNull
+<a class="jxr_linenumber" name="L812" href="#L812">812</a>         <strong class="jxr_keyword">public</strong> Builder addConnectionProperty(@NonNull String key, @NonNull String value) {
+<a class="jxr_linenumber" name="L813" href="#L813">813</a>             checkNotNull(key, <span class="jxr_string">"key is null"</span>);
+<a class="jxr_linenumber" name="L814" href="#L814">814</a>             checkNotNull(value, <span class="jxr_string">"value is null"</span>);
+<a class="jxr_linenumber" name="L815" href="#L815">815</a>             <strong class="jxr_keyword">this</strong>.connectionProperties.put(key, value);
+<a class="jxr_linenumber" name="L816" href="#L816">816</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L817" href="#L817">817</a>         }
+<a class="jxr_linenumber" name="L818" href="#L818">818</a> 
+<a class="jxr_linenumber" name="L819" href="#L819">819</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L820" href="#L820">820</a> <em class="jxr_javadoccomment">         * Sets the directory where the PostgreSQL distribution is unpacked. Setting the installation base directory resets the {@link NativeBinaryManager} used</em>
+<a class="jxr_linenumber" name="L821" href="#L821">821</a> <em class="jxr_javadoccomment">         * to locate the postgres installation back to the default (which is to download the zonky.io Postgres archive and unpack it in the installation</em>
+<a class="jxr_linenumber" name="L822" href="#L822">822</a> <em class="jxr_javadoccomment">         * directory. The default is using a managed directory.</em>
+<a class="jxr_linenumber" name="L823" href="#L823">823</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L824" href="#L824">824</a> <em class="jxr_javadoccomment">         * @param installationBaseDirectory The directory to unpack the postgres distribution. The current user must be able to create and write this directory.</em>
+<a class="jxr_linenumber" name="L825" href="#L825">825</a> <em class="jxr_javadoccomment">         *                                  Must not be null.</em>
+<a class="jxr_linenumber" name="L826" href="#L826">826</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L827" href="#L827">827</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
+<a class="jxr_linenumber" name="L828" href="#L828">828</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L829" href="#L829">829</a>         @NonNull
+<a class="jxr_linenumber" name="L830" href="#L830">830</a>         <strong class="jxr_keyword">public</strong> Builder setInstallationBaseDirectory(@NonNull File installationBaseDirectory) {
+<a class="jxr_linenumber" name="L831" href="#L831">831</a>             checkNotNull(installationBaseDirectory, <span class="jxr_string">"installationBaseDirectory is null"</span>);
+<a class="jxr_linenumber" name="L832" href="#L832">832</a>             <strong class="jxr_keyword">this</strong>.installationBaseDirectory = installationBaseDirectory;
+<a class="jxr_linenumber" name="L833" href="#L833">833</a>             <strong class="jxr_keyword">this</strong>.nativeBinaryManager = <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L834" href="#L834">834</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L835" href="#L835">835</a>         }
+<a class="jxr_linenumber" name="L836" href="#L836">836</a> 
+<a class="jxr_linenumber" name="L837" href="#L837">837</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L838" href="#L838">838</a> <em class="jxr_javadoccomment">         * Explicitly set the TCP port for the PostgreSQL server. If the port is not available, starting the server will fail. Default is to find and use an</em>
+<a class="jxr_linenumber" name="L839" href="#L839">839</a> <em class="jxr_javadoccomment">         * available TCP port.</em>
+<a class="jxr_linenumber" name="L840" href="#L840">840</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L841" href="#L841">841</a> <em class="jxr_javadoccomment">         * @param port The port to use. Must be &amp;gt; 1023 and &amp;lt; 65536.</em>
+<a class="jxr_linenumber" name="L842" href="#L842">842</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L843" href="#L843">843</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L844" href="#L844">844</a>         @NonNull
+<a class="jxr_linenumber" name="L845" href="#L845">845</a>         <strong class="jxr_keyword">public</strong> Builder setPort(<strong class="jxr_keyword">int</strong> port) {
+<a class="jxr_linenumber" name="L846" href="#L846">846</a>             checkState(port &gt; 1023 &amp;&amp; port &lt; 65535, <span class="jxr_string">"Port %s is not within 1024..65535"</span>, port);
+<a class="jxr_linenumber" name="L847" href="#L847">847</a>             <strong class="jxr_keyword">this</strong>.port = port;
+<a class="jxr_linenumber" name="L848" href="#L848">848</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L849" href="#L849">849</a>         }
+<a class="jxr_linenumber" name="L850" href="#L850">850</a> 
+<a class="jxr_linenumber" name="L851" href="#L851">851</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L852" href="#L852">852</a> <em class="jxr_javadoccomment">         * Set the version of the PostgreSQL server. This value is passed to the default binary manager which will try to resolve this version from existing</em>
+<a class="jxr_linenumber" name="L853" href="#L853">853</a> <em class="jxr_javadoccomment">         * Maven artifacts. The value is ignored if {@link Builder#setNativeBinaryManager(NativeBinaryManager)} is called.</em>
+<a class="jxr_linenumber" name="L854" href="#L854">854</a> <em class="jxr_javadoccomment">         * &lt;p&gt;</em>
+<a class="jxr_linenumber" name="L855" href="#L855">855</a> <em class="jxr_javadoccomment">         * Not every PostgreSQL version is supported by pg-embedded. Some older versions lack the necessary options for the command line parameters and will</em>
+<a class="jxr_linenumber" name="L856" href="#L856">856</a> <em class="jxr_javadoccomment">         * fail at startup. Currently, every version 10 or newer should be working.</em>
+<a class="jxr_linenumber" name="L857" href="#L857">857</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L858" href="#L858">858</a> <em class="jxr_javadoccomment">         * @param serverVersion A partial or full version. Valid values are e.g. "12" or "11.3".</em>
+<a class="jxr_linenumber" name="L859" href="#L859">859</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L860" href="#L860">860</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
+<a class="jxr_linenumber" name="L861" href="#L861">861</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L862" href="#L862">862</a>         @NonNull
+<a class="jxr_linenumber" name="L863" href="#L863">863</a>         <strong class="jxr_keyword">public</strong> Builder setServerVersion(@NonNull String serverVersion) {
+<a class="jxr_linenumber" name="L864" href="#L864">864</a>             <strong class="jxr_keyword">this</strong>.serverVersion = checkNotNull(serverVersion, <span class="jxr_string">"serverVersion is null"</span>);
+<a class="jxr_linenumber" name="L865" href="#L865">865</a> 
+<a class="jxr_linenumber" name="L866" href="#L866">866</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L867" href="#L867">867</a>         }
+<a class="jxr_linenumber" name="L868" href="#L868">868</a> 
+<a class="jxr_linenumber" name="L869" href="#L869">869</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L870" href="#L870">870</a> <em class="jxr_javadoccomment">         * Set a {@link ProcessBuilder.Redirect} instance to receive stderr output from the spawned processes.</em>
 <a class="jxr_linenumber" name="L871" href="#L871">871</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L872" href="#L872">872</a> <em class="jxr_javadoccomment">         * @param port The port to use. Must be &amp;gt; 1023 and &amp;lt; 65536.</em>
+<a class="jxr_linenumber" name="L872" href="#L872">872</a> <em class="jxr_javadoccomment">         * @param errorRedirector a {@link ProcessBuilder.Redirect} instance. Must not be null.</em>
 <a class="jxr_linenumber" name="L873" href="#L873">873</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
 <a class="jxr_linenumber" name="L874" href="#L874">874</a> <em class="jxr_javadoccomment">         */</em>
 <a class="jxr_linenumber" name="L875" href="#L875">875</a>         @NonNull
-<a class="jxr_linenumber" name="L876" href="#L876">876</a>         <strong class="jxr_keyword">public</strong> Builder setPort(<strong class="jxr_keyword">int</strong> port) {
-<a class="jxr_linenumber" name="L877" href="#L877">877</a>             checkState(port &gt; 1023 &amp;&amp; port &lt; 65535, <span class="jxr_string">"Port %s is not within 1024..65535"</span>, port);
-<a class="jxr_linenumber" name="L878" href="#L878">878</a>             <strong class="jxr_keyword">this</strong>.port = port;
-<a class="jxr_linenumber" name="L879" href="#L879">879</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L880" href="#L880">880</a>         }
-<a class="jxr_linenumber" name="L881" href="#L881">881</a> 
-<a class="jxr_linenumber" name="L882" href="#L882">882</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L883" href="#L883">883</a> <em class="jxr_javadoccomment">         * Set the version of the PostgreSQL server. This value is passed to the default binary manager which will try to resolve this version from existing</em>
-<a class="jxr_linenumber" name="L884" href="#L884">884</a> <em class="jxr_javadoccomment">         * Maven artifacts. The value is ignored if {@link Builder#setNativeBinaryManager(NativeBinaryManager)} is called.</em>
-<a class="jxr_linenumber" name="L885" href="#L885">885</a> <em class="jxr_javadoccomment">         * &lt;p&gt;</em>
-<a class="jxr_linenumber" name="L886" href="#L886">886</a> <em class="jxr_javadoccomment">         * Not every PostgreSQL version is supported by pg-embedded. Some older versions lack the necessary options for the command line parameters and will</em>
-<a class="jxr_linenumber" name="L887" href="#L887">887</a> <em class="jxr_javadoccomment">         * fail at startup. Currently, every version 10 or newer should be working.</em>
-<a class="jxr_linenumber" name="L888" href="#L888">888</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L889" href="#L889">889</a> <em class="jxr_javadoccomment">         * @param serverVersion A partial or full version. Valid values are e.g. "12" or "11.3".</em>
-<a class="jxr_linenumber" name="L890" href="#L890">890</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L891" href="#L891">891</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
-<a class="jxr_linenumber" name="L892" href="#L892">892</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L893" href="#L893">893</a>         @NonNull
-<a class="jxr_linenumber" name="L894" href="#L894">894</a>         <strong class="jxr_keyword">public</strong> Builder setServerVersion(@NonNull String serverVersion) {
-<a class="jxr_linenumber" name="L895" href="#L895">895</a>             <strong class="jxr_keyword">this</strong>.serverVersion = checkNotNull(serverVersion, <span class="jxr_string">"serverVersion is null"</span>);
-<a class="jxr_linenumber" name="L896" href="#L896">896</a> 
-<a class="jxr_linenumber" name="L897" href="#L897">897</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L898" href="#L898">898</a>         }
-<a class="jxr_linenumber" name="L899" href="#L899">899</a> 
-<a class="jxr_linenumber" name="L900" href="#L900">900</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L901" href="#L901">901</a> <em class="jxr_javadoccomment">         * Set a {@link ProcessBuilder.Redirect} instance to receive stderr output from the spawned processes.</em>
-<a class="jxr_linenumber" name="L902" href="#L902">902</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L903" href="#L903">903</a> <em class="jxr_javadoccomment">         * @param errorRedirector a {@link ProcessBuilder.Redirect} instance. Must not be null.</em>
-<a class="jxr_linenumber" name="L904" href="#L904">904</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L905" href="#L905">905</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L906" href="#L906">906</a>         @NonNull
-<a class="jxr_linenumber" name="L907" href="#L907">907</a>         <strong class="jxr_keyword">public</strong> Builder setErrorRedirector(@NonNull ProcessBuilder.Redirect errorRedirector) {
-<a class="jxr_linenumber" name="L908" href="#L908">908</a>             <strong class="jxr_keyword">this</strong>.errorRedirector = checkNotNull(errorRedirector, <span class="jxr_string">"errorRedirector is null"</span>);
-<a class="jxr_linenumber" name="L909" href="#L909">909</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L910" href="#L910">910</a>         }
-<a class="jxr_linenumber" name="L911" href="#L911">911</a> 
-<a class="jxr_linenumber" name="L912" href="#L912">912</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L913" href="#L913">913</a> <em class="jxr_javadoccomment">         * Set a {@link ProcessBuilder.Redirect} instance to receive stdout output from the spawned processes.</em>
-<a class="jxr_linenumber" name="L914" href="#L914">914</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L915" href="#L915">915</a> <em class="jxr_javadoccomment">         * @param outputRedirector a {@link ProcessBuilder.Redirect} instance. Must not be null.</em>
-<a class="jxr_linenumber" name="L916" href="#L916">916</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L876" href="#L876">876</a>         <strong class="jxr_keyword">public</strong> Builder setErrorRedirector(@NonNull ProcessBuilder.Redirect errorRedirector) {
+<a class="jxr_linenumber" name="L877" href="#L877">877</a>             <strong class="jxr_keyword">this</strong>.errorRedirector = checkNotNull(errorRedirector, <span class="jxr_string">"errorRedirector is null"</span>);
+<a class="jxr_linenumber" name="L878" href="#L878">878</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L879" href="#L879">879</a>         }
+<a class="jxr_linenumber" name="L880" href="#L880">880</a> 
+<a class="jxr_linenumber" name="L881" href="#L881">881</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L882" href="#L882">882</a> <em class="jxr_javadoccomment">         * Set a {@link ProcessBuilder.Redirect} instance to receive stdout output from the spawned processes.</em>
+<a class="jxr_linenumber" name="L883" href="#L883">883</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L884" href="#L884">884</a> <em class="jxr_javadoccomment">         * @param outputRedirector a {@link ProcessBuilder.Redirect} instance. Must not be null.</em>
+<a class="jxr_linenumber" name="L885" href="#L885">885</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L886" href="#L886">886</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L887" href="#L887">887</a>         @NonNull
+<a class="jxr_linenumber" name="L888" href="#L888">888</a>         <strong class="jxr_keyword">public</strong> Builder setOutputRedirector(@NonNull ProcessBuilder.Redirect outputRedirector) {
+<a class="jxr_linenumber" name="L889" href="#L889">889</a>             <strong class="jxr_keyword">this</strong>.outputRedirector = checkNotNull(outputRedirector, <span class="jxr_string">"outputRedirector is null"</span>);
+<a class="jxr_linenumber" name="L890" href="#L890">890</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L891" href="#L891">891</a>         }
+<a class="jxr_linenumber" name="L892" href="#L892">892</a> 
+<a class="jxr_linenumber" name="L893" href="#L893">893</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L894" href="#L894">894</a> <em class="jxr_javadoccomment">         * Sets the {@link NativeBinaryManager} that provides the location of the postgres installation. Explicitly setting a binary manager overrides the</em>
+<a class="jxr_linenumber" name="L895" href="#L895">895</a> <em class="jxr_javadoccomment">         * installation base directory location set with {@link Builder#setInstallationBaseDirectory(File)} as this is only used by the default binary manager.</em>
+<a class="jxr_linenumber" name="L896" href="#L896">896</a> <em class="jxr_javadoccomment">         * Calling {@link Builder#setInstallationBaseDirectory(File)} after this method undoes setting the binary manager.</em>
+<a class="jxr_linenumber" name="L897" href="#L897">897</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L898" href="#L898">898</a> <em class="jxr_javadoccomment">         * @param nativeBinaryManager A {@link NativeBinaryManager} implementation. Must not be null.</em>
+<a class="jxr_linenumber" name="L899" href="#L899">899</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L900" href="#L900">900</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
+<a class="jxr_linenumber" name="L901" href="#L901">901</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L902" href="#L902">902</a>         @NonNull
+<a class="jxr_linenumber" name="L903" href="#L903">903</a>         <strong class="jxr_keyword">public</strong> Builder setNativeBinaryManager(@NonNull <a name="NativeBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/NativeBinaryManager.html#NativeBinaryManager">NativeBinaryManager</a> nativeBinaryManager) {
+<a class="jxr_linenumber" name="L904" href="#L904">904</a>             <strong class="jxr_keyword">this</strong>.nativeBinaryManager = checkNotNull(nativeBinaryManager, <span class="jxr_string">"nativeBinaryManager is null"</span>);
+<a class="jxr_linenumber" name="L905" href="#L905">905</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a class="jxr_linenumber" name="L906" href="#L906">906</a>         }
+<a class="jxr_linenumber" name="L907" href="#L907">907</a> 
+<a class="jxr_linenumber" name="L908" href="#L908">908</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L909" href="#L909">909</a> <em class="jxr_javadoccomment">         * Use a locally installed PostgreSQL server for tests. The tests will still spin up a new instance and locate the data in the data directory but it</em>
+<a class="jxr_linenumber" name="L910" href="#L910">910</a> <em class="jxr_javadoccomment">         * will use the locally installed binaries for starting and stopping. Calling this method sets a binary manager, so it overrides {@link</em>
+<a class="jxr_linenumber" name="L911" href="#L911">911</a> <em class="jxr_javadoccomment">         * Builder#setNativeBinaryManager(NativeBinaryManager)}. Calling this method makes the builder ignore the {@link</em>
+<a class="jxr_linenumber" name="L912" href="#L912">912</a> <em class="jxr_javadoccomment">         * Builder#setInstallationBaseDirectory(File)} setting.</em>
+<a class="jxr_linenumber" name="L913" href="#L913">913</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L914" href="#L914">914</a> <em class="jxr_javadoccomment">         * @param directory A local directory that contains a standard PostgreSQL installation. The directory must exist and read and executable.</em>
+<a class="jxr_linenumber" name="L915" href="#L915">915</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
+<a class="jxr_linenumber" name="L916" href="#L916">916</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
 <a class="jxr_linenumber" name="L917" href="#L917">917</a> <em class="jxr_javadoccomment">         */</em>
 <a class="jxr_linenumber" name="L918" href="#L918">918</a>         @NonNull
-<a class="jxr_linenumber" name="L919" href="#L919">919</a>         <strong class="jxr_keyword">public</strong> Builder setOutputRedirector(@NonNull ProcessBuilder.Redirect outputRedirector) {
-<a class="jxr_linenumber" name="L920" href="#L920">920</a>             <strong class="jxr_keyword">this</strong>.outputRedirector = checkNotNull(outputRedirector, <span class="jxr_string">"outputRedirector is null"</span>);
-<a class="jxr_linenumber" name="L921" href="#L921">921</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L922" href="#L922">922</a>         }
-<a class="jxr_linenumber" name="L923" href="#L923">923</a> 
-<a class="jxr_linenumber" name="L924" href="#L924">924</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L925" href="#L925">925</a> <em class="jxr_javadoccomment">         * Sets the {@link NativeBinaryManager} that provides the location of the postgres installation. Explicitly setting a binary manager overrides the</em>
-<a class="jxr_linenumber" name="L926" href="#L926">926</a> <em class="jxr_javadoccomment">         * installation base directory location set with {@link Builder#setInstallationBaseDirectory(File)} as this is only used by the default binary manager.</em>
-<a class="jxr_linenumber" name="L927" href="#L927">927</a> <em class="jxr_javadoccomment">         * Calling {@link Builder#setInstallationBaseDirectory(File)} after this method undoes setting the binary manager.</em>
-<a class="jxr_linenumber" name="L928" href="#L928">928</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L929" href="#L929">929</a> <em class="jxr_javadoccomment">         * @param nativeBinaryManager A {@link NativeBinaryManager} implementation. Must not be null.</em>
-<a class="jxr_linenumber" name="L930" href="#L930">930</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L931" href="#L931">931</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
-<a class="jxr_linenumber" name="L932" href="#L932">932</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L933" href="#L933">933</a>         @NonNull
-<a class="jxr_linenumber" name="L934" href="#L934">934</a>         <strong class="jxr_keyword">public</strong> Builder setNativeBinaryManager(@NonNull <a name="NativeBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/NativeBinaryManager.html#NativeBinaryManager">NativeBinaryManager</a> nativeBinaryManager) {
-<a class="jxr_linenumber" name="L935" href="#L935">935</a>             <strong class="jxr_keyword">this</strong>.nativeBinaryManager = checkNotNull(nativeBinaryManager, <span class="jxr_string">"nativeBinaryManager is null"</span>);
-<a class="jxr_linenumber" name="L936" href="#L936">936</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a class="jxr_linenumber" name="L937" href="#L937">937</a>         }
-<a class="jxr_linenumber" name="L938" href="#L938">938</a> 
-<a class="jxr_linenumber" name="L939" href="#L939">939</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L940" href="#L940">940</a> <em class="jxr_javadoccomment">         * Use a locally installed PostgreSQL server for tests. The tests will still spin up a new instance and locate the data in the data directory but it</em>
-<a class="jxr_linenumber" name="L941" href="#L941">941</a> <em class="jxr_javadoccomment">         * will use the locally installed binaries for starting and stopping. Calling this method sets a binary manager, so it overrides {@link</em>
-<a class="jxr_linenumber" name="L942" href="#L942">942</a> <em class="jxr_javadoccomment">         * Builder#setNativeBinaryManager(NativeBinaryManager)}. Calling this method makes the builder ignore the {@link</em>
-<a class="jxr_linenumber" name="L943" href="#L943">943</a> <em class="jxr_javadoccomment">         * Builder#setInstallationBaseDirectory(File)} setting.</em>
-<a class="jxr_linenumber" name="L944" href="#L944">944</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L945" href="#L945">945</a> <em class="jxr_javadoccomment">         * @param directory A local directory that contains a standard PostgreSQL installation. The directory must exist and read and executable.</em>
-<a class="jxr_linenumber" name="L946" href="#L946">946</a> <em class="jxr_javadoccomment">         * @return The builder itself.</em>
-<a class="jxr_linenumber" name="L947" href="#L947">947</a> <em class="jxr_javadoccomment">         * @since 3.0</em>
-<a class="jxr_linenumber" name="L948" href="#L948">948</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L949" href="#L949">949</a>         @NonNull
-<a class="jxr_linenumber" name="L950" href="#L950">950</a>         <strong class="jxr_keyword">public</strong> Builder useLocalPostgresInstallation(@NonNull File directory) {
-<a class="jxr_linenumber" name="L951" href="#L951">951</a>             checkNotNull(directory, <span class="jxr_string">"directory is null"</span>);
-<a class="jxr_linenumber" name="L952" href="#L952">952</a>             checkState(directory.exists() &amp;&amp; directory.isDirectory(), <span class="jxr_string">"'%s' either does not exist or is not a directory!"</span>, directory);
-<a class="jxr_linenumber" name="L953" href="#L953">953</a>             <strong class="jxr_keyword">return</strong> setNativeBinaryManager(() -&gt; directory);
-<a class="jxr_linenumber" name="L954" href="#L954">954</a>         }
-<a class="jxr_linenumber" name="L955" href="#L955">955</a> 
-<a class="jxr_linenumber" name="L956" href="#L956">956</a>         <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L957" href="#L957">957</a> <em class="jxr_javadoccomment">         * Creates and boots a new {@link EmbeddedPostgres} instance.</em>
-<a class="jxr_linenumber" name="L958" href="#L958">958</a> <em class="jxr_javadoccomment">         *</em>
-<a class="jxr_linenumber" name="L959" href="#L959">959</a> <em class="jxr_javadoccomment">         * @return A {@link EmbeddedPostgres} instance representing a started PostgreSQL server.</em>
-<a class="jxr_linenumber" name="L960" href="#L960">960</a> <em class="jxr_javadoccomment">         * @throws IOException If the server could not be installed or started.</em>
-<a class="jxr_linenumber" name="L961" href="#L961">961</a> <em class="jxr_javadoccomment">         */</em>
-<a class="jxr_linenumber" name="L962" href="#L962">962</a>         @NonNull
-<a class="jxr_linenumber" name="L963" href="#L963">963</a>         <strong class="jxr_keyword">public</strong> <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a> build() <strong class="jxr_keyword">throws</strong> IOException {
-<a class="jxr_linenumber" name="L964" href="#L964">964</a>             <em class="jxr_comment">// Builder Id</em>
-<a class="jxr_linenumber" name="L965" href="#L965">965</a>             <strong class="jxr_keyword">final</strong> String instanceId = EmbeddedUtil.randomAlphaNumeric(16);
-<a class="jxr_linenumber" name="L966" href="#L966">966</a> 
-<a class="jxr_linenumber" name="L967" href="#L967">967</a>             <strong class="jxr_keyword">int</strong> port = <strong class="jxr_keyword">this</strong>.port != 0 ? <strong class="jxr_keyword">this</strong>.port : EmbeddedUtil.allocatePort();
-<a class="jxr_linenumber" name="L968" href="#L968">968</a> 
-<a class="jxr_linenumber" name="L969" href="#L969">969</a>             <em class="jxr_comment">// installation root if nothing has been set by the user.</em>
-<a class="jxr_linenumber" name="L970" href="#L970">970</a>             <strong class="jxr_keyword">final</strong> File parentDirectory = EmbeddedUtil.getWorkingDirectory();
+<a class="jxr_linenumber" name="L919" href="#L919">919</a>         <strong class="jxr_keyword">public</strong> Builder useLocalPostgresInstallation(@NonNull File directory) {
+<a class="jxr_linenumber" name="L920" href="#L920">920</a>             checkNotNull(directory, <span class="jxr_string">"directory is null"</span>);
+<a class="jxr_linenumber" name="L921" href="#L921">921</a>             checkState(directory.exists() &amp;&amp; directory.isDirectory(), <span class="jxr_string">"'%s' either does not exist or is not a directory!"</span>, directory);
+<a class="jxr_linenumber" name="L922" href="#L922">922</a>             <strong class="jxr_keyword">return</strong> setNativeBinaryManager(() -&gt; directory);
+<a class="jxr_linenumber" name="L923" href="#L923">923</a>         }
+<a class="jxr_linenumber" name="L924" href="#L924">924</a> 
+<a class="jxr_linenumber" name="L925" href="#L925">925</a>         <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L926" href="#L926">926</a> <em class="jxr_javadoccomment">         * Creates and boots a new {@link EmbeddedPostgres} instance.</em>
+<a class="jxr_linenumber" name="L927" href="#L927">927</a> <em class="jxr_javadoccomment">         *</em>
+<a class="jxr_linenumber" name="L928" href="#L928">928</a> <em class="jxr_javadoccomment">         * @return A {@link EmbeddedPostgres} instance representing a started PostgreSQL server.</em>
+<a class="jxr_linenumber" name="L929" href="#L929">929</a> <em class="jxr_javadoccomment">         * @throws IOException If the server could not be installed or started.</em>
+<a class="jxr_linenumber" name="L930" href="#L930">930</a> <em class="jxr_javadoccomment">         */</em>
+<a class="jxr_linenumber" name="L931" href="#L931">931</a>         @NonNull
+<a class="jxr_linenumber" name="L932" href="#L932">932</a>         <strong class="jxr_keyword">public</strong> <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a> build() <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L933" href="#L933">933</a>             <em class="jxr_comment">// Builder Id</em>
+<a class="jxr_linenumber" name="L934" href="#L934">934</a>             <strong class="jxr_keyword">final</strong> String instanceId = EmbeddedUtil.randomAlphaNumeric(16);
+<a class="jxr_linenumber" name="L935" href="#L935">935</a> 
+<a class="jxr_linenumber" name="L936" href="#L936">936</a>             <strong class="jxr_keyword">int</strong> port = <strong class="jxr_keyword">this</strong>.port != 0 ? <strong class="jxr_keyword">this</strong>.port : EmbeddedUtil.allocatePort();
+<a class="jxr_linenumber" name="L937" href="#L937">937</a> 
+<a class="jxr_linenumber" name="L938" href="#L938">938</a>             <em class="jxr_comment">// installation root if nothing has been set by the user.</em>
+<a class="jxr_linenumber" name="L939" href="#L939">939</a>             <strong class="jxr_keyword">final</strong> File parentDirectory = EmbeddedUtil.getWorkingDirectory();
+<a class="jxr_linenumber" name="L940" href="#L940">940</a> 
+<a class="jxr_linenumber" name="L941" href="#L941">941</a>             <a name="NativeBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/NativeBinaryManager.html#NativeBinaryManager">NativeBinaryManager</a> nativeBinaryManager = <strong class="jxr_keyword">this</strong>.nativeBinaryManager;
+<a class="jxr_linenumber" name="L942" href="#L942">942</a>             <strong class="jxr_keyword">if</strong> (nativeBinaryManager == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L943" href="#L943">943</a>                 <strong class="jxr_keyword">final</strong> String serverVersion = System.getProperty(<span class="jxr_string">"pg-embedded.postgres-version"</span>, <strong class="jxr_keyword">this</strong>.serverVersion);
+<a class="jxr_linenumber" name="L944" href="#L944">944</a>                 nativeBinaryManager = <strong class="jxr_keyword">new</strong> <a name="TarXzCompressedBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/TarXzCompressedBinaryManager.html#TarXzCompressedBinaryManager">TarXzCompressedBinaryManager</a>(<strong class="jxr_keyword">new</strong> <a name="ZonkyIOPostgresLocator" href="../../../../../de/softwareforge/testing/postgres/embedded/ZonkyIOPostgresLocator.html#ZonkyIOPostgresLocator">ZonkyIOPostgresLocator</a>(serverVersion));
+<a class="jxr_linenumber" name="L945" href="#L945">945</a>             }
+<a class="jxr_linenumber" name="L946" href="#L946">946</a> 
+<a class="jxr_linenumber" name="L947" href="#L947">947</a>             <em class="jxr_comment">// Use the parent directory if no installation directory set.</em>
+<a class="jxr_linenumber" name="L948" href="#L948">948</a>             File installationBaseDirectory = Objects.requireNonNullElse(<strong class="jxr_keyword">this</strong>.installationBaseDirectory, parentDirectory);
+<a class="jxr_linenumber" name="L949" href="#L949">949</a>             nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);
+<a class="jxr_linenumber" name="L950" href="#L950">950</a> 
+<a class="jxr_linenumber" name="L951" href="#L951">951</a>             <em class="jxr_comment">// this is where the binary manager actually places the unpackaged postgres installation.</em>
+<a class="jxr_linenumber" name="L952" href="#L952">952</a>             <strong class="jxr_keyword">final</strong> File postgresInstallDirectory = nativeBinaryManager.getLocation();
+<a class="jxr_linenumber" name="L953" href="#L953">953</a> 
+<a class="jxr_linenumber" name="L954" href="#L954">954</a>             File dataDirectory = <strong class="jxr_keyword">this</strong>.dataDirectory;
+<a class="jxr_linenumber" name="L955" href="#L955">955</a>             <strong class="jxr_keyword">if</strong> (dataDirectory == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L956" href="#L956">956</a>                 dataDirectory = <strong class="jxr_keyword">new</strong> File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);
+<a class="jxr_linenumber" name="L957" href="#L957">957</a>             }
+<a class="jxr_linenumber" name="L958" href="#L958">958</a> 
+<a class="jxr_linenumber" name="L959" href="#L959">959</a>             <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a> embeddedPostgres = <strong class="jxr_keyword">new</strong> <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a>(instanceId, postgresInstallDirectory, dataDirectory,
+<a class="jxr_linenumber" name="L960" href="#L960">960</a>                     removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,
+<a class="jxr_linenumber" name="L961" href="#L961">961</a>                     port, errorRedirector, outputRedirector,
+<a class="jxr_linenumber" name="L962" href="#L962">962</a>                     serverStartupWait);
+<a class="jxr_linenumber" name="L963" href="#L963">963</a> 
+<a class="jxr_linenumber" name="L964" href="#L964">964</a>             embeddedPostgres.cleanOldDataDirectories(parentDirectory);
+<a class="jxr_linenumber" name="L965" href="#L965">965</a> 
+<a class="jxr_linenumber" name="L966" href="#L966">966</a>             <em class="jxr_comment">// for version checking (calling getPostgresVersion(), the instance does not need to run</em>
+<a class="jxr_linenumber" name="L967" href="#L967">967</a>             <em class="jxr_comment">// this is a special case to make the version check run faster for unit test selection.</em>
+<a class="jxr_linenumber" name="L968" href="#L968">968</a>             <strong class="jxr_keyword">if</strong> (bootInstance) {
+<a class="jxr_linenumber" name="L969" href="#L969">969</a>                 embeddedPostgres.boot();
+<a class="jxr_linenumber" name="L970" href="#L970">970</a>             }
 <a class="jxr_linenumber" name="L971" href="#L971">971</a> 
-<a class="jxr_linenumber" name="L972" href="#L972">972</a>             <a name="NativeBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/NativeBinaryManager.html#NativeBinaryManager">NativeBinaryManager</a> nativeBinaryManager = <strong class="jxr_keyword">this</strong>.nativeBinaryManager;
-<a class="jxr_linenumber" name="L973" href="#L973">973</a>             <strong class="jxr_keyword">if</strong> (nativeBinaryManager == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L974" href="#L974">974</a>                 <strong class="jxr_keyword">final</strong> String serverVersion = System.getProperty(<span class="jxr_string">"pg-embedded.postgres-version"</span>, <strong class="jxr_keyword">this</strong>.serverVersion);
-<a class="jxr_linenumber" name="L975" href="#L975">975</a>                 nativeBinaryManager = <strong class="jxr_keyword">new</strong> <a name="TarXzCompressedBinaryManager" href="../../../../../de/softwareforge/testing/postgres/embedded/TarXzCompressedBinaryManager.html#TarXzCompressedBinaryManager">TarXzCompressedBinaryManager</a>(<strong class="jxr_keyword">new</strong> <a name="ZonkyIOPostgresLocator" href="../../../../../de/softwareforge/testing/postgres/embedded/ZonkyIOPostgresLocator.html#ZonkyIOPostgresLocator">ZonkyIOPostgresLocator</a>(serverVersion));
-<a class="jxr_linenumber" name="L976" href="#L976">976</a>             }
-<a class="jxr_linenumber" name="L977" href="#L977">977</a> 
-<a class="jxr_linenumber" name="L978" href="#L978">978</a>             <em class="jxr_comment">// Use the parent directory if no installation directory set.</em>
-<a class="jxr_linenumber" name="L979" href="#L979">979</a>             File installationBaseDirectory = Objects.requireNonNullElse(<strong class="jxr_keyword">this</strong>.installationBaseDirectory, parentDirectory);
-<a class="jxr_linenumber" name="L980" href="#L980">980</a>             nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);
-<a class="jxr_linenumber" name="L981" href="#L981">981</a> 
-<a class="jxr_linenumber" name="L982" href="#L982">982</a>             <em class="jxr_comment">// this is where the binary manager actually places the unpackaged postgres installation.</em>
-<a class="jxr_linenumber" name="L983" href="#L983">983</a>             <strong class="jxr_keyword">final</strong> File postgresInstallDirectory = nativeBinaryManager.getLocation();
-<a class="jxr_linenumber" name="L984" href="#L984">984</a> 
-<a class="jxr_linenumber" name="L985" href="#L985">985</a>             File dataDirectory = <strong class="jxr_keyword">this</strong>.dataDirectory;
-<a class="jxr_linenumber" name="L986" href="#L986">986</a>             <strong class="jxr_keyword">if</strong> (dataDirectory == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L987" href="#L987">987</a>                 dataDirectory = <strong class="jxr_keyword">new</strong> File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);
-<a class="jxr_linenumber" name="L988" href="#L988">988</a>             }
-<a class="jxr_linenumber" name="L989" href="#L989">989</a> 
-<a class="jxr_linenumber" name="L990" href="#L990">990</a>             <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a> embeddedPostgres = <strong class="jxr_keyword">new</strong> <a name="EmbeddedPostgres" href="../../../../../de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.html#EmbeddedPostgres">EmbeddedPostgres</a>(instanceId, postgresInstallDirectory, dataDirectory,
-<a class="jxr_linenumber" name="L991" href="#L991">991</a>                     removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,
-<a class="jxr_linenumber" name="L992" href="#L992">992</a>                     port, errorRedirector, outputRedirector,
-<a class="jxr_linenumber" name="L993" href="#L993">993</a>                     serverStartupWait);
-<a class="jxr_linenumber" name="L994" href="#L994">994</a> 
-<a class="jxr_linenumber" name="L995" href="#L995">995</a>             embeddedPostgres.cleanOldDataDirectories(parentDirectory);
-<a class="jxr_linenumber" name="L996" href="#L996">996</a> 
-<a class="jxr_linenumber" name="L997" href="#L997">997</a>             <em class="jxr_comment">// for version checking (calling getPostgresVersion(), the instance does not need to run</em>
-<a class="jxr_linenumber" name="L998" href="#L998">998</a>             <em class="jxr_comment">// this is a special case to make the version check run faster for unit test selection.</em>
-<a class="jxr_linenumber" name="L999" href="#L999">999</a>             <strong class="jxr_keyword">if</strong> (bootInstance) {
-<a class="jxr_linenumber" name="L1000" href="#L1000">1000</a>                 embeddedPostgres.boot();
-<a class="jxr_linenumber" name="L1001" href="#L1001">1001</a>             }
-<a class="jxr_linenumber" name="L1002" href="#L1002">1002</a> 
-<a class="jxr_linenumber" name="L1003" href="#L1003">1003</a>             <strong class="jxr_keyword">return</strong> embeddedPostgres;
-<a class="jxr_linenumber" name="L1004" href="#L1004">1004</a>         }
-<a class="jxr_linenumber" name="L1005" href="#L1005">1005</a>     }
-<a class="jxr_linenumber" name="L1006" href="#L1006">1006</a> }
+<a class="jxr_linenumber" name="L972" href="#L972">972</a>             <strong class="jxr_keyword">return</strong> embeddedPostgres;
+<a class="jxr_linenumber" name="L973" href="#L973">973</a>         }
+<a class="jxr_linenumber" name="L974" href="#L974">974</a>     }
+<a class="jxr_linenumber" name="L975" href="#L975">975</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2021&#x2013;2023 <a href="https://github.com/hgschmie">Henning Schmiedehausen</a>. All rights reserved.</div>

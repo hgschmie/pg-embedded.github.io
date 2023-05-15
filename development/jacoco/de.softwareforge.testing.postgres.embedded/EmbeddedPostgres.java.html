@@ -645,53 +645,34 @@ public final class EmbeddedPostgres implements AutoCloseable {
     }
 
     /**
-     * Callback interface to customize a builder during creation.
-     *
-     * @deprecated Use {@link EmbeddedPostgresPreparer} with {@link Builder} as type parameter.
-     */
-    @Deprecated
-    @FunctionalInterface
-    public interface BuilderCustomizer {
-
-        /**
-         * Callback to customize a given {@link Builder}.
-         *
-         * @param builder The builder instance. Any method on the builder can be called.
-         * @throws SQLException For any SQL related problems.
-         * @throws IOException  For any IO related problem.
-         */
-        void customize(@NonNull Builder builder) throws IOException, SQLException;
-    }
-
-    /**
      * Creates a new {@link EmbeddedPostgres} instance and starts it.
      */
     public static class Builder {
 
-<span class="fc" id="L671">        private File installationBaseDirectory = null;</span>
-<span class="fc" id="L672">        private File dataDirectory = null;</span>
+<span class="fc" id="L652">        private File installationBaseDirectory = null;</span>
+<span class="fc" id="L653">        private File dataDirectory = null;</span>
 
-<span class="fc" id="L674">        private final Map&lt;String, String&gt; serverConfiguration = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L675">        private final Map&lt;String, String&gt; localeConfiguration = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L676">        private boolean removeDataOnShutdown = true;</span>
-<span class="fc" id="L677">        private int port = 0;</span>
-<span class="fc" id="L678">        private String serverVersion = DEFAULT_POSTGRES_VERSION;</span>
-<span class="fc" id="L679">        private final Map&lt;String, String&gt; connectionProperties = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L680">        private NativeBinaryManager nativeBinaryManager = null;</span>
-<span class="fc" id="L681">        private Duration serverStartupWait = DEFAULT_PG_STARTUP_WAIT;</span>
+<span class="fc" id="L655">        private final Map&lt;String, String&gt; serverConfiguration = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L656">        private final Map&lt;String, String&gt; localeConfiguration = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L657">        private boolean removeDataOnShutdown = true;</span>
+<span class="fc" id="L658">        private int port = 0;</span>
+<span class="fc" id="L659">        private String serverVersion = DEFAULT_POSTGRES_VERSION;</span>
+<span class="fc" id="L660">        private final Map&lt;String, String&gt; connectionProperties = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L661">        private NativeBinaryManager nativeBinaryManager = null;</span>
+<span class="fc" id="L662">        private Duration serverStartupWait = DEFAULT_PG_STARTUP_WAIT;</span>
 
-<span class="fc" id="L683">        private ProcessBuilder.Redirect errorRedirector = ProcessBuilder.Redirect.PIPE;</span>
-<span class="fc" id="L684">        private ProcessBuilder.Redirect outputRedirector = ProcessBuilder.Redirect.PIPE;</span>
+<span class="fc" id="L664">        private ProcessBuilder.Redirect errorRedirector = ProcessBuilder.Redirect.PIPE;</span>
+<span class="fc" id="L665">        private ProcessBuilder.Redirect outputRedirector = ProcessBuilder.Redirect.PIPE;</span>
 
         private boolean bootInstance;
 
-<span class="fc" id="L688">        private Builder(boolean bootInstance) {</span>
-<span class="fc" id="L689">            this.bootInstance = bootInstance;</span>
-<span class="fc" id="L690">        }</span>
+<span class="fc" id="L669">        private Builder(boolean bootInstance) {</span>
+<span class="fc" id="L670">            this.bootInstance = bootInstance;</span>
+<span class="fc" id="L671">        }</span>
 
         Builder() {
-<span class="fc" id="L693">            this(true);</span>
-<span class="fc" id="L694">        }</span>
+<span class="fc" id="L674">            this(true);</span>
+<span class="fc" id="L675">        }</span>
 
         /**
          * Apply a set of defaults to the database server:
@@ -705,10 +686,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder withDefaults() {
-<span class="fc" id="L708">            serverConfiguration.put(&quot;timezone&quot;, &quot;UTC&quot;);</span>
-<span class="fc" id="L709">            serverConfiguration.put(&quot;synchronous_commit&quot;, &quot;off&quot;);</span>
-<span class="fc" id="L710">            serverConfiguration.put(&quot;max_connections&quot;, &quot;300&quot;);</span>
-<span class="fc" id="L711">            return this;</span>
+<span class="fc" id="L689">            serverConfiguration.put(&quot;timezone&quot;, &quot;UTC&quot;);</span>
+<span class="fc" id="L690">            serverConfiguration.put(&quot;synchronous_commit&quot;, &quot;off&quot;);</span>
+<span class="fc" id="L691">            serverConfiguration.put(&quot;max_connections&quot;, &quot;300&quot;);</span>
+<span class="fc" id="L692">            return this;</span>
         }
 
         /**
@@ -719,11 +700,11 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setServerStartupWait(@NonNull Duration serverStartupWait) {
-<span class="nc" id="L722">            checkNotNull(serverStartupWait, &quot;serverStartupWait is null&quot;);</span>
-<span class="nc bnc" id="L723" title="All 2 branches missed.">            checkArgument(!serverStartupWait.isNegative(), &quot;Negative durations are not permitted.&quot;);</span>
+<span class="nc" id="L703">            checkNotNull(serverStartupWait, &quot;serverStartupWait is null&quot;);</span>
+<span class="nc bnc" id="L704" title="All 2 branches missed.">            checkArgument(!serverStartupWait.isNegative(), &quot;Negative durations are not permitted.&quot;);</span>
 
-<span class="nc" id="L725">            this.serverStartupWait = serverStartupWait;</span>
-<span class="nc" id="L726">            return this;</span>
+<span class="nc" id="L706">            this.serverStartupWait = serverStartupWait;</span>
+<span class="nc" id="L707">            return this;</span>
         }
 
         /**
@@ -735,8 +716,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setRemoveDataOnShutdown(boolean removeDataOnShutdown) {
-<span class="nc" id="L738">            this.removeDataOnShutdown = removeDataOnShutdown;</span>
-<span class="nc" id="L739">            return this;</span>
+<span class="nc" id="L719">            this.removeDataOnShutdown = removeDataOnShutdown;</span>
+<span class="nc" id="L720">            return this;</span>
         }
 
         /**
@@ -748,8 +729,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setDataDirectory(@NonNull Path dataDirectory) {
-<span class="fc" id="L751">            checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
-<span class="fc" id="L752">            return setDataDirectory(dataDirectory.toFile());</span>
+<span class="fc" id="L732">            checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
+<span class="fc" id="L733">            return setDataDirectory(dataDirectory.toFile());</span>
         }
 
         /**
@@ -761,8 +742,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setDataDirectory(@NonNull String dataDirectory) {
-<span class="nc" id="L764">            checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
-<span class="nc" id="L765">            return setDataDirectory(new File(dataDirectory));</span>
+<span class="nc" id="L745">            checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
+<span class="nc" id="L746">            return setDataDirectory(new File(dataDirectory));</span>
         }
 
         /**
@@ -774,8 +755,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setDataDirectory(@NonNull File dataDirectory) {
-<span class="fc" id="L777">            this.dataDirectory = checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
-<span class="fc" id="L778">            return this;</span>
+<span class="fc" id="L758">            this.dataDirectory = checkNotNull(dataDirectory, &quot;dataDirectory is null&quot;);</span>
+<span class="fc" id="L759">            return this;</span>
         }
 
         /**
@@ -791,22 +772,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder addServerConfiguration(@NonNull String key, @NonNull String value) {
-<span class="nc" id="L794">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="nc" id="L795">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="nc" id="L796">            this.serverConfiguration.put(key, value);</span>
-<span class="nc" id="L797">            return this;</span>
-        }
-
-        /**
-         * @deprecated Use {@link Builder#addInitDbConfiguration(String, String)}.
-         */
-        @Deprecated
-        @NonNull
-        public Builder addLocaleConfiguration(@NonNull String key, @NonNull String value) {
-<span class="nc" id="L806">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="nc" id="L807">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="nc" id="L808">            this.localeConfiguration.put(key, value);</span>
-<span class="nc" id="L809">            return this;</span>
+<span class="nc" id="L775">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="nc" id="L776">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="nc" id="L777">            this.serverConfiguration.put(key, value);</span>
+<span class="nc" id="L778">            return this;</span>
         }
 
         /**
@@ -824,10 +793,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder addInitDbConfiguration(@NonNull String key, @NonNull String value) {
-<span class="fc" id="L827">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="fc" id="L828">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="fc" id="L829">            this.localeConfiguration.put(key, value);</span>
-<span class="fc" id="L830">            return this;</span>
+<span class="fc" id="L796">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="fc" id="L797">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="fc" id="L798">            this.localeConfiguration.put(key, value);</span>
+<span class="fc" id="L799">            return this;</span>
         }
 
         /**
@@ -841,10 +810,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder addConnectionProperty(@NonNull String key, @NonNull String value) {
-<span class="fc" id="L844">            checkNotNull(key, &quot;key is null&quot;);</span>
-<span class="fc" id="L845">            checkNotNull(value, &quot;value is null&quot;);</span>
-<span class="fc" id="L846">            this.connectionProperties.put(key, value);</span>
-<span class="fc" id="L847">            return this;</span>
+<span class="fc" id="L813">            checkNotNull(key, &quot;key is null&quot;);</span>
+<span class="fc" id="L814">            checkNotNull(value, &quot;value is null&quot;);</span>
+<span class="fc" id="L815">            this.connectionProperties.put(key, value);</span>
+<span class="fc" id="L816">            return this;</span>
         }
 
         /**
@@ -859,10 +828,10 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setInstallationBaseDirectory(@NonNull File installationBaseDirectory) {
-<span class="nc" id="L862">            checkNotNull(installationBaseDirectory, &quot;installationBaseDirectory is null&quot;);</span>
-<span class="nc" id="L863">            this.installationBaseDirectory = installationBaseDirectory;</span>
-<span class="nc" id="L864">            this.nativeBinaryManager = null;</span>
-<span class="nc" id="L865">            return this;</span>
+<span class="nc" id="L831">            checkNotNull(installationBaseDirectory, &quot;installationBaseDirectory is null&quot;);</span>
+<span class="nc" id="L832">            this.installationBaseDirectory = installationBaseDirectory;</span>
+<span class="nc" id="L833">            this.nativeBinaryManager = null;</span>
+<span class="nc" id="L834">            return this;</span>
         }
 
         /**
@@ -874,9 +843,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setPort(int port) {
-<span class="nc bnc" id="L877" title="All 4 branches missed.">            checkState(port &gt; 1023 &amp;&amp; port &lt; 65535, &quot;Port %s is not within 1024..65535&quot;, port);</span>
-<span class="nc" id="L878">            this.port = port;</span>
-<span class="nc" id="L879">            return this;</span>
+<span class="nc bnc" id="L846" title="All 4 branches missed.">            checkState(port &gt; 1023 &amp;&amp; port &lt; 65535, &quot;Port %s is not within 1024..65535&quot;, port);</span>
+<span class="nc" id="L847">            this.port = port;</span>
+<span class="nc" id="L848">            return this;</span>
         }
 
         /**
@@ -892,9 +861,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setServerVersion(@NonNull String serverVersion) {
-<span class="nc" id="L895">            this.serverVersion = checkNotNull(serverVersion, &quot;serverVersion is null&quot;);</span>
+<span class="nc" id="L864">            this.serverVersion = checkNotNull(serverVersion, &quot;serverVersion is null&quot;);</span>
 
-<span class="nc" id="L897">            return this;</span>
+<span class="nc" id="L866">            return this;</span>
         }
 
         /**
@@ -905,8 +874,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setErrorRedirector(@NonNull ProcessBuilder.Redirect errorRedirector) {
-<span class="nc" id="L908">            this.errorRedirector = checkNotNull(errorRedirector, &quot;errorRedirector is null&quot;);</span>
-<span class="nc" id="L909">            return this;</span>
+<span class="nc" id="L877">            this.errorRedirector = checkNotNull(errorRedirector, &quot;errorRedirector is null&quot;);</span>
+<span class="nc" id="L878">            return this;</span>
         }
 
         /**
@@ -917,8 +886,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setOutputRedirector(@NonNull ProcessBuilder.Redirect outputRedirector) {
-<span class="nc" id="L920">            this.outputRedirector = checkNotNull(outputRedirector, &quot;outputRedirector is null&quot;);</span>
-<span class="nc" id="L921">            return this;</span>
+<span class="nc" id="L889">            this.outputRedirector = checkNotNull(outputRedirector, &quot;outputRedirector is null&quot;);</span>
+<span class="nc" id="L890">            return this;</span>
         }
 
         /**
@@ -932,8 +901,8 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder setNativeBinaryManager(@NonNull NativeBinaryManager nativeBinaryManager) {
-<span class="fc" id="L935">            this.nativeBinaryManager = checkNotNull(nativeBinaryManager, &quot;nativeBinaryManager is null&quot;);</span>
-<span class="fc" id="L936">            return this;</span>
+<span class="fc" id="L904">            this.nativeBinaryManager = checkNotNull(nativeBinaryManager, &quot;nativeBinaryManager is null&quot;);</span>
+<span class="fc" id="L905">            return this;</span>
         }
 
         /**
@@ -948,9 +917,9 @@ public final class EmbeddedPostgres implements AutoCloseable {
          */
         @NonNull
         public Builder useLocalPostgresInstallation(@NonNull File directory) {
-<span class="nc" id="L951">            checkNotNull(directory, &quot;directory is null&quot;);</span>
-<span class="nc bnc" id="L952" title="All 4 branches missed.">            checkState(directory.exists() &amp;&amp; directory.isDirectory(), &quot;'%s' either does not exist or is not a directory!&quot;, directory);</span>
-<span class="nc" id="L953">            return setNativeBinaryManager(() -&gt; directory);</span>
+<span class="nc" id="L920">            checkNotNull(directory, &quot;directory is null&quot;);</span>
+<span class="nc bnc" id="L921" title="All 4 branches missed.">            checkState(directory.exists() &amp;&amp; directory.isDirectory(), &quot;'%s' either does not exist or is not a directory!&quot;, directory);</span>
+<span class="nc" id="L922">            return setNativeBinaryManager(() -&gt; directory);</span>
         }
 
         /**
@@ -962,45 +931,45 @@ public final class EmbeddedPostgres implements AutoCloseable {
         @NonNull
         public EmbeddedPostgres build() throws IOException {
             // Builder Id
-<span class="fc" id="L965">            final String instanceId = EmbeddedUtil.randomAlphaNumeric(16);</span>
+<span class="fc" id="L934">            final String instanceId = EmbeddedUtil.randomAlphaNumeric(16);</span>
 
-<span class="pc bpc" id="L967" title="1 of 2 branches missed.">            int port = this.port != 0 ? this.port : EmbeddedUtil.allocatePort();</span>
+<span class="pc bpc" id="L936" title="1 of 2 branches missed.">            int port = this.port != 0 ? this.port : EmbeddedUtil.allocatePort();</span>
 
             // installation root if nothing has been set by the user.
-<span class="fc" id="L970">            final File parentDirectory = EmbeddedUtil.getWorkingDirectory();</span>
+<span class="fc" id="L939">            final File parentDirectory = EmbeddedUtil.getWorkingDirectory();</span>
 
-<span class="fc" id="L972">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
-<span class="fc bfc" id="L973" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
-<span class="fc" id="L974">                final String serverVersion = System.getProperty(&quot;pg-embedded.postgres-version&quot;, this.serverVersion);</span>
-<span class="fc" id="L975">                nativeBinaryManager = new TarXzCompressedBinaryManager(new ZonkyIOPostgresLocator(serverVersion));</span>
+<span class="fc" id="L941">            NativeBinaryManager nativeBinaryManager = this.nativeBinaryManager;</span>
+<span class="fc bfc" id="L942" title="All 2 branches covered.">            if (nativeBinaryManager == null) {</span>
+<span class="fc" id="L943">                final String serverVersion = System.getProperty(&quot;pg-embedded.postgres-version&quot;, this.serverVersion);</span>
+<span class="fc" id="L944">                nativeBinaryManager = new TarXzCompressedBinaryManager(new ZonkyIOPostgresLocator(serverVersion));</span>
             }
 
             // Use the parent directory if no installation directory set.
-<span class="fc" id="L979">            File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
-<span class="fc" id="L980">            nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);</span>
+<span class="fc" id="L948">            File installationBaseDirectory = Objects.requireNonNullElse(this.installationBaseDirectory, parentDirectory);</span>
+<span class="fc" id="L949">            nativeBinaryManager.setInstallationBaseDirectory(installationBaseDirectory);</span>
 
             // this is where the binary manager actually places the unpackaged postgres installation.
-<span class="fc" id="L983">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
+<span class="fc" id="L952">            final File postgresInstallDirectory = nativeBinaryManager.getLocation();</span>
 
-<span class="fc" id="L985">            File dataDirectory = this.dataDirectory;</span>
-<span class="fc bfc" id="L986" title="All 2 branches covered.">            if (dataDirectory == null) {</span>
-<span class="fc" id="L987">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
+<span class="fc" id="L954">            File dataDirectory = this.dataDirectory;</span>
+<span class="fc bfc" id="L955" title="All 2 branches covered.">            if (dataDirectory == null) {</span>
+<span class="fc" id="L956">                dataDirectory = new File(parentDirectory, DATA_DIRECTORY_PREFIX + instanceId);</span>
             }
 
-<span class="fc" id="L990">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
+<span class="fc" id="L959">            EmbeddedPostgres embeddedPostgres = new EmbeddedPostgres(instanceId, postgresInstallDirectory, dataDirectory,</span>
                     removeDataOnShutdown, serverConfiguration, localeConfiguration, connectionProperties,
                     port, errorRedirector, outputRedirector,
                     serverStartupWait);
 
-<span class="fc" id="L995">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
+<span class="fc" id="L964">            embeddedPostgres.cleanOldDataDirectories(parentDirectory);</span>
 
             // for version checking (calling getPostgresVersion(), the instance does not need to run
             // this is a special case to make the version check run faster for unit test selection.
-<span class="fc bfc" id="L999" title="All 2 branches covered.">            if (bootInstance) {</span>
-<span class="fc" id="L1000">                embeddedPostgres.boot();</span>
+<span class="fc bfc" id="L968" title="All 2 branches covered.">            if (bootInstance) {</span>
+<span class="fc" id="L969">                embeddedPostgres.boot();</span>
             }
 
-<span class="fc" id="L1003">            return embeddedPostgres;</span>
+<span class="fc" id="L972">            return embeddedPostgres;</span>
         }
     }
 }

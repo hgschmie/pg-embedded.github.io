@@ -14,7 +14,6 @@
 package de.softwareforge.testing.postgres.junit5;
 
 import de.softwareforge.testing.postgres.embedded.DatabaseManager;
-import de.softwareforge.testing.postgres.embedded.DatabasePreparer;
 import de.softwareforge.testing.postgres.embedded.EmbeddedPostgres;
 import de.softwareforge.testing.postgres.embedded.EmbeddedPostgresPreparer;
 
@@ -28,8 +27,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  */
 public final class SingleDatabaseBuilder {
 
-<span class="nc" id="L31">    private SingleDatabaseBuilder() {</span>
-<span class="nc" id="L32">        throw new AssertionError(&quot;SingleDatabaseBuilder can not be instantiated&quot;);</span>
+<span class="nc" id="L30">    private SingleDatabaseBuilder() {</span>
+<span class="nc" id="L31">        throw new AssertionError(&quot;SingleDatabaseBuilder can not be instantiated&quot;);</span>
     }
 
     /**
@@ -39,7 +38,7 @@ public final class SingleDatabaseBuilder {
      */
     @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instance() {
-<span class="nc" id="L42">        return EmbeddedPgExtension.singleDatabase();</span>
+<span class="nc" id="L41">        return EmbeddedPgExtension.singleDatabase();</span>
     }
 
     /**
@@ -49,25 +48,7 @@ public final class SingleDatabaseBuilder {
      */
     @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instanceWithDefaults() {
-<span class="fc" id="L52">        return EmbeddedPgExtension.singleDatabase().withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
-    }
-
-    /**
-     * @deprecated Use {@link SingleDatabaseBuilder#preparedInstance(EmbeddedPostgresPreparer)}.
-     */
-    @Deprecated
-    @NonNull
-    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@NonNull DatabasePreparer preparer) {
-<span class="nc" id="L61">        return EmbeddedPgExtension.singleDatabase().withPreparer(preparer);</span>
-    }
-
-    /**
-     * @deprecated Use {@link SingleDatabaseBuilder#preparedInstanceWithDefaults(EmbeddedPostgresPreparer)}.
-     */
-    @Deprecated
-    @NonNull
-    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@NonNull DatabasePreparer preparer) {
-<span class="nc" id="L70">        return EmbeddedPgExtension.singleDatabase().withPreparer(preparer).withCustomizer(EmbeddedPostgres.Builder::withDefaults);</span>
+<span class="fc" id="L51">        return EmbeddedPgExtension.singleDatabase().withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 
     /**
@@ -79,7 +60,7 @@ public final class SingleDatabaseBuilder {
      */
     @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {
-<span class="nc" id="L82">        return EmbeddedPgExtension.singleDatabase().withDatabasePreparer(databasePreparer);</span>
+<span class="nc" id="L63">        return EmbeddedPgExtension.singleDatabase().withDatabasePreparer(databasePreparer);</span>
     }
 
     /**
@@ -92,7 +73,7 @@ public final class SingleDatabaseBuilder {
      */
     @NonNull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {
-<span class="fc" id="L95">        return EmbeddedPgExtension.singleDatabase().withDatabasePreparer(databasePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+<span class="fc" id="L76">        return EmbeddedPgExtension.singleDatabase().withDatabasePreparer(databasePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

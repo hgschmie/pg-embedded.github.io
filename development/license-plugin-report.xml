@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1684124431914">
-    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="4.4-SNAPSHOT"/>
+<licensePluginReport goal="CHECK" timestamp="1684126972627">
+    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="5.0-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabaseInfo.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabaseManager.java" result="PRESENT"/>
-        <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabasePreparer.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/EmbeddedPostgres.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/EmbeddedPostgresPreparer.java" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/EmbeddedUtil.java" result="PRESENT"/>

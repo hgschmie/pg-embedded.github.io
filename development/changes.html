@@ -76,7 +76,9 @@
 <section>
 <h1>Changelog</h1>
 <p>This is the changelog for the pg-embedded. It follows <a href="http://keepachangelog.com/en/1.0.0/" class="externalLink">Keep a Changelog v1.0.0</a>.</p><section>
-<h2>unreleased</h2>
+<h2>unreleased</h2><section>
+<h3>Added</h3></section><section>
+<h3>Removed</h3>
 <ul>
 
 <li>remove deprecated <code>DatabasePreparer</code> code and all related methods</li>
@@ -84,17 +86,20 @@
 <li>remove deprecated <code>EmbeddedPostgres#addLocaleConfiguration()</code> method</li>
 <li>remove deprecated <code>FlywayPreparer#customize()</code> method</li>
 </ul></section><section>
+<h3>Changed</h3>
+<ul>
+
+<li>fixed obscure NPE when postgres does not start</li>
+<li>MacOS default is now to use native binaries, not x86_64</li>
+</ul></section></section><section>
 <h2>4.3 - 2023-05-14</h2><section>
 <h3>Added</h3>
 <ul>
 
-<li>log database architecture when starting.</li>
-<li>support mac arm64 for building the distribution.</li>
-</ul></section><section>
-<h3>Removed</h3></section><section>
-<h3>Changed</h3>
-<ul>
-
+<li>
+<p>log database architecture when starting.</p></li>
+<li>
+<p>support mac arm64 for building the distribution.</p></li>
 <li>
 <p>update github actions</p></li>
 <li>

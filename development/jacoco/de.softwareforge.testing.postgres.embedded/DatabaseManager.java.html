@@ -218,7 +218,7 @@ public final class DatabaseManager implements AutoCloseable {
 
         @Override
         public void run() {
-<span class="fc bfc" id="L221" title="All 2 branches covered.">            while (!closed.get()) {</span>
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">            while (!closed.get()) {</span>
                 try {
 <span class="fc" id="L223">                    final String newDbName = EmbeddedUtil.randomLowercase(12);</span>
                     try {
@@ -231,7 +231,7 @@ public final class DatabaseManager implements AutoCloseable {
 <span class="fc" id="L231">                    } catch (SQLException e) {</span>
                         // https://www.postgresql.org/docs/13/errcodes-appendix.html - 57P01 admin_shutdown
 <span class="pc bpc" id="L233" title="1 of 2 branches missed.">                        if (!e.getSQLState().equals(&quot;57P01&quot;)) {</span>
-<span class="nc" id="L234">                            LOG.warn(&quot;Caught SQL Exception (&quot; + e.getSQLState() + &quot;):&quot;, e);</span>
+<span class="fc" id="L234">                            LOG.warn(&quot;Caught SQL Exception (&quot; + e.getSQLState() + &quot;):&quot;, e);</span>
 <span class="nc" id="L235">                            nextDatabase.put(DatabaseInfo.forException(e));</span>
                         }
 <span class="fc" id="L237">                    }</span>
@@ -242,7 +242,7 @@ public final class DatabaseManager implements AutoCloseable {
 <span class="nc" id="L242">                    LOG.warn(&quot;Caught Throwable in instance provider loop:&quot;, t);</span>
 <span class="pc" id="L243">                }</span>
             }
-<span class="fc" id="L245">        }</span>
+<span class="nc" id="L245">        }</span>
 
         @Override
         public DatabaseInfo get() {

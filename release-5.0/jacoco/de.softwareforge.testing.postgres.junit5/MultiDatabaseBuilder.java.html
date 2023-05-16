@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MultiDatabaseBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pg-embedded</a> &gt; <a href="index.source.html" class="el_package">de.softwareforge.testing.postgres.junit5</a> &gt; <span class="el_source">MultiDatabaseBuilder.java</span></div><h1>MultiDatabaseBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.softwareforge.testing.postgres.junit5;
+
+import de.softwareforge.testing.postgres.embedded.DatabaseManager;
+import de.softwareforge.testing.postgres.embedded.EmbeddedPostgres;
+import de.softwareforge.testing.postgres.embedded.EmbeddedPostgresPreparer;
+
+import javax.sql.DataSource;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+
+/**
+ * Create a new PostgreSQL server that supports multiple databases. Each database is cloned from a template.
+ */
+public final class MultiDatabaseBuilder {
+
+<span class="nc" id="L29">    private MultiDatabaseBuilder() {</span>
+<span class="nc" id="L30">        throw new AssertionError(&quot;MultiDatabaseBuilder can not be instantiated&quot;);</span>
+    }
+
+    /**
+     * Create a builder without any customizations applied.
+     *
+     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
+     */
+    @NonNull
+    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instance() {
+<span class="nc" id="L40">        return EmbeddedPgExtension.multiDatabase();</span>
+    }
+
+    /**
+     * Create a builder with standard initializations ({@link EmbeddedPostgres.Builder#withDefaults()}) applied.
+     *
+     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
+     */
+    @NonNull
+    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instanceWithDefaults() {
+<span class="fc" id="L50">        return EmbeddedPgExtension.multiDatabase().withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+    }
+
+    /**
+     * Create a builder and register a {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} to set up the template database.
+     *
+     * @param databasePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.
+     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
+     * @since 3.0
+     */
+    @NonNull
+    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {
+<span class="nc" id="L62">        return EmbeddedPgExtension.multiDatabase().withDatabasePreparer(databasePreparer);</span>
+    }
+
+    /**
+     * Create a builder with standard initializations ({@link EmbeddedPostgres.Builder#withDefaults()}) applied and register a {@link
+     * EmbeddedPostgresPreparer&lt;DataSource&gt;} to set up the template database.
+     *
+     * @param databasePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.
+     * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
+     * @since 3.0
+     */
+    @NonNull
+    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {
+<span class="fc" id="L75">        return EmbeddedPgExtension.multiDatabase().withDatabasePreparer(databasePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

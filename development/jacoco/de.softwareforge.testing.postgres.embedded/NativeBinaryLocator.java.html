@@ -11,26 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.softwareforge.testing.postgres.embedded;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.CheckForNull;
 
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingInputStream;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Locates a native binary on the Filesystem. If necessary, it should download the binary first from the network.
  * &lt;p&gt;
- * Implementations of this class &lt;b&gt;must&lt;/b&gt; implement {@link Object#hashCode()} and {@link Object#equals(Object)} and &lt;i&gt;should&lt;/i&gt; implement {@link
- * Object#toString()}.
+ * Implementations of this class &lt;b&gt;must&lt;/b&gt; implement {@link Object#hashCode()} and {@link Object#equals(Object)} and &lt;i&gt;should&lt;/i&gt; implement
+ * {@link Object#toString()}.
  *
  * @since 3.0
  */
@@ -59,8 +59,8 @@ public interface NativeBinaryLocator {
      * @return A stable indentifier that can be used as a file name.
      * @throws IOException If the stream could not be read.
      */
-    @NonNull
-    @SuppressFBWarnings(&quot;NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE&quot;) // false positive
+    @Nonnull
+    @SuppressWarnings(&quot;NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE&quot;) // false positive
     default String getIdentifier() throws IOException {
 <span class="fc" id="L65">        try (InputStream installationArchive = getInputStream()) {</span>
 <span class="pc bpc" id="L66" title="1 of 2 branches missed.">            checkState(installationArchive != null, &quot;Locator '%s' did not find a suitable archive to unpack!&quot;, toString());</span>
@@ -71,4 +71,4 @@ public interface NativeBinaryLocator {
         }
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

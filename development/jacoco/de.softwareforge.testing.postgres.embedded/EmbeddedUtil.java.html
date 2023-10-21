@@ -17,6 +17,7 @@ package de.softwareforge.testing.postgres.embedded;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import jakarta.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -32,7 +33,6 @@ import java.util.stream.Stream;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 final class EmbeddedUtil {
 
@@ -86,7 +86,7 @@ final class EmbeddedUtil {
 <span class="fc" id="L86">        return workDir;</span>
     }
 
-    static void ensureDirectory(@NonNull File workDir) {
+    static void ensureDirectory(@Nonnull File workDir) {
 
 <span class="fc bfc" id="L91" title="All 2 branches covered.">        if (!workDir.exists()) {</span>
 <span class="fc" id="L92">            checkState(workDir.mkdirs(), &quot; Could not create directory '%s'&quot;, workDir);</span>
@@ -227,4 +227,4 @@ final class EmbeddedUtil {
 <span class="fc" id="L227">        return OS_NAME.toLowerCase(Locale.ROOT).startsWith(osNamePrefix.toLowerCase(Locale.ROOT));</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

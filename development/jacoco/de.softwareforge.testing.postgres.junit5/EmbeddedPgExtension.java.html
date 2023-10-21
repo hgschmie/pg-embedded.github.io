@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.softwareforge.testing.postgres.junit5;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -21,13 +22,13 @@ import de.softwareforge.testing.postgres.embedded.DatabaseManager;
 import de.softwareforge.testing.postgres.embedded.DatabaseManager.DatabaseManagerBuilder;
 import de.softwareforge.testing.postgres.embedded.EmbeddedPostgres;
 
+import jakarta.annotation.Nonnull;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.UUID;
 import javax.sql.DataSource;
 
 import com.google.common.annotations.VisibleForTesting;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -53,18 +54,18 @@ import org.slf4j.LoggerFactory;
  */
 public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
-<span class="fc" id="L56">    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedPgExtension.class);</span>
+<span class="fc" id="L57">    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedPgExtension.class);</span>
 
     // multiple instances must use different namespaces
-<span class="fc" id="L59">    private final Namespace PG_NAMESPACE = Namespace.create(UUID.randomUUID());</span>
+<span class="fc" id="L60">    private final Namespace pgNamespace = Namespace.create(UUID.randomUUID());</span>
 
     private final DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder;
 
-<span class="fc" id="L63">    private volatile DatabaseManager databaseManager = null;</span>
+<span class="fc" id="L64">    private volatile DatabaseManager databaseManager = null;</span>
 
-<span class="fc" id="L65">    private EmbeddedPgExtension(DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder) {</span>
-<span class="fc" id="L66">        this.databaseManagerBuilder = databaseManagerBuilder;</span>
-<span class="fc" id="L67">    }</span>
+<span class="fc" id="L66">    private EmbeddedPgExtension(DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder) {</span>
+<span class="fc" id="L67">        this.databaseManagerBuilder = databaseManagerBuilder;</span>
+<span class="fc" id="L68">    }</span>
 
     /**
      * Creates a new {@link EmbeddedPgExtensionBuilder} that allows further customization of the {@link EmbeddedPgExtension}. The resulting extension manages
@@ -72,9 +73,9 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
      *
      * @return A {@link EmbeddedPgExtensionBuilder} instance. Never null.
      */
-    @NonNull
+    @Nonnull
     static EmbeddedPgExtensionBuilder multiDatabase() {
-<span class="fc" id="L77">        return new EmbeddedPgExtensionBuilder(true);</span>
+<span class="fc" id="L78">        return new EmbeddedPgExtensionBuilder(true);</span>
     }
 
     /**
@@ -83,9 +84,9 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
      *
      * @return A {@link EmbeddedPgExtensionBuilder} instance. Never null.
      */
-    @NonNull
+    @Nonnull
     static EmbeddedPgExtensionBuilder singleDatabase() {
-<span class="fc" id="L88">        return new EmbeddedPgExtensionBuilder(false);</span>
+<span class="fc" id="L89">        return new EmbeddedPgExtensionBuilder(false);</span>
     }
 
     /**
@@ -99,8 +100,8 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
      * @since 3.0
      */
     public EmbeddedPgExtension() {
-<span class="fc" id="L102">        this(new DatabaseManagerBuilder(true).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults));</span>
-<span class="fc" id="L103">    }</span>
+<span class="fc" id="L103">        this(new DatabaseManagerBuilder(true).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults));</span>
+<span class="fc" id="L104">    }</span>
 
     /**
      * Returns a data source. Depending on the mode it returns a datasource connected to the same database (single mode) or a new database (multi mode) on every
@@ -109,14 +110,14 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
      * @return A {@link DataSource} instance. This is never null.
      * @throws SQLException If a problem connecting to the database occurs.
      */
-    @NonNull
+    @Nonnull
     public DataSource createDataSource() throws SQLException {
-<span class="fc" id="L114">        return createDatabaseInfo().asDataSource();</span>
+<span class="fc" id="L115">        return createDatabaseInfo().asDataSource();</span>
     }
 
     @VisibleForTesting
     EmbeddedPostgres getEmbeddedPostgres() {
-<span class="fc" id="L119">        return databaseManager.getEmbeddedPostgres();</span>
+<span class="fc" id="L120">        return databaseManager.getEmbeddedPostgres();</span>
     }
 
     /**
@@ -127,88 +128,88 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
      * @return A {@link DatabaseInfo} instance. This is never null.
      * @throws SQLException If a problem connecting to the database occurs.
      */
-    @NonNull
+    @Nonnull
     public DatabaseInfo createDatabaseInfo() throws SQLException {
-<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        checkState(databaseManager != null, &quot;no before method has been called!&quot;);</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        checkState(databaseManager != null, &quot;no before method has been called!&quot;);</span>
 
-<span class="fc" id="L134">        DatabaseInfo databaseInfo = databaseManager.getDatabaseInfo();</span>
-<span class="fc" id="L135">        LOG.info(&quot;Connection to {}&quot;, databaseInfo.asJdbcUrl());</span>
-<span class="fc" id="L136">        return databaseInfo;</span>
+<span class="fc" id="L135">        DatabaseInfo databaseInfo = databaseManager.getDatabaseInfo();</span>
+<span class="fc" id="L136">        LOG.info(&quot;Connection to {}&quot;, databaseInfo.asJdbcUrl());</span>
+<span class="fc" id="L137">        return databaseInfo;</span>
     }
 
     @Override
-    public void beforeAll(@NonNull ExtensionContext extensionContext) throws Exception {
-<span class="fc" id="L141">        checkNotNull(extensionContext, &quot;extensionContext is null&quot;);</span>
+    public void beforeAll(@Nonnull ExtensionContext extensionContext) throws Exception {
+<span class="fc" id="L142">        checkNotNull(extensionContext, &quot;extensionContext is null&quot;);</span>
 
-<span class="fc" id="L143">        Store pgStore = extensionContext.getStore(PG_NAMESPACE);</span>
+<span class="fc" id="L144">        Store pgStore = extensionContext.getStore(pgNamespace);</span>
 
-<span class="fc" id="L145">        TestMode testMode = pgStore.getOrComputeIfAbsent(TestMode.TESTMODE_KEY,</span>
-<span class="fc" id="L146">                k -&gt; new TestMode(extensionContext.getUniqueId(), databaseManagerBuilder.build()),</span>
-                TestMode.class);
+<span class="fc" id="L146">        TestingContext testingContext = pgStore.getOrComputeIfAbsent(TestingContext.TESTING_CONTEXT_KEY,</span>
+<span class="fc" id="L147">                k -&gt; new TestingContext(extensionContext.getUniqueId(), databaseManagerBuilder.build()),</span>
+                TestingContext.class);
 
-<span class="fc" id="L149">        this.databaseManager = testMode.start(extensionContext.getUniqueId());</span>
-<span class="fc" id="L150">    }</span>
+<span class="fc" id="L150">        this.databaseManager = testingContext.start(extensionContext.getUniqueId());</span>
+<span class="fc" id="L151">    }</span>
 
     @Override
-    public void afterAll(@NonNull ExtensionContext extensionContext) throws Exception {
-<span class="fc" id="L154">        checkNotNull(extensionContext, &quot;extensionContext is null&quot;);</span>
+    public void afterAll(@Nonnull ExtensionContext extensionContext) throws Exception {
+<span class="fc" id="L155">        checkNotNull(extensionContext, &quot;extensionContext is null&quot;);</span>
 
-<span class="fc" id="L156">        Store pgStore = extensionContext.getStore(PG_NAMESPACE);</span>
-<span class="fc" id="L157">        TestMode testMode = pgStore.get(TestMode.TESTMODE_KEY, TestMode.class);</span>
+<span class="fc" id="L157">        Store pgStore = extensionContext.getStore(pgNamespace);</span>
+<span class="fc" id="L158">        TestingContext testingContext = pgStore.get(TestingContext.TESTING_CONTEXT_KEY, TestingContext.class);</span>
 
-<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        if (testMode != null) {</span>
-<span class="fc" id="L160">            this.databaseManager = testMode.stop(extensionContext.getUniqueId());</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">        if (testingContext != null) {</span>
+<span class="fc" id="L161">            this.databaseManager = testingContext.stop(extensionContext.getUniqueId());</span>
         }
-<span class="fc" id="L162">    }</span>
+<span class="fc" id="L163">    }</span>
 
     @Override
-    public void beforeEach(@NonNull ExtensionContext extensionContext) throws Exception {
-<span class="fc" id="L166">        checkNotNull(extensionContext, &quot;extensionContext is null&quot;);</span>
+    public void beforeEach(@Nonnull ExtensionContext extensionContext) throws Exception {
+<span class="fc" id="L167">        checkNotNull(extensionContext, &quot;extensionContext is null&quot;);</span>
 
-<span class="fc" id="L168">        Store pgStore = extensionContext.getStore(PG_NAMESPACE);</span>
-<span class="fc" id="L169">        TestMode testMode = pgStore.getOrComputeIfAbsent(TestMode.TESTMODE_KEY,</span>
-<span class="fc" id="L170">                k -&gt; new TestMode(extensionContext.getUniqueId(), databaseManagerBuilder.build()),</span>
-                TestMode.class);
+<span class="fc" id="L169">        Store pgStore = extensionContext.getStore(pgNamespace);</span>
+<span class="fc" id="L170">        TestingContext testingContext = pgStore.getOrComputeIfAbsent(TestingContext.TESTING_CONTEXT_KEY,</span>
+<span class="fc" id="L171">                k -&gt; new TestingContext(extensionContext.getUniqueId(), databaseManagerBuilder.build()),</span>
+                TestingContext.class);
 
-<span class="fc" id="L173">        this.databaseManager = testMode.start(extensionContext.getUniqueId());</span>
-<span class="fc" id="L174">    }</span>
+<span class="fc" id="L174">        this.databaseManager = testingContext.start(extensionContext.getUniqueId());</span>
+<span class="fc" id="L175">    }</span>
 
     @Override
-    public void afterEach(@NonNull ExtensionContext extensionContext) throws Exception {
-<span class="fc" id="L178">        checkNotNull(extensionContext, &quot;extensionContext is null&quot;);</span>
+    public void afterEach(@Nonnull ExtensionContext extensionContext) throws Exception {
+<span class="fc" id="L179">        checkNotNull(extensionContext, &quot;extensionContext is null&quot;);</span>
 
-<span class="fc" id="L180">        Store pgStore = extensionContext.getStore(PG_NAMESPACE);</span>
-<span class="fc" id="L181">        TestMode testMode = pgStore.get(TestMode.TESTMODE_KEY, TestMode.class);</span>
+<span class="fc" id="L181">        Store pgStore = extensionContext.getStore(pgNamespace);</span>
+<span class="fc" id="L182">        TestingContext testingContext = pgStore.get(TestingContext.TESTING_CONTEXT_KEY, TestingContext.class);</span>
 
-<span class="pc bpc" id="L183" title="1 of 2 branches missed.">        if (testMode != null) {</span>
-<span class="fc" id="L184">            this.databaseManager = testMode.stop(extensionContext.getUniqueId());</span>
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">        if (testingContext != null) {</span>
+<span class="fc" id="L185">            this.databaseManager = testingContext.stop(extensionContext.getUniqueId());</span>
         }
-<span class="fc" id="L186">    }</span>
+<span class="fc" id="L187">    }</span>
 
     @Override
-    public boolean supportsParameter(@NonNull ParameterContext parameterContext, ExtensionContext extensionContext) {
-<span class="fc" id="L190">        Type type = parameterContext.getParameter().getType();</span>
-<span class="pc bpc" id="L191" title="1 of 6 branches missed.">        return type == EmbeddedPostgres.class</span>
+    public boolean supportsParameter(@Nonnull ParameterContext parameterContext, ExtensionContext extensionContext) {
+<span class="fc" id="L191">        Type type = parameterContext.getParameter().getType();</span>
+<span class="pc bpc" id="L192" title="1 of 6 branches missed.">        return type == EmbeddedPostgres.class</span>
                 || type == DatabaseInfo.class
                 || type == DataSource.class;
     }
 
     @Override
-    public Object resolveParameter(@NonNull ParameterContext parameterContext, ExtensionContext extensionContext) {
-<span class="fc" id="L198">        Type type = parameterContext.getParameter().getType();</span>
+    public Object resolveParameter(@Nonnull ParameterContext parameterContext, ExtensionContext extensionContext) {
+<span class="fc" id="L199">        Type type = parameterContext.getParameter().getType();</span>
         try {
-<span class="fc bfc" id="L200" title="All 2 branches covered.">            if (type == EmbeddedPostgres.class) {</span>
-<span class="fc" id="L201">                return getEmbeddedPostgres();</span>
-<span class="fc bfc" id="L202" title="All 2 branches covered.">            } else if (type == DatabaseInfo.class) {</span>
-<span class="fc" id="L203">                return createDatabaseInfo();</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">            if (type == EmbeddedPostgres.class) {</span>
+<span class="fc" id="L202">                return getEmbeddedPostgres();</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">            } else if (type == DatabaseInfo.class) {</span>
+<span class="fc" id="L204">                return createDatabaseInfo();</span>
 
-<span class="pc bpc" id="L205" title="1 of 2 branches missed.">            } else if (type == DataSource.class) {</span>
-<span class="fc" id="L206">                return createDataSource();</span>
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">            } else if (type == DataSource.class) {</span>
+<span class="fc" id="L207">                return createDataSource();</span>
             }
-<span class="nc" id="L208">        } catch (SQLException e) {</span>
-<span class="nc" id="L209">            throw new ParameterResolutionException(&quot;Could not create &quot; + type.getTypeName() + &quot; instance&quot;, e);</span>
-<span class="nc" id="L210">        }</span>
-<span class="nc" id="L211">        return null;</span>
+<span class="nc" id="L209">        } catch (SQLException e) {</span>
+<span class="nc" id="L210">            throw new ParameterResolutionException(&quot;Could not create &quot; + type.getTypeName() + &quot; instance&quot;, e);</span>
+<span class="nc" id="L211">        }</span>
+<span class="nc" id="L212">        return null;</span>
     }
 
     /**
@@ -217,8 +218,8 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
     public static final class EmbeddedPgExtensionBuilder extends DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; {
 
         private EmbeddedPgExtensionBuilder(boolean multiMode) {
-<span class="fc" id="L220">            super(multiMode);</span>
-<span class="fc" id="L221">        }</span>
+<span class="fc" id="L221">            super(multiMode);</span>
+<span class="fc" id="L222">        }</span>
 
         /**
          * Create a {@link EmbeddedPgExtension} instance.
@@ -226,44 +227,44 @@ public final class EmbeddedPgExtension implements BeforeAllCallback, AfterAllCal
          * @return A {@link EmbeddedPgExtension} instance. Is never null.
          */
         @Override
-        @NonNull
+        @Nonnull
         public EmbeddedPgExtension build() {
-<span class="fc" id="L231">            DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder = new DatabaseManagerBuilder(multiMode)</span>
-<span class="fc" id="L232">                    .withDatabasePreparers(databasePreparers.build())</span>
-<span class="fc" id="L233">                    .withInstancePreparers(instancePreparers.build());</span>
+<span class="fc" id="L232">            DatabaseManager.Builder&lt;DatabaseManager&gt; databaseManagerBuilder = new DatabaseManagerBuilder(multiMode)</span>
+<span class="fc" id="L233">                    .withDatabasePreparers(databasePreparers.build())</span>
+<span class="fc" id="L234">                    .withInstancePreparers(instancePreparers.build());</span>
 
-<span class="fc" id="L235">            return new EmbeddedPgExtension(databaseManagerBuilder);</span>
+<span class="fc" id="L236">            return new EmbeddedPgExtension(databaseManagerBuilder);</span>
         }
     }
 
-    private static final class TestMode {
+    private static final class TestingContext {
 
-<span class="fc" id="L241">        private static final Object TESTMODE_KEY = new Object();</span>
+<span class="fc" id="L242">        private static final Object TESTING_CONTEXT_KEY = new Object();</span>
 
         private final String id;
         private final DatabaseManager databaseManager;
 
-<span class="fc" id="L246">        private TestMode(String id, DatabaseManager databaseManager) {</span>
-<span class="fc" id="L247">            this.id = id;</span>
-<span class="fc" id="L248">            this.databaseManager = databaseManager;</span>
-<span class="fc" id="L249">        }</span>
+<span class="fc" id="L247">        private TestingContext(String id, DatabaseManager databaseManager) {</span>
+<span class="fc" id="L248">            this.id = id;</span>
+<span class="fc" id="L249">            this.databaseManager = databaseManager;</span>
+<span class="fc" id="L250">        }</span>
 
         private DatabaseManager start(String id) throws Exception {
-<span class="fc bfc" id="L252" title="All 2 branches covered.">            if (this.id.equals(id)) {</span>
-<span class="fc" id="L253">                databaseManager.start();</span>
+<span class="fc bfc" id="L253" title="All 2 branches covered.">            if (this.id.equals(id)) {</span>
+<span class="fc" id="L254">                databaseManager.start();</span>
             }
 
-<span class="fc" id="L256">            return databaseManager;</span>
+<span class="fc" id="L257">            return databaseManager;</span>
         }
 
         private DatabaseManager stop(String id) throws Exception {
-<span class="fc bfc" id="L260" title="All 2 branches covered.">            if (this.id.equals(id)) {</span>
-<span class="fc" id="L261">                databaseManager.close();</span>
-<span class="fc" id="L262">                return null;</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">            if (this.id.equals(id)) {</span>
+<span class="fc" id="L262">                databaseManager.close();</span>
+<span class="fc" id="L263">                return null;</span>
             }
 
-<span class="fc" id="L265">            return databaseManager;</span>
+<span class="fc" id="L266">            return databaseManager;</span>
         }
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

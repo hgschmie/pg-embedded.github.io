@@ -11,22 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.softwareforge.testing.postgres.embedded;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
 
 import com.google.common.collect.ImmutableList;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} that uses the &lt;a href=&quot;https://flywaydb.org/&quot;&gt;Flyway version control for your database&lt;/a&gt; framework to
@@ -34,9 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class FlywayPreparer implements EmbeddedPostgresPreparer&lt;DataSource&gt; {
 
-<span class="fc" id="L37">    private static final Logger LOG = LoggerFactory.getLogger(FlywayPreparer.class);</span>
-
-<span class="fc" id="L39">    private final ImmutableList.Builder&lt;Consumer&lt;FluentConfiguration&gt;&gt; customizers = ImmutableList.builder();</span>
+<span class="fc" id="L36">    private final ImmutableList.Builder&lt;Consumer&lt;FluentConfiguration&gt;&gt; customizers = ImmutableList.builder();</span>
 
     /**
      * Creates a new instance using one or more classpath locations.
@@ -44,68 +41,68 @@ public final class FlywayPreparer implements EmbeddedPostgresPreparer&lt;DataSou
      * @param locations One or more locations on the classpath.
      * @return A {@link FlywayPreparer} instance.
      */
-    @NonNull
+    @Nonnull
     public static FlywayPreparer forClasspathLocation(String... locations) {
-<span class="fc" id="L49">        FlywayPreparer preparer = new FlywayPreparer();</span>
-<span class="fc" id="L50">        preparer.addCustomizer(c -&gt; c.locations(locations));</span>
-<span class="fc" id="L51">        return preparer;</span>
+<span class="fc" id="L46">        FlywayPreparer preparer = new FlywayPreparer();</span>
+<span class="fc" id="L47">        preparer.addCustomizer(c -&gt; c.locations(locations));</span>
+<span class="fc" id="L48">        return preparer;</span>
     }
 
     /**
-     * Create a new, uninitialized preparer instance. Use {@link FlywayPreparer#addCustomizer(Consumer)} to modify the configuration for the {@link
-     * FluentConfiguration} object.
+     * Create a new, uninitialized preparer instance. Use {@link FlywayPreparer#addCustomizer(Consumer)} to modify the configuration for the
+     * {@link FluentConfiguration} object.
      */
-<span class="fc" id="L58">    public FlywayPreparer() {</span>
-<span class="fc" id="L59">    }</span>
+<span class="fc" id="L55">    public FlywayPreparer() {</span>
+<span class="fc" id="L56">    }</span>
 
     /**
-     * Add a customizer instance. Each customizer is called once with the {@link FluentConfiguration} instance before setting the datasource and calling {@link
-     * FluentConfiguration#load()} and {@link Flyway#migrate()}.
+     * Add a customizer instance. Each customizer is called once with the {@link FluentConfiguration} instance before setting the datasource and calling
+     * {@link FluentConfiguration#load()} and {@link Flyway#migrate()}.
      *
      * @param customizer A {@link Consumer&lt;FluentConfiguration&gt;} instance. Must not be null.
      * @return This object.
      * @since 3.0
      */
-    @NonNull
-    public FlywayPreparer addCustomizer(@NonNull Consumer&lt;FluentConfiguration&gt; customizer) {
-<span class="fc" id="L71">        checkNotNull(customizer, &quot;customizer is null&quot;);</span>
-<span class="fc" id="L72">        customizers.add(customizer);</span>
+    @Nonnull
+    public FlywayPreparer addCustomizer(@Nonnull Consumer&lt;FluentConfiguration&gt; customizer) {
+<span class="fc" id="L68">        checkNotNull(customizer, &quot;customizer is null&quot;);</span>
+<span class="fc" id="L69">        customizers.add(customizer);</span>
 
-<span class="fc" id="L74">        return this;</span>
+<span class="fc" id="L71">        return this;</span>
     }
 
     /**
-     * Add customizer instances. Each customizer is called once with the {@link FluentConfiguration} instance before setting the datasource and calling {@link
-     * FluentConfiguration#load()} and {@link Flyway#migrate()}.
+     * Add customizer instances. Each customizer is called once with the {@link FluentConfiguration} instance before setting the datasource and calling
+     * {@link FluentConfiguration#load()} and {@link Flyway#migrate()}.
      *
      * @param customizers A set of {@link Consumer&lt;FluentConfiguration&gt;} instances. Must not be null.
      * @return This object.
      * @since 3.0
      */
-    @NonNull
-    public FlywayPreparer addCustomizers(@NonNull Set&lt;Consumer&lt;FluentConfiguration&gt;&gt; customizers) {
-<span class="nc" id="L87">        checkNotNull(customizers, &quot;customizers is null&quot;);</span>
-<span class="nc" id="L88">        customizers.addAll(customizers);</span>
+    @Nonnull
+    public FlywayPreparer addCustomizers(@Nonnull Set&lt;Consumer&lt;FluentConfiguration&gt;&gt; customizers) {
+<span class="nc" id="L84">        checkNotNull(customizers, &quot;customizers is null&quot;);</span>
+<span class="nc" id="L85">        customizers.addAll(customizers);</span>
 
-<span class="nc" id="L90">        return this;</span>
+<span class="nc" id="L87">        return this;</span>
     }
 
     @Override
-    public void prepare(@NonNull DataSource dataSource) throws IOException {
-<span class="fc" id="L95">        checkNotNull(dataSource, &quot;dataSource is null&quot;);</span>
+    public void prepare(@Nonnull DataSource dataSource) throws IOException {
+<span class="fc" id="L92">        checkNotNull(dataSource, &quot;dataSource is null&quot;);</span>
 
         try {
-<span class="fc" id="L98">            final FluentConfiguration config = Flyway.configure();</span>
+<span class="fc" id="L95">            final FluentConfiguration config = Flyway.configure();</span>
 
-<span class="fc" id="L100">            customizers.build().forEach(c -&gt; c.accept(config));</span>
+<span class="fc" id="L97">            customizers.build().forEach(c -&gt; c.accept(config));</span>
 
-<span class="fc" id="L102">            config.dataSource(dataSource);</span>
-<span class="fc" id="L103">            Flyway flyway = config.load();</span>
-<span class="fc" id="L104">            flyway.migrate();</span>
+<span class="fc" id="L99">            config.dataSource(dataSource);</span>
+<span class="fc" id="L100">            Flyway flyway = config.load();</span>
+<span class="fc" id="L101">            flyway.migrate();</span>
 
-<span class="fc" id="L106">        } catch (FlywayException e) {</span>
-<span class="fc" id="L107">            throw new IOException(e);</span>
-<span class="fc" id="L108">        }</span>
-<span class="fc" id="L109">    }</span>
+<span class="fc" id="L103">        } catch (FlywayException e) {</span>
+<span class="fc" id="L104">            throw new IOException(e);</span>
+<span class="fc" id="L105">        }</span>
+<span class="fc" id="L106">    }</span>
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

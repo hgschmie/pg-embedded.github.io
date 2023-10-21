@@ -11,15 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.softwareforge.testing.postgres.junit5;
 
 import de.softwareforge.testing.postgres.embedded.DatabaseManager;
 import de.softwareforge.testing.postgres.embedded.EmbeddedPostgres;
 import de.softwareforge.testing.postgres.embedded.EmbeddedPostgresPreparer;
 
+import jakarta.annotation.Nonnull;
 import javax.sql.DataSource;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 
 /**
@@ -36,7 +36,7 @@ public final class SingleDatabaseBuilder {
      *
      * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
-    @NonNull
+    @Nonnull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instance() {
 <span class="nc" id="L41">        return EmbeddedPgExtension.singleDatabase();</span>
     }
@@ -46,7 +46,7 @@ public final class SingleDatabaseBuilder {
      *
      * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      */
-    @NonNull
+    @Nonnull
     public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; instanceWithDefaults() {
 <span class="fc" id="L51">        return EmbeddedPgExtension.singleDatabase().withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
@@ -58,22 +58,22 @@ public final class SingleDatabaseBuilder {
      * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      * @since 3.0
      */
-    @NonNull
-    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {
+    @Nonnull
+    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstance(@Nonnull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {
 <span class="nc" id="L63">        return EmbeddedPgExtension.singleDatabase().withDatabasePreparer(databasePreparer);</span>
     }
 
     /**
-     * Create a builder with standard initializations ({@link EmbeddedPostgres.Builder#withDefaults()}) applied and register a {@link
-     * EmbeddedPostgresPreparer&lt;DataSource&gt;} to set up the database.
+     * Create a builder with standard initializations ({@link EmbeddedPostgres.Builder#withDefaults()}) applied and register a
+     * {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} to set up the database.
      *
      * @param databasePreparer A {@link EmbeddedPostgresPreparer&lt;DataSource&gt;} instance. Must not be null.
      * @return A {@link DatabaseManager.Builder&lt;EmbeddedPgExtension&gt;} instance that can be customized further.
      * @since 3.0
      */
-    @NonNull
-    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@NonNull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {
+    @Nonnull
+    public static DatabaseManager.Builder&lt;EmbeddedPgExtension&gt; preparedInstanceWithDefaults(@Nonnull EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer) {
 <span class="fc" id="L76">        return EmbeddedPgExtension.singleDatabase().withDatabasePreparer(databasePreparer).withInstancePreparer(EmbeddedPostgres.Builder::withDefaults);</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

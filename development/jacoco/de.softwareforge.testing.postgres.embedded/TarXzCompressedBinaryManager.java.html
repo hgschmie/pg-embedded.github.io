@@ -117,14 +117,14 @@ public final class TarXzCompressedBinaryManager implements NativeBinaryManager {
 <span class="fc" id="L117">            final File installationExistsFile = new File(installationDirectory, &quot;.exists&quot;);</span>
 
 <span class="pc bpc" id="L119" title="1 of 2 branches missed.">            if (!installationExistsFile.exists()) {</span>
-<span class="fc" id="L120">                try (FileChannel lockChannel = FileChannel.open(unpackLockFile.toPath(), CREATE, WRITE, TRUNCATE_EXISTING, DELETE_ON_CLOSE);</span>
-<span class="fc" id="L121">                        FileLock unpackLock = lockChannel.tryLock()) {</span>
-<span class="pc bpc" id="L122" title="1 of 2 branches missed.">                    if (unpackLock != null) {</span>
-<span class="pc bpc" id="L123" title="1 of 2 branches missed.">                        checkState(!installationExistsFile.exists(), &quot;unpack lock acquired but .exists file is present &quot; + installationExistsFile);</span>
-<span class="fc" id="L124">                        LOG.info(&quot;extracting archive...&quot;);</span>
-<span class="fc" id="L125">                        try (InputStream archiveStream = nativeBinaryLocator.getInputStream()) {</span>
-<span class="fc" id="L126">                            extractTxz(archiveStream, installationDirectory.getPath());</span>
-<span class="fc" id="L127">                            checkState(installationExistsFile.createNewFile(), &quot;couldn't create %s file!&quot;, installationExistsFile);</span>
+<span class="nc" id="L120">                try (FileChannel lockChannel = FileChannel.open(unpackLockFile.toPath(), CREATE, WRITE, TRUNCATE_EXISTING, DELETE_ON_CLOSE);</span>
+<span class="nc" id="L121">                        FileLock unpackLock = lockChannel.tryLock()) {</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                    if (unpackLock != null) {</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">                        checkState(!installationExistsFile.exists(), &quot;unpack lock acquired but .exists file is present &quot; + installationExistsFile);</span>
+<span class="nc" id="L124">                        LOG.info(&quot;extracting archive...&quot;);</span>
+<span class="nc" id="L125">                        try (InputStream archiveStream = nativeBinaryLocator.getInputStream()) {</span>
+<span class="nc" id="L126">                            extractTxz(archiveStream, installationDirectory.getPath());</span>
+<span class="nc" id="L127">                            checkState(installationExistsFile.createNewFile(), &quot;couldn't create %s file!&quot;, installationExistsFile);</span>
                         }
                     } else {
                         // the other guy is unpacking for us.
@@ -135,7 +135,7 @@ public final class TarXzCompressedBinaryManager implements NativeBinaryManager {
 <span class="nc" id="L135">                        checkState(installationExistsFile.exists(), &quot;Waited 60 seconds for archive to be unpacked but it never finished!&quot;);</span>
                     }
                 } finally {
-<span class="pc bpc" id="L138" title="3 of 4 branches missed.">                    if (unpackLockFile.exists() &amp;&amp; !unpackLockFile.delete()) {</span>
+<span class="nc bnc" id="L138" title="All 4 branches missed.">                    if (unpackLockFile.exists() &amp;&amp; !unpackLockFile.delete()) {</span>
 <span class="nc" id="L139">                        LOG.error(format(&quot;could not remove lock file %s&quot;, unpackLockFile.getAbsolutePath()));</span>
                     }
                 }
@@ -160,38 +160,38 @@ public final class TarXzCompressedBinaryManager implements NativeBinaryManager {
      * @param targetDir The directory to extract the content to.
      */
     private static void extractTxz(InputStream stream, String targetDir) throws IOException {
-<span class="fc" id="L163">        try (XZInputStream xzIn = new XZInputStream(stream);</span>
-<span class="fc" id="L164">                TarArchiveInputStream tarIn = new TarArchiveInputStream(xzIn)) {</span>
-<span class="fc" id="L165">            final Phaser phaser = new Phaser(1);</span>
+<span class="nc" id="L163">        try (XZInputStream xzIn = new XZInputStream(stream);</span>
+<span class="nc" id="L164">                TarArchiveInputStream tarIn = new TarArchiveInputStream(xzIn)) {</span>
+<span class="nc" id="L165">            final Phaser phaser = new Phaser(1);</span>
             TarArchiveEntry entry;
 
-<span class="fc bfc" id="L168" title="All 2 branches covered.">            while ((entry = tarIn.getNextTarEntry()) != null) { //NOPMD</span>
-<span class="fc" id="L169">                final String individualFile = entry.getName();</span>
-<span class="fc" id="L170">                final File fsObject = new File(targetDir, individualFile);</span>
-<span class="fc" id="L171">                final Path fsPath = fsObject.toPath();</span>
-<span class="pc bpc" id="L172" title="3 of 4 branches missed.">                if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS) &amp;&amp; !Files.isDirectory(fsPath, LinkOption.NOFOLLOW_LINKS)) {</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">            while ((entry = tarIn.getNextTarEntry()) != null) { //NOPMD</span>
+<span class="nc" id="L169">                final String individualFile = entry.getName();</span>
+<span class="nc" id="L170">                final File fsObject = new File(targetDir, individualFile);</span>
+<span class="nc" id="L171">                final Path fsPath = fsObject.toPath();</span>
+<span class="nc bnc" id="L172" title="All 4 branches missed.">                if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS) &amp;&amp; !Files.isDirectory(fsPath, LinkOption.NOFOLLOW_LINKS)) {</span>
 <span class="nc" id="L173">                    Files.delete(fsPath);</span>
 <span class="nc" id="L174">                    LOG.debug(format(&quot;Deleting existing entry %s&quot;, fsPath));</span>
                 }
 
-<span class="pc bpc" id="L177" title="1 of 4 branches missed.">                if (entry.isSymbolicLink() || entry.isLink()) {</span>
-<span class="fc" id="L178">                    Path target = FileSystems.getDefault().getPath(entry.getLinkName());</span>
-<span class="fc" id="L179">                    Files.createSymbolicLink(fsPath, target);</span>
-<span class="fc bfc" id="L180" title="All 2 branches covered.">                } else if (entry.isFile()) {</span>
-<span class="fc" id="L181">                    byte[] content = new byte[(int) entry.getSize()];</span>
-<span class="fc" id="L182">                    int read = tarIn.read(content, 0, content.length);</span>
-<span class="pc bpc" id="L183" title="1 of 2 branches missed.">                    checkState(read != -1, &quot;could not read %s&quot;, individualFile);</span>
-<span class="fc" id="L184">                    EmbeddedUtil.ensureDirectory(fsObject.getParentFile());</span>
+<span class="nc bnc" id="L177" title="All 4 branches missed.">                if (entry.isSymbolicLink() || entry.isLink()) {</span>
+<span class="nc" id="L178">                    Path target = FileSystems.getDefault().getPath(entry.getLinkName());</span>
+<span class="nc" id="L179">                    Files.createSymbolicLink(fsPath, target);</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">                } else if (entry.isFile()) {</span>
+<span class="nc" id="L181">                    byte[] content = new byte[(int) entry.getSize()];</span>
+<span class="nc" id="L182">                    int read = tarIn.read(content, 0, content.length);</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">                    checkState(read != -1, &quot;could not read %s&quot;, individualFile);</span>
+<span class="nc" id="L184">                    EmbeddedUtil.ensureDirectory(fsObject.getParentFile());</span>
 
-<span class="fc" id="L186">                    final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(fsPath, CREATE, WRITE); //NOPMD</span>
-<span class="fc" id="L187">                    final ByteBuffer buffer = ByteBuffer.wrap(content); //NOPMD</span>
+<span class="nc" id="L186">                    final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(fsPath, CREATE, WRITE); //NOPMD</span>
+<span class="nc" id="L187">                    final ByteBuffer buffer = ByteBuffer.wrap(content); //NOPMD</span>
 
-<span class="fc" id="L189">                    phaser.register();</span>
-<span class="fc" id="L190">                    fileChannel.write(buffer, 0, fileChannel, new CompletionHandler&lt;Integer, Channel&gt;() {</span>
+<span class="nc" id="L189">                    phaser.register();</span>
+<span class="nc" id="L190">                    fileChannel.write(buffer, 0, fileChannel, new CompletionHandler&lt;Integer, Channel&gt;() {</span>
                         @Override
                         public void completed(Integer written, Channel channel) {
-<span class="fc" id="L193">                            closeChannel(channel);</span>
-<span class="fc" id="L194">                        }</span>
+<span class="nc" id="L193">                            closeChannel(channel);</span>
+<span class="nc" id="L194">                        }</span>
 
                         @Override
                         public void failed(Throwable error, Channel channel) {
@@ -201,29 +201,29 @@ public final class TarXzCompressedBinaryManager implements NativeBinaryManager {
 
                         private void closeChannel(Channel channel) {
                             try {
-<span class="fc" id="L204">                                channel.close();</span>
+<span class="nc" id="L204">                                channel.close();</span>
 <span class="nc" id="L205">                            } catch (IOException e) {</span>
 <span class="nc" id="L206">                                LOG.error(&quot;While closing channel:&quot;, e);</span>
                             } finally {
-<span class="fc" id="L208">                                phaser.arriveAndDeregister();</span>
+<span class="nc" id="L208">                                phaser.arriveAndDeregister();</span>
                             }
-<span class="fc" id="L210">                        }</span>
+<span class="nc" id="L210">                        }</span>
                     });
-<span class="pc bpc" id="L212" title="1 of 2 branches missed.">                } else if (entry.isDirectory()) {</span>
-<span class="fc" id="L213">                    EmbeddedUtil.ensureDirectory(fsObject);</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">                } else if (entry.isDirectory()) {</span>
+<span class="nc" id="L213">                    EmbeddedUtil.ensureDirectory(fsObject);</span>
                 } else {
 <span class="nc" id="L215">                    throw new IOException(format(&quot;Unsupported entry in tar file found: %s&quot;, individualFile));</span>
                 }
 
-<span class="pc bpc" id="L218" title="1 of 4 branches missed.">                if (individualFile.startsWith(&quot;bin/&quot;) || individualFile.startsWith(&quot;./bin/&quot;)) {</span>
-<span class="pc bpc" id="L219" title="1 of 2 branches missed.">                    if (!fsObject.setExecutable(true, false)) {</span>
+<span class="nc bnc" id="L218" title="All 4 branches missed.">                if (individualFile.startsWith(&quot;bin/&quot;) || individualFile.startsWith(&quot;./bin/&quot;)) {</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">                    if (!fsObject.setExecutable(true, false)) {</span>
 <span class="nc" id="L220">                        throw new IOException(format(&quot;Could not make %s executable!&quot;, individualFile));</span>
                     }
                 }
-<span class="fc" id="L223">            }</span>
+<span class="nc" id="L223">            }</span>
 
-<span class="fc" id="L225">            phaser.arriveAndAwaitAdvance();</span>
+<span class="nc" id="L225">            phaser.arriveAndAwaitAdvance();</span>
         }
-<span class="fc" id="L227">    }</span>
+<span class="nc" id="L227">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

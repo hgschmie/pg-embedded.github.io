@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1698025570866">
-    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="5.1-SNAPSHOT"/>
+<licensePluginReport goal="CHECK" timestamp="1698025916394">
+    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="5.1.1-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
         <file path="src/main/java/de/softwareforge/testing/postgres/embedded/DatabaseInfo.java" result="PRESENT"/>

@@ -11,14 +11,14 @@ pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryMana
 pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo,71,75,6,8,15,20,8,8,2,7
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.Builder,0,52,0,0,0,13,0,5,0,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,NativeBinaryManager,1,0,0,0,1,0,1,0,1,0
-pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres,300,993,31,33,54,192,27,44,3,36
+pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres,299,994,30,34,53,193,26,45,3,36
 pg-embedded,de.softwareforge.testing.postgres.embedded,ProcessOutputLogger.StreamCapture,0,31,0,0,0,7,0,3,0,3
 pg-embedded,de.softwareforge.testing.postgres.embedded,FlywayPreparer,10,67,0,0,3,19,1,6,1,6
 pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator.new FilterInputStream() {...},0,16,0,0,0,4,0,2,0,2
 pg-embedded,de.softwareforge.testing.postgres.embedded,ZonkyIOPostgresLocator,111,272,34,14,29,49,26,11,2,11
 pg-embedded,de.softwareforge.testing.postgres.embedded,DatabaseManager.InstanceProviderPipeline,25,94,2,4,7,30,2,6,0,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,NativeBinaryLocator,1,29,1,1,0,5,1,1,0,1
-pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager,77,297,16,20,13,60,14,10,1,5
+pg-embedded,de.softwareforge.testing.postgres.embedded,TarXzCompressedBinaryManager,62,312,12,24,9,64,12,12,1,5
 pg-embedded,de.softwareforge.testing.postgres.embedded,AutoValue_DatabaseInfo.Builder,66,100,15,13,15,28,12,10,0,8
 pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgres.Builder,128,213,11,7,28,53,17,12,11,9
 pg-embedded,de.softwareforge.testing.postgres.embedded,EmbeddedPostgresPreparer,3,0,0,0,1,0,2,0,2,0

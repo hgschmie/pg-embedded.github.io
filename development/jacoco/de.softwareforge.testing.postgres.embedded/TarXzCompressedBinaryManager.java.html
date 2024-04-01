@@ -118,7 +118,7 @@ public final class TarXzCompressedBinaryManager implements NativeBinaryManager {
 <span class="pc bpc" id="L118" title="1 of 2 branches missed.">            if (!installationExistsFile.exists()) {</span>
 <span class="fc" id="L119">                try (FileChannel lockChannel = FileChannel.open(unpackLockFile.toPath(), CREATE, WRITE, TRUNCATE_EXISTING);</span>
 <span class="fc" id="L120">                        FileLock unpackLock = lockChannel.tryLock()) {</span>
-<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                    if (unpackLock != null) {</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">                    if (unpackLock != null) {</span>
 <span class="pc bpc" id="L122" title="1 of 2 branches missed.">                        checkState(!installationExistsFile.exists(), &quot;unpack lock acquired but .exists file is present &quot; + installationExistsFile);</span>
 <span class="fc" id="L123">                        LOG.info(&quot;extracting archive...&quot;);</span>
 <span class="fc" id="L124">                        try (InputStream archiveStream = nativeBinaryLocator.getInputStream()) {</span>
@@ -127,11 +127,11 @@ public final class TarXzCompressedBinaryManager implements NativeBinaryManager {
                         }
                     } else {
                         // the other guy is unpacking for us.
-<span class="nc" id="L130">                        int maxAttempts = 60;</span>
-<span class="nc bnc" id="L131" title="All 4 branches missed.">                        while (!installationExistsFile.exists() &amp;&amp; --maxAttempts &gt; 0) { // NOPMD</span>
-<span class="nc" id="L132">                            Thread.sleep(1000L);</span>
+<span class="fc" id="L130">                        int maxAttempts = 60;</span>
+<span class="pc bpc" id="L131" title="1 of 4 branches missed.">                        while (!installationExistsFile.exists() &amp;&amp; --maxAttempts &gt; 0) { // NOPMD</span>
+<span class="fc" id="L132">                            Thread.sleep(1000L);</span>
                         }
-<span class="nc" id="L134">                        checkState(installationExistsFile.exists(), &quot;Waited 60 seconds for archive to be unpacked but it never finished!&quot;);</span>
+<span class="fc" id="L134">                        checkState(installationExistsFile.exists(), &quot;Waited 60 seconds for archive to be unpacked but it never finished!&quot;);</span>
                     }
                 } finally {
 <span class="fc" id="L137">                    Files.deleteIfExists(unpackLockFile.toPath());</span>

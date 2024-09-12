@@ -36,7 +36,7 @@ import org.slf4j.Logger;
  * &lt;p&gt;
  * The use of the input stream is thread safe since it's used only in a single thread&amp;mdash;the one launched by this code.
  */
-class ProcessOutputLogger implements Closeable {
+final class ProcessOutputLogger implements Closeable {
 
     private final Logger logger;
     private final ListeningExecutorService executorService;
@@ -63,7 +63,7 @@ class ProcessOutputLogger implements Closeable {
     }
 
 
-    class StreamCapture implements BiConsumer&lt;String, InputStream&gt; {
+    final class StreamCapture implements BiConsumer&lt;String, InputStream&gt; {
 
         private final Consumer&lt;String&gt; consumer;
 <span class="fc" id="L69">        private volatile Future&lt;?&gt; completionFuture = null;</span>
@@ -82,7 +82,7 @@ class ProcessOutputLogger implements Closeable {
         }
     }
 
-    private class LogRunnable implements Runnable {
+    private final class LogRunnable implements Runnable {
 
         private final InputStream inputStream;
         private final String name;
@@ -101,7 +101,7 @@ class ProcessOutputLogger implements Closeable {
 <span class="fc" id="L101">            try (InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);</span>
 <span class="fc" id="L102">                    BufferedReader reader = new BufferedReader(isr)) {</span>
                 try {
-<span class="fc" id="L104">                    reader.lines().forEach(consumer::accept);</span>
+<span class="fc" id="L104">                    reader.lines().forEach(consumer);</span>
 <span class="nc" id="L105">                } catch (final UncheckedIOException e) {</span>
 <span class="nc" id="L106">                    logger.error(&quot;while reading output:&quot;, e);</span>
 <span class="fc" id="L107">                }</span>
@@ -113,4 +113,4 @@ class ProcessOutputLogger implements Closeable {
 <span class="fc" id="L113">        }</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

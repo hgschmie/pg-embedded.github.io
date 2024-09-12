@@ -75,8 +75,8 @@ public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
     @Override
     public InputStream getInputStream() throws IOException {
         try {
-<span class="fc" id="L78">            File artifactFile = fileSupplier.get();</span>
-<span class="fc" id="L79">            return createJarStream(artifactFile);</span>
+<span class="nc" id="L78">            File artifactFile = fileSupplier.get();</span>
+<span class="nc" id="L79">            return createJarStream(artifactFile);</span>
 <span class="nc" id="L80">        } catch (UncheckedIOException e) {</span>
 <span class="nc" id="L81">            throw e.getCause();</span>
         }
@@ -121,27 +121,27 @@ public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
 
     private InputStream createJarStream(File file) {
         try {
-<span class="fc" id="L124">            JarFile jar = new JarFile(file);</span>
-<span class="fc" id="L125">            String entryName = format(&quot;postgres-%s-%s&quot;, computeOS(), computeTarXzArchitectureName());</span>
+<span class="nc" id="L124">            JarFile jar = new JarFile(file);</span>
+<span class="nc" id="L125">            String entryName = format(&quot;postgres-%s-%s&quot;, computeOS(), computeTarXzArchitectureName());</span>
 
             // alpine hack
-<span class="pc bpc" id="L128" title="1 of 2 branches missed.">            if (EmbeddedUtil.IS_ALPINE_LINUX) {</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (EmbeddedUtil.IS_ALPINE_LINUX) {</span>
 <span class="nc" id="L129">                entryName += &quot;-alpine_linux&quot;;</span>
             }
 
-<span class="fc" id="L132">            JarEntry jarEntry = jar.getJarEntry(entryName + &quot;.txz&quot;);</span>
-<span class="pc bpc" id="L133" title="1 of 2 branches missed.">            checkState(jarEntry != null, &quot;Could not locate %s in the jar file (%s)&quot;, entryName, file.getAbsoluteFile());</span>
+<span class="nc" id="L132">            JarEntry jarEntry = jar.getJarEntry(entryName + &quot;.txz&quot;);</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            checkState(jarEntry != null, &quot;Could not locate %s in the jar file (%s)&quot;, entryName, file.getAbsoluteFile());</span>
 
             // When the input stream gets closed, close the jar file as well.
-<span class="fc" id="L136">            return new FilterInputStream(jar.getInputStream(jarEntry)) {</span>
+<span class="nc" id="L136">            return new FilterInputStream(jar.getInputStream(jarEntry)) {</span>
                 @Override
                 public void close() throws IOException {
                     try {
-<span class="fc" id="L140">                        super.close();</span>
+<span class="nc" id="L140">                        super.close();</span>
                     } finally {
-<span class="fc" id="L142">                        jar.close();</span>
+<span class="nc" id="L142">                        jar.close();</span>
                     }
-<span class="fc" id="L144">                }</span>
+<span class="nc" id="L144">                }</span>
             };
 <span class="nc" id="L146">        } catch (IOException e) {</span>
 <span class="nc" id="L147">            throw new UncheckedIOException(e);</span>
@@ -174,11 +174,11 @@ public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
     private static String computeTarXzArchitectureName() {
 <span class="fc" id="L175">        String architecture = EmbeddedUtil.OS_ARCH;</span>
 <span class="pc bpc" id="L176" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_ARCH_X86_64) {</span>
-<span class="fc" id="L177">            architecture = &quot;x86_64&quot;;  // Zonky uses x86_64</span>
-<span class="nc bnc" id="L178" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
-<span class="nc bnc" id="L179" title="All 4 branches missed.">            if (!PREFER_NATIVE &amp;&amp; EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="nc" id="L177">            architecture = &quot;x86_64&quot;;  // Zonky uses x86_64</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
+<span class="pc bpc" id="L179" title="2 of 4 branches missed.">            if (!PREFER_NATIVE &amp;&amp; EmbeddedUtil.IS_OS_MAC) {</span>
                 // Mac binaries are fat binaries stored as x86_64
-<span class="nc" id="L181">                architecture = &quot;x86_64&quot;;</span>
+<span class="fc" id="L181">                architecture = &quot;x86_64&quot;;</span>
             } else {
 <span class="nc" id="L183">                architecture = &quot;arm_64&quot;;</span>
             }
@@ -191,11 +191,11 @@ public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
     private static String computeJarArchitectureName() {
 <span class="fc" id="L192">        String architecture = EmbeddedUtil.OS_ARCH;</span>
 <span class="pc bpc" id="L193" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_ARCH_X86_64) {</span>
-<span class="fc" id="L194">            architecture = &quot;amd64&quot;;  // Zonky uses amd64 for the jar name</span>
-<span class="nc bnc" id="L195" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
-<span class="nc bnc" id="L196" title="All 4 branches missed.">            if (!PREFER_NATIVE &amp;&amp; EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="nc" id="L194">            architecture = &quot;amd64&quot;;  // Zonky uses amd64 for the jar name</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">        } else if (EmbeddedUtil.IS_ARCH_AARCH64) {</span>
+<span class="pc bpc" id="L196" title="2 of 4 branches missed.">            if (!PREFER_NATIVE &amp;&amp; EmbeddedUtil.IS_OS_MAC) {</span>
                 // Mac binaries are fat binaries stored as amd64
-<span class="nc" id="L198">                architecture = &quot;amd64&quot;;</span>
+<span class="fc" id="L198">                architecture = &quot;amd64&quot;;</span>
             } else {
 <span class="nc" id="L200">                architecture = &quot;arm64v8&quot;;</span>
             }
@@ -208,13 +208,13 @@ public final class ZonkyIOPostgresLocator implements NativeBinaryLocator {
     private static String computeOS() {
 <span class="fc" id="L209">        String os = EmbeddedUtil.OS_NAME;</span>
 <span class="pc bpc" id="L210" title="1 of 2 branches missed.">        if (EmbeddedUtil.IS_OS_LINUX) {</span>
-<span class="fc" id="L211">            os = &quot;linux&quot;;</span>
-<span class="nc bnc" id="L212" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
-<span class="nc" id="L213">            os = &quot;darwin&quot;;</span>
+<span class="nc" id="L211">            os = &quot;linux&quot;;</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_MAC) {</span>
+<span class="fc" id="L213">            os = &quot;darwin&quot;;</span>
 <span class="nc bnc" id="L214" title="All 2 branches missed.">        } else if (EmbeddedUtil.IS_OS_WINDOWS) {</span>
 <span class="nc" id="L215">            os = &quot;windows&quot;;</span>
         }
 <span class="fc" id="L217">        return os;</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -118,7 +118,7 @@ public final class DatabaseManager implements AutoCloseable {
 <span class="fc" id="L118">                dataSource = pg.createDefaultDataSource();</span>
 
                 // always return a reference to the default database.
-<span class="fc" id="L121">                this.instanceProvider = () -&gt; pg.createDefaultDatabaseInfo();</span>
+<span class="fc" id="L121">                this.instanceProvider = pg::createDefaultDatabaseInfo;</span>
             }
 
 <span class="fc bfc" id="L124" title="All 2 branches covered.">            for (EmbeddedPostgresPreparer&lt;DataSource&gt; databasePreparer : databasePreparers) {</span>
@@ -377,4 +377,4 @@ public final class DatabaseManager implements AutoCloseable {
         }
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

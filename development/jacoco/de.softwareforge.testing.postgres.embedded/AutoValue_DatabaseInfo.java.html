@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AutoValue_DatabaseInfo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pg-embedded</a> &gt; <a href="index.source.html" class="el_package">de.softwareforge.testing.postgres.embedded</a> &gt; <span class="el_source">AutoValue_DatabaseInfo.java</span></div><h1>AutoValue_DatabaseInfo.java</h1><pre class="source lang-java linenums">package de.softwareforge.testing.postgres.embedded;
+
+import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
+import java.sql.SQLException;
+import java.util.Optional;
+import javax.annotation.processing.Generated;
+
+@Generated(&quot;com.google.auto.value.processor.AutoValueProcessor&quot;)
+final class AutoValue_DatabaseInfo extends DatabaseInfo {
+
+  private final String dbName;
+
+  private final int port;
+
+  private final String user;
+
+  private final ImmutableMap&lt;String, String&gt; connectionProperties;
+
+  private final Optional&lt;SQLException&gt; exception;
+
+  private AutoValue_DatabaseInfo(
+      String dbName,
+      int port,
+      String user,
+      ImmutableMap&lt;String, String&gt; connectionProperties,
+<span class="fc" id="L27">      Optional&lt;SQLException&gt; exception) {</span>
+<span class="fc" id="L28">    this.dbName = dbName;</span>
+<span class="fc" id="L29">    this.port = port;</span>
+<span class="fc" id="L30">    this.user = user;</span>
+<span class="fc" id="L31">    this.connectionProperties = connectionProperties;</span>
+<span class="fc" id="L32">    this.exception = exception;</span>
+<span class="fc" id="L33">  }</span>
+
+  @Nonnull
+  @Override
+  public String dbName() {
+<span class="fc" id="L38">    return dbName;</span>
+  }
+
+  @Override
+  public int port() {
+<span class="fc" id="L43">    return port;</span>
+  }
+
+  @Nonnull
+  @Override
+  public String user() {
+<span class="fc" id="L49">    return user;</span>
+  }
+
+  @Nonnull
+  @Override
+  public ImmutableMap&lt;String, String&gt; connectionProperties() {
+<span class="fc" id="L55">    return connectionProperties;</span>
+  }
+
+  @Nonnull
+  @Override
+  Optional&lt;SQLException&gt; exception() {
+<span class="fc" id="L61">    return exception;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L66">    return &quot;DatabaseInfo{&quot;</span>
+        + &quot;dbName=&quot; + dbName + &quot;, &quot;
+        + &quot;port=&quot; + port + &quot;, &quot;
+        + &quot;user=&quot; + user + &quot;, &quot;
+        + &quot;connectionProperties=&quot; + connectionProperties + &quot;, &quot;
+        + &quot;exception=&quot; + exception
+        + &quot;}&quot;;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">    if (o == this) {</span>
+<span class="nc" id="L78">      return true;</span>
+    }
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">    if (o instanceof DatabaseInfo) {</span>
+<span class="fc" id="L81">      DatabaseInfo that = (DatabaseInfo) o;</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">      return this.dbName.equals(that.dbName())</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">          &amp;&amp; this.port == that.port()</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">          &amp;&amp; this.user.equals(that.user())</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">          &amp;&amp; this.connectionProperties.equals(that.connectionProperties())</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">          &amp;&amp; this.exception.equals(that.exception());</span>
+    }
+<span class="nc" id="L88">    return false;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L93">    int h$ = 1;</span>
+<span class="nc" id="L94">    h$ *= 1000003;</span>
+<span class="nc" id="L95">    h$ ^= dbName.hashCode();</span>
+<span class="nc" id="L96">    h$ *= 1000003;</span>
+<span class="nc" id="L97">    h$ ^= port;</span>
+<span class="nc" id="L98">    h$ *= 1000003;</span>
+<span class="nc" id="L99">    h$ ^= user.hashCode();</span>
+<span class="nc" id="L100">    h$ *= 1000003;</span>
+<span class="nc" id="L101">    h$ ^= connectionProperties.hashCode();</span>
+<span class="nc" id="L102">    h$ *= 1000003;</span>
+<span class="nc" id="L103">    h$ ^= exception.hashCode();</span>
+<span class="nc" id="L104">    return h$;</span>
+  }
+
+  static final class Builder extends DatabaseInfo.Builder {
+    private String dbName;
+    private int port;
+    private String user;
+    private ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder$;
+    private ImmutableMap&lt;String, String&gt; connectionProperties;
+<span class="fc" id="L113">    private Optional&lt;SQLException&gt; exception = Optional.empty();</span>
+    private byte set$0;
+<span class="fc" id="L115">    Builder() {</span>
+<span class="fc" id="L116">    }</span>
+    @Override
+    DatabaseInfo.Builder dbName(String dbName) {
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">      if (dbName == null) {</span>
+<span class="nc" id="L120">        throw new NullPointerException(&quot;Null dbName&quot;);</span>
+      }
+<span class="fc" id="L122">      this.dbName = dbName;</span>
+<span class="fc" id="L123">      return this;</span>
+    }
+    @Override
+    DatabaseInfo.Builder port(int port) {
+<span class="fc" id="L127">      this.port = port;</span>
+<span class="fc" id="L128">      set$0 |= (byte) 1;</span>
+<span class="fc" id="L129">      return this;</span>
+    }
+    @Override
+    DatabaseInfo.Builder user(String user) {
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">      if (user == null) {</span>
+<span class="nc" id="L134">        throw new NullPointerException(&quot;Null user&quot;);</span>
+      }
+<span class="fc" id="L136">      this.user = user;</span>
+<span class="fc" id="L137">      return this;</span>
+    }
+    @Override
+    DatabaseInfo.Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties) {
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">      if (connectionProperties == null) {</span>
+<span class="nc" id="L142">        throw new NullPointerException(&quot;Null connectionProperties&quot;);</span>
+      }
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">      if (connectionPropertiesBuilder$ != null) {</span>
+<span class="nc" id="L145">        throw new IllegalStateException(&quot;Cannot set connectionProperties after calling connectionPropertiesBuilder()&quot;);</span>
+      }
+<span class="fc" id="L147">      this.connectionProperties = connectionProperties;</span>
+<span class="fc" id="L148">      return this;</span>
+    }
+    @Override
+    ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder() {
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">      if (connectionPropertiesBuilder$ == null) {</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">        if (connectionProperties == null) {</span>
+<span class="fc" id="L154">          connectionPropertiesBuilder$ = ImmutableMap.builder();</span>
+        } else {
+<span class="nc" id="L156">          connectionPropertiesBuilder$ = ImmutableMap.builder();</span>
+<span class="nc" id="L157">          connectionPropertiesBuilder$.putAll(connectionProperties);</span>
+<span class="nc" id="L158">          connectionProperties = null;</span>
+        }
+      }
+<span class="fc" id="L161">      return connectionPropertiesBuilder$;</span>
+    }
+    @Override
+    DatabaseInfo.Builder exception(SQLException exception) {
+<span class="fc" id="L165">      this.exception = Optional.of(exception);</span>
+<span class="fc" id="L166">      return this;</span>
+    }
+    @Override
+    DatabaseInfo build() {
+<span class="fc bfc" id="L170" title="All 2 branches covered.">      if (connectionPropertiesBuilder$ != null) {</span>
+<span class="fc" id="L171">        this.connectionProperties = connectionPropertiesBuilder$.buildOrThrow();</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">      } else if (this.connectionProperties == null) {</span>
+<span class="fc" id="L173">        this.connectionProperties = ImmutableMap.of();</span>
+      }
+<span class="pc bpc" id="L175" title="3 of 6 branches missed.">      if (set$0 != 1</span>
+          || this.dbName == null
+          || this.user == null) {
+<span class="nc" id="L178">        StringBuilder missing = new StringBuilder();</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        if (this.dbName == null) {</span>
+<span class="nc" id="L180">          missing.append(&quot; dbName&quot;);</span>
+        }
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        if ((set$0 &amp; 1) == 0) {</span>
+<span class="nc" id="L183">          missing.append(&quot; port&quot;);</span>
+        }
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        if (this.user == null) {</span>
+<span class="nc" id="L186">          missing.append(&quot; user&quot;);</span>
+        }
+<span class="nc" id="L188">        throw new IllegalStateException(&quot;Missing required properties:&quot; + missing);</span>
+      }
+<span class="fc" id="L190">      return new AutoValue_DatabaseInfo(</span>
+          this.dbName,
+          this.port,
+          this.user,
+          this.connectionProperties,
+          this.exception);
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

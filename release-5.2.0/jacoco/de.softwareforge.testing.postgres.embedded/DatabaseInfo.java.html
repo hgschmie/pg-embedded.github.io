@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseInfo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pg-embedded</a> &gt; <a href="index.source.html" class="el_package">de.softwareforge.testing.postgres.embedded</a> &gt; <span class="el_source">DatabaseInfo.java</span></div><h1>DatabaseInfo.java</h1><pre class="source lang-java linenums">/*
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.softwareforge.testing.postgres.embedded;
+
+import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
+
+import jakarta.annotation.Nonnull;
+import java.sql.SQLException;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.sql.DataSource;
+
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+
+/**
+ * Information about a database located on a PostgreSQL server connected to an {@link EmbeddedPostgres} instance.
+ */
+@AutoValue
+public abstract class DatabaseInfo {
+
+    private static final String JDBC_FORMAT = &quot;jdbc:postgresql://localhost:%d/%s?user=%s&quot;;
+
+<span class="fc" id="L37">    DatabaseInfo() {</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * The default user used for databases.
+     */
+    static final String PG_DEFAULT_USER = &quot;postgres&quot;;
+
+    /**
+     * The default database name.
+     */
+    static final String PG_DEFAULT_DB = &quot;postgres&quot;;
+
+    /**
+     * Returns the name of the database.
+     *
+     * @return Name of the database. Is never null.
+     */
+    @Nonnull
+    public abstract String dbName();
+
+    /**
+     * Returns the TCP port for the database server.
+     *
+     * @return A port number. May be -1 if this objects represents an error connection.
+     */
+    public abstract int port();
+
+    /**
+     * Returns the user that can connect to this database.
+     *
+     * @return The user name. Is never null.
+     */
+    @Nonnull
+    public abstract String user();
+
+    /**
+     * Returns all properties that are be applied to a new data source connection to this database. See
+     * &lt;a href=&quot;https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters&quot;&gt;the
+     * PostgreSQL JDBC driver documentation&lt;/a&gt; for a comprehensive list.
+     *
+     * @return Map of key-value pairs representing data source connection properties.
+     * @since 3.0
+     */
+    @Nonnull
+    public abstract ImmutableMap&lt;String, String&gt; connectionProperties();
+
+    @Nonnull
+    abstract Optional&lt;SQLException&gt; exception();
+
+    @Nonnull
+    static Builder builder() {
+<span class="fc" id="L89">        return new AutoValue_DatabaseInfo.Builder()</span>
+<span class="fc" id="L90">                .dbName(PG_DEFAULT_DB)</span>
+<span class="fc" id="L91">                .user(PG_DEFAULT_USER);</span>
+    }
+
+    @Nonnull
+    static DatabaseInfo forException(SQLException e) {
+<span class="fc" id="L96">        return builder().exception(e).port(-1).build();</span>
+    }
+
+    /**
+     * Returns a JDBC url to connect to the described database.
+     *
+     * @return A JDBC url that can be used to connect to the database. Never null.
+     */
+    @Nonnull
+    public String asJdbcUrl() {
+<span class="fc" id="L106">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
+
+<span class="fc" id="L108">        String additionalParameters = connectionProperties().entrySet().stream()</span>
+<span class="fc" id="L109">                .map(e -&gt; format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
+<span class="fc" id="L110">                .collect(Collectors.joining());</span>
+<span class="fc" id="L111">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
+    }
+
+    /**
+     * Returns a {@link DataSource} instance connected to the described database.
+     *
+     * @return An initialized {@link DataSource} object. Never null.
+     * @throws SQLException A problem occurred trying to connect to the database.
+     */
+    @Nonnull
+    public DataSource asDataSource() throws SQLException {
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (exception().isPresent()) {</span>
+<span class="nc" id="L123">            throw exception().get();</span>
+        }
+
+<span class="fc" id="L126">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
+    }
+
+    @AutoValue.Builder
+<span class="fc" id="L130">    abstract static class Builder {</span>
+
+        abstract Builder dbName(String dbName);
+
+        abstract Builder port(int port);
+
+        abstract Builder user(String user);
+
+        abstract Builder exception(SQLException exception);
+
+        abstract ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder();
+
+        final Builder addConnectionProperty(String key, String value) {
+<span class="fc" id="L143">            connectionPropertiesBuilder().put(key, value);</span>
+<span class="fc" id="L144">            return this;</span>
+        }
+
+        abstract Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties);
+
+        abstract DatabaseInfo build();
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

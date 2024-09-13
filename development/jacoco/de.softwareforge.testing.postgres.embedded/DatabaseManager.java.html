@@ -229,9 +229,9 @@ public final class DatabaseManager implements AutoCloseable {
 <span class="fc" id="L229">                                .port(pg.getPort())</span>
 <span class="fc" id="L230">                                .connectionProperties(pg.getConnectionProperties())</span>
 <span class="fc" id="L231">                                .build());</span>
-<span class="fc" id="L232">                    } catch (SQLException e) {</span>
+<span class="nc" id="L232">                    } catch (SQLException e) {</span>
                         // https://www.postgresql.org/docs/13/errcodes-appendix.html - 57P01 admin_shutdown
-<span class="pc bpc" id="L234" title="1 of 2 branches missed.">                        if (!e.getSQLState().equals(&quot;57P01&quot;)) {</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">                        if (!e.getSQLState().equals(&quot;57P01&quot;)) {</span>
 <span class="nc" id="L235">                            LOG.warn(&quot;Caught SQL Exception (&quot; + e.getSQLState() + &quot;):&quot;, e);</span>
 <span class="nc" id="L236">                            nextDatabase.put(DatabaseInfo.forException(e));</span>
                         }

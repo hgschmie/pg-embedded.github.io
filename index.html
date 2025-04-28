@@ -1,77 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <title>pg-embedded - Embedded Postgres for JVM</title>
-
-
-    <!-- Bootstrap core CSS -->
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-      .bd-placeholder-img {
-          font-size: 1.125rem;
-          text-anchor: middle;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          user-select: none;
-      }
-
-      @media (min-width: 768px) {
-          .bd-placeholder-img-lg {
-              font-size: 3.5rem;
-          }
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <div class="container py-4">
-        <header class="pb-3 mb-4 border-bottom">
-          <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
-            <span class="fs-4">pg-embedded - Embedded Postgres for JVM</span>
-          </a>
-        </header>
-
-        <div class="p-5 mb-4 bg-light rounded-3">
-          <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold">pg-embedded</h1>
-            <p class="col-md-8 fs-4">Spin up a postgres database for unit testing or development.<br/>
-              Supports per test class and per test case schemas and databases.</p>
-          </div>
-        </div>
-
-        <div class="row align-items-md-stretch">
-          <div class="col-md-6">
-            <div class="h-100 p-5 bg-light border rounded-3">
-              <h2>Released Versions</h2>
-              <ul>
-                <li><a href="/release-5.2.0/">5.2.0 Release documentation</a> [<a href="/release-5.2.0/apidocs/">Javadoc</a>]</li>
-                <li><a href="/release-5.1.0/">5.1.0 Release documentation</a> [<a href="/release-5.1.0/apidocs/">Javadoc</a>]</li>
-                <li><a href="/release-5.0/">5.0 Release documentation</a> [<a href="/release-5.0/apidocs/">Javadoc</a>]</li>
-                <li><a href="/release-4.3/">4.3 Release documentation</a> [<a href="/release-4.3/apidocs/">Javadoc</a>]</li>
-                <li><a href="/release-4.2/">4.2 Release documentation</a> [<a href="/release-4.2/apidocs/">Javadoc</a>]</li>
-                <li><a href="/release-4.1/">4.1 Release documentation</a> [<a href="/release-4.1/apidocs/">Javadoc</a>]</li>
-                <li><a href="/release-4.0/">4.0 Release documentation</a> [<a href="/release-4.0/apidocs/">Javadoc</a>]</li>
-                <li><a href="/release-3.0/">3.0 Release documentation</a> [<a href="/release-3.0/apidocs/">Javadoc</a>]</li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="h-100 p-5 bg-light border rounded-3">
-              <h2>Development Version</h2>
-              <p><a href="/development/">Current development version</a> [<a href="/development/apidocs/">Javadoc</a>] <a href="https://github.com/hgschmie/pg-embedded/actions/workflows/master-cd.yml"><img src="https://github.com/hgschmie/pg-embedded/actions/workflows/master-cd.yml/badge.svg" /></a></p>
-              <p><a href="/development/changes.html">Change Log</a></p>
-            </div>
-          </div>
-        </div>
-
-        <footer class="pt-3 mt-4 text-muted border-top">
-          &copy; 2021 <a href="https://github.com/hgschmie/">Henning Schmiedehausen</a>
-        </footer>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Versions</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+</head>
+<body>
+  <section class="hero is-primary">
+    <div class="hero-body">
+      <div class="container">
+        <h1 id="project-title" class="title"></h1>
+        <p id="project-description" class="subtitle"></p>
       </div>
-    </main>
-  </body>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="columns">
+        <div class="column">
+          <div class="box">
+            <h2 class="title is-4">Released Versions</h2>
+            <div id="released-versions"></div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <h2 class="title is-4">Development Versions</h2>
+            <div id="dev-versions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>Created with <a href="https://bulma.io">Bulma</a></p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
 </html>

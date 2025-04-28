@@ -1,0 +1,47 @@
+title: pg-embedded
+description: Embedded Postgres for JVM
+theme:
+  headerBackground: "#4a148c"  # Dark purple header background
+  headerText: "#ffffff"        # White text on header
+  versionBackground: "#00796b"  # Teal background for version tags
+  versionText: "#ffffff"        # White text on version tags
+
+releasedVersions:
+  - version: 5.2.0
+    date: 2024-09-12
+    url: https://pg-embedded.softwareforge.de/release-5.2.0
+  - version: 5.1.0
+    date: 2023-10-22
+    url: https://pg-embedded.softwareforge.de/release-5.1.0
+  - version: 5.0
+    date: 2023-05-16
+    url: https://pg-embedded.softwareforge.de/release-5.0
+  - version: 4.3
+    date: 2023-05-14
+    url: https://pg-embedded.softwareforge.de/release-4.3
+  - version: 4.2
+    date: 2022-02-23
+    url: https://pg-embedded.softwareforge.de/release-4.2
+  - version: 4.1
+    date: 2021-12-15
+    url: https://pg-embedded.softwareforge.de/release-4.1
+  - version: 4.0
+    date: 2021-11-30
+    url: https://pg-embedded.softwareforge.de/release-4.0
+  - version: 3.0
+    date: 2021-10-21
+    url: https://pg-embedded.softwareforge.de/release-3.0
+  - version: 2.1
+    date: 2021-06-28
+    url: https://pg-embedded.softwareforge.de/release-2.1
+  - version: 2.0
+    date: 2021-06-08
+    url: https://pg-embedded.softwareforge.de/release-2.0
+
+developmentVersions:
+  - name: Latest Development Build
+    url: https://pg-embedded.softwareforge.de/development
+  - name: Changelog
+    url: https://pg-embedded.softwareforge.de/development/changes.html
+  - name: GitHub Repository
+    url: https://github.com/hgschmie/pg-embedded

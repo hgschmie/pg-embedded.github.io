@@ -3,46 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Versions</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <title id="title">[UNSET]</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
 </head>
 <body>
-  <section class="hero is-primary">
-    <div class="hero-body">
-      <div class="container">
-        <h1 id="project-title" class="title"></h1>
-        <p id="project-description" class="subtitle"></p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
+<section id="project" class="hero is-primary">
+  <div class="hero-body">
     <div class="container">
-      <div class="columns">
-        <div class="column">
-          <div class="box">
-            <h2 class="title is-4">Released Versions</h2>
-            <div id="released-versions"></div>
-          </div>
+      <h1 id="project-title" class="title">[UNSET]</h1>
+      <p id="project-subtitle" class="subtitle">[UNSET]</p>
+    </div>
+  </div>
+</section>
+
+<section id="info" class="hero is-info">
+  <div class="hero-body">
+    <div id="info-container" class="container" ></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      <div class="column">
+        <div class="box">
+          <h2 class="title is-4">Released Versions</h2>
+          <table class="table">
+            <tbody id="released-versions" >
+          </table>
         </div>
-        <div class="column">
-          <div class="box">
-            <h2 class="title is-4">Development Versions</h2>
-            <div id="dev-versions"></div>
-          </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <h2 class="title is-4">Development</h2>
+          <div class="grid is-col-min-1" id="dev-container"></div>
+          <div id="dev-badges"></div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer class="footer">
-    <div class="content has-text-centered">
-      <p>Created with <a href="https://bulma.io">Bulma</a></p>
-    </div>
-  </footer>
+<footer class="footer">
+  <div class="content has-text-left">
+    <p>Copyright &copy; 2021-2025 Henning Schmiedehausen</p>
+  </div>
+</footer>
 
-  <script src="js/app.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

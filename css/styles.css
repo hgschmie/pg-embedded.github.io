@@ -1,5 +1,5 @@
 .version-item {
-  display: flex;
+  vertical-align: middle;
   align-items: center;
   padding: 0.5rem 0;
   border-bottom: 1px solid #f0f0f0;
@@ -7,6 +7,11 @@
 
 .version-item:last-child {
   border-bottom: none;
+}
+
+a.dev {
+  width: 95%;
+  text-align: center;
 }
 
 /* Make boxes equal height */
@@ -35,8 +40,13 @@
   .columns {
     display: block;
   }
-  
+
   .column {
     margin-bottom: 1rem;
   }
+}
+
+tr.version-item td {
+  vertical-align: middle;
+  text-align: center;
 }

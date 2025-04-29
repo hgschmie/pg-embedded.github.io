@@ -1,104 +1,134 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    // Fetch the YAML file
-    const response = await fetch('project-data.yaml');
-    const yamlText = await response.text();
-    
-    // Parse YAML
-    const data = jsyaml.load(yamlText);
-    
-    // Set title and description
-    document.getElementById('project-title').textContent = data.title;
-    document.getElementById('project-description').textContent = data.description;
-    
-    // Apply custom theme colors if provided
-    if (data.theme) {
-      const heroSection = document.querySelector('.hero');
-      if (data.theme.headerBackground) {
-        heroSection.style.backgroundColor = data.theme.headerBackground;
-        // Remove the default Bulma class
-        heroSection.classList.remove('is-primary');
-      }
-      
-      if (data.theme.headerText) {
-        // Apply text color to all text elements in the header
-        const titleElement = document.getElementById('project-title');
-        const descriptionElement = document.getElementById('project-description');
-        
-        titleElement.style.color = data.theme.headerText;
-        descriptionElement.style.color = data.theme.headerText;
-      }
-    }
-    
-    // Populate released versions
-    const releasedVersionsContainer = document.getElementById('released-versions');
-    data.releasedVersions.forEach(version => {
-      const versionElement = document.createElement('div');
-      versionElement.className = 'version-item mb-3';
-      
-      // Create a link for the version
-      const versionLink = document.createElement('a');
-      versionLink.href = version.url;
-      versionLink.className = 'mr-2';
-      
-      const versionName = document.createElement('span');
-      versionName.className = 'tag is-medium';
-      versionName.textContent = version.version;
-      
-      // Apply custom version tag colors if provided in theme
-      if (data.theme) {
-        if (data.theme.versionBackground) {
-          versionName.style.backgroundColor = data.theme.versionBackground;
-        } else {
-          versionName.classList.add('is-primary'); // Default Bulma class if no custom color
+    try {
+        // Fetch the YAML file
+        const response = await fetch('project-data.yaml');
+        const yamlText = await response.text();
+
+        // Parse YAML
+        const data = jsyaml.load(yamlText);
+
+        console.assert(data.theme);
+
+        // load colors
+
+        if (data.theme.project) {
+            document.getElementById('project').style.backgroundColor = data.theme.project;
         }
-        
-        if (data.theme.versionText) {
-          versionName.style.color = data.theme.versionText;
+        if (data.theme.project_text) {
+            document.getElementById('project-title').style.color = data.theme.project_text;
+            document.getElementById('project-subtitle').style.color = data.theme.project_text;
         }
-      } else {
-        versionName.classList.add('is-primary'); // Default Bulma class if no theme
-      }
-      
-      versionLink.appendChild(versionName);
-      
-      const versionDate = document.createElement('span');
-      versionDate.className = 'is-size-7';
-      
-      // Format date to display only the date part (YYYY-MM-DD)
-      let formattedDate = version.date;
-      if (version.date instanceof Date) {
-        formattedDate = version.date.toISOString().split('T')[0];
-      } else if (typeof version.date === 'string' && version.date.includes('T')) {
-        formattedDate = version.date.split('T')[0];
-      }
-      
-      versionDate.textContent = `Released: ${formattedDate}`;
-      
-      versionElement.appendChild(versionLink);
-      versionElement.appendChild(versionDate);
-      releasedVersionsContainer.appendChild(versionElement);
-    });
-    
-    // Populate development versions
-    const devVersionsContainer = document.getElementById('dev-versions');
-    data.developmentVersions.forEach(version => {
-      const versionElement = document.createElement('div');
-      versionElement.className = 'version-item mb-3';
-      
-      const versionLink = document.createElement('a');
-      versionLink.href = version.url;
-      versionLink.className = 'button is-info is-outlined is-small';
-      versionLink.textContent = version.name;
-      
-      versionElement.appendChild(versionLink);
-      devVersionsContainer.appendChild(versionElement);
-    });
-    
-  } catch (error) {
-    console.error('Error loading project data:', error);
-    document.body.innerHTML = `<div class="notification is-danger">
+        if (data.theme.info) {
+            document.getElementById('info').style.backgroundColor = data.theme.info;
+        }
+
+        // Set title and description
+        document.getElementById('title').textContent = data.title + " - " + data.subtitle;
+        document.getElementById('project-title').textContent = data.title;
+        document.getElementById('project-subtitle').textContent = data.subtitle;
+
+        // render the info section
+        const infoContainer = document.getElementById('info-container')
+        const infoLines = data.info.split(/\r?\n/);
+        infoLines.forEach(line => {
+            const infoParagraph = document.createElement('p');
+            infoParagraph.textContent = line;
+
+            if (data.theme.info_text) {
+                infoParagraph.style.color = data.theme.info_text;
+            }
+
+            infoContainer.appendChild(infoParagraph);
+        });
+
+        // Populate released versions
+        const releaseContainer = document.getElementById('released-versions');
+
+        data.releasedVersions.forEach(version => {
+            const releaseRow = document.createElement('tr');
+            releaseRow.className = 'version-item mb-3';
+
+            releaseContainer.appendChild(releaseRow);
+
+            // Create a link for the version
+            const releaseCell = document.createElement('td');
+            const versionLink = document.createElement('a');
+            versionLink.className = 'tag is-medium px-4';
+            versionLink.href = version.url;
+            versionLink.textContent = version.version;
+
+            // Apply custom version tag colors if provided in theme
+            if (data.theme.version) {
+                versionLink.style.backgroundColor = data.theme.version;
+            } else {
+                versionLink.classList.add('is-primary'); // Default Bulma class if no custom color
+            }
+
+            if (data.theme.version_text) {
+                versionLink.style.color = data.theme.version_text;
+            }
+
+            releaseCell.appendChild(versionLink);
+            releaseRow.appendChild(releaseCell);
+
+            // Create a link for the api docs
+            const apidocCell = document.createElement('td');
+            const apidocLink = document.createElement('a');
+            apidocLink.className = 'is-size-6 px-4';
+            apidocLink.href = version.url + "/apidocs/";
+            apidocLink.textContent = '[API Documentation]';
+
+            apidocCell.appendChild(apidocLink);
+            releaseRow.appendChild(apidocCell);
+
+            // parse date
+            // Format date to display only the date part (YYYY-MM-DD)
+            let formattedDate = version.date;
+            if (version.date instanceof Date) {
+                formattedDate = version.date.toISOString().split('T')[0];
+            } else if (typeof version.date === 'string' && version.date.includes('T')) {
+                formattedDate = version.date.split('T')[0];
+            }
+
+            const dateCell = document.createElement('td');
+            dateCell.className = 'is-size-7 px-4';
+            dateCell.textContent = `Released: ${formattedDate}`;
+
+            releaseRow.appendChild(dateCell);
+        });
+
+        // Populate development versions
+        const devContainer = document.getElementById('dev-container');
+        data.developmentInfo.forEach(info => {
+            const infoCell = document.createElement('div');
+            infoCell.className = 'cell is-col-span-1';
+
+            const infoLink = document.createElement('a');
+            infoLink.href = info.url;
+            infoLink.className = 'button is-info is-outlined is-small dev';
+            infoLink.textContent = info.name;
+
+            infoCell.appendChild(infoLink);
+            devContainer.appendChild(infoCell);
+        });
+
+        // Populate badges
+        const devBadges = document.getElementById('dev-badges');
+        data.developmentBadges.forEach(badge => {
+            const badgeImg = document.createElement('img');
+            badgeImg.src = badge.img;
+
+            const badgeLink = document.createElement('a');
+            badgeLink.href = badge.url;
+            badgeLink.appendChild(badgeImg);
+
+            devBadges.appendChild(badgeLink);
+        });
+
+    } catch (error) {
+        console.error('Error loading project data:', error);
+        document.body.innerHTML = `<div class="notification is-danger">
       <p>Error loading project data: ${error.message}</p>
     </div>`;
-  }
+    }
 });

@@ -100,16 +100,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Populate development versions
         const devContainer = document.getElementById('dev-container');
         data.developmentInfo.forEach(info => {
-            const infoCell = document.createElement('div');
-            infoCell.className = 'cell is-col-span-1';
-
             const infoLink = document.createElement('a');
             infoLink.href = info.url;
-            infoLink.className = 'button is-info is-outlined is-small dev';
+            infoLink.className = 'button is-info is-outlined';
             infoLink.textContent = info.name;
 
-            infoCell.appendChild(infoLink);
-            devContainer.appendChild(infoCell);
+            devContainer.appendChild(infoLink);
         });
 
         // Populate badges

@@ -9,11 +9,6 @@
   border-bottom: none;
 }
 
-a.dev {
-  width: 95%;
-  text-align: center;
-}
-
 /* Make boxes equal height */
 .columns {
   display: flex;

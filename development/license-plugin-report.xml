@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1747026765908">
-    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="5.2.1-SNAPSHOT"/>
+<licensePluginReport goal="CHECK" timestamp="1747027101115">
+    <module artifactId="pg-embedded" groupId="de.softwareforge.testing" version="5.3.1-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
         <file path="src/it/invoker.properties" result="PRESENT"/>

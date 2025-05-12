@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -32,10 +33,10 @@ import com.google.common.collect.ImmutableMap;
 @AutoValue
 public abstract class DatabaseInfo {
 
-    private static final String JDBC_FORMAT = &quot;jdbc:postgresql://localhost:%d/%s?user=%s&quot;;
+    private static final String JDBC_FORMAT = &quot;jdbc:postgresql://localhost:%d/%s&quot;;
 
-<span class="fc" id="L37">    DatabaseInfo() {</span>
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L38">    DatabaseInfo() {</span>
+<span class="fc" id="L39">    }</span>
 
     /**
      * The default user used for databases.
@@ -86,14 +87,26 @@ public abstract class DatabaseInfo {
 
     @Nonnull
     static Builder builder() {
-<span class="fc" id="L89">        return new AutoValue_DatabaseInfo.Builder()</span>
-<span class="fc" id="L90">                .dbName(PG_DEFAULT_DB)</span>
-<span class="fc" id="L91">                .user(PG_DEFAULT_USER);</span>
+<span class="fc" id="L90">        return new AutoValue_DatabaseInfo.Builder()</span>
+<span class="fc" id="L91">                .dbName(PG_DEFAULT_DB)</span>
+<span class="fc" id="L92">                .user(PG_DEFAULT_USER);</span>
     }
 
     @Nonnull
     static DatabaseInfo forException(SQLException e) {
-<span class="fc" id="L96">        return builder().exception(e).port(-1).build();</span>
+<span class="fc" id="L97">        return builder().exception(e).port(-1).build();</span>
+    }
+
+    @VisibleForTesting
+    String getBaseUrl() {
+<span class="fc" id="L102">        return format(JDBC_FORMAT, port(), dbName());</span>
+    }
+
+    @VisibleForTesting
+    String getAdditionalParameters() {
+<span class="fc" id="L107">        return connectionProperties().entrySet().stream()</span>
+<span class="fc" id="L108">                .map(e -&gt; format(&quot;%s=%s&quot;, e.getKey(), e.getValue()))</span>
+<span class="fc" id="L109">                .collect(Collectors.joining(&quot;&amp;&quot;));</span>
     }
 
     /**
@@ -103,12 +116,9 @@ public abstract class DatabaseInfo {
      */
     @Nonnull
     public String asJdbcUrl() {
-<span class="fc" id="L106">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
-
-<span class="fc" id="L108">        String additionalParameters = connectionProperties().entrySet().stream()</span>
-<span class="fc" id="L109">                .map(e -&gt; format(&quot;&amp;%s=%s&quot;, e.getKey(), e.getValue()))</span>
-<span class="fc" id="L110">                .collect(Collectors.joining());</span>
-<span class="fc" id="L111">        return format(JDBC_FORMAT, port(), dbName(), user()) + additionalParameters;</span>
+<span class="fc" id="L119">        checkState(exception().isEmpty(), &quot;DatabaseInfo contains SQLException: %s&quot;, exception());</span>
+<span class="fc" id="L120">        var parameters = getAdditionalParameters();</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        return parameters.isEmpty() ? getBaseUrl() : getBaseUrl() + &quot;?&quot; + parameters;</span>
     }
 
     /**
@@ -119,15 +129,15 @@ public abstract class DatabaseInfo {
      */
     @Nonnull
     public DataSource asDataSource() throws SQLException {
-<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (exception().isPresent()) {</span>
-<span class="nc" id="L123">            throw exception().get();</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        if (exception().isPresent()) {</span>
+<span class="nc" id="L133">            throw exception().get();</span>
         }
 
-<span class="fc" id="L126">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
+<span class="fc" id="L136">        return EmbeddedPostgres.createDataSource(user(), dbName(), port(), connectionProperties());</span>
     }
 
     @AutoValue.Builder
-<span class="fc" id="L130">    abstract static class Builder {</span>
+<span class="fc" id="L140">    abstract static class Builder {</span>
 
         abstract Builder dbName(String dbName);
 
@@ -140,8 +150,8 @@ public abstract class DatabaseInfo {
         abstract ImmutableMap.Builder&lt;String, String&gt; connectionPropertiesBuilder();
 
         final Builder addConnectionProperty(String key, String value) {
-<span class="fc" id="L143">            connectionPropertiesBuilder().put(key, value);</span>
-<span class="fc" id="L144">            return this;</span>
+<span class="fc" id="L153">            connectionPropertiesBuilder().put(key, value);</span>
+<span class="fc" id="L154">            return this;</span>
         }
 
         abstract Builder connectionProperties(ImmutableMap&lt;String, String&gt; connectionProperties);

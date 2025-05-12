@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProcessOutputLogger.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pg-embedded :: code</a> &gt; <a href="index.source.html" class="el_package">de.softwareforge.testing.postgres.embedded</a> &gt; <span class="el_source">ProcessOutputLogger.java</span></div><h1>ProcessOutputLogger.java</h1><pre class="source lang-java linenums">/*
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.softwareforge.testing.postgres.embedded;
+
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.slf4j.Logger;
+
+/**
+ * Read from an {@link InputStream} and send the information to the logger supplied.
+ * &lt;p&gt;
+ * The use of the input stream is thread safe since it's used only in a single thread&amp;mdash;the one launched by this code.
+ */
+final class ProcessOutputLogger implements Closeable {
+
+    private final Logger logger;
+    private final ListeningExecutorService executorService;
+
+<span class="fc" id="L44">    ProcessOutputLogger(final Logger errorLogger) {</span>
+<span class="fc" id="L45">        this.logger = errorLogger;</span>
+<span class="fc" id="L46">        this.executorService = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(new ThreadFactoryBuilder()</span>
+<span class="fc" id="L47">                .setDaemon(true)</span>
+<span class="fc" id="L48">                .setNameFormat(&quot;logger-thread-%d&quot;)</span>
+<span class="fc" id="L49">                .build()));</span>
+<span class="fc" id="L50">    }</span>
+
+    @Override
+    public void close() {
+<span class="fc" id="L54">        this.executorService.shutdownNow();</span>
+<span class="fc" id="L55">    }</span>
+
+    StreamCapture captureStreamAsLog() {
+<span class="fc" id="L58">        return new StreamCapture(logger::debug);</span>
+    }
+
+    StreamCapture captureStreamAsConsumer(Consumer&lt;String&gt; consumer) {
+<span class="fc" id="L62">        return new StreamCapture(consumer);</span>
+    }
+
+
+    final class StreamCapture implements BiConsumer&lt;String, InputStream&gt; {
+
+        private final Consumer&lt;String&gt; consumer;
+<span class="fc" id="L69">        private volatile Future&lt;?&gt; completionFuture = null;</span>
+
+<span class="fc" id="L71">        private StreamCapture(Consumer&lt;String&gt; consumer) {</span>
+<span class="fc" id="L72">            this.consumer = consumer;</span>
+<span class="fc" id="L73">        }</span>
+
+        @Override
+        public void accept(String name, InputStream inputStream) {
+<span class="fc" id="L77">            this.completionFuture = executorService.submit(new LogRunnable(name, inputStream, consumer));</span>
+<span class="fc" id="L78">        }</span>
+
+        public Future&lt;?&gt; getCompletion() {
+<span class="fc" id="L81">            return completionFuture;</span>
+        }
+    }
+
+    private final class LogRunnable implements Runnable {
+
+        private final InputStream inputStream;
+        private final String name;
+        private final Consumer&lt;String&gt; consumer;
+
+<span class="fc" id="L91">        private LogRunnable(String name, InputStream inputStream, Consumer&lt;String&gt; consumer) {</span>
+<span class="fc" id="L92">            this.name = name;</span>
+<span class="fc" id="L93">            this.inputStream = inputStream;</span>
+<span class="fc" id="L94">            this.consumer = consumer;</span>
+<span class="fc" id="L95">        }</span>
+
+        @Override
+        public void run() {
+<span class="fc" id="L99">            String oldName = Thread.currentThread().getName();</span>
+<span class="fc" id="L100">            Thread.currentThread().setName(name);</span>
+<span class="fc" id="L101">            try (InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);</span>
+<span class="fc" id="L102">                    BufferedReader reader = new BufferedReader(isr)) {</span>
+                try {
+<span class="fc" id="L104">                    reader.lines().forEach(consumer);</span>
+<span class="nc" id="L105">                } catch (final UncheckedIOException e) {</span>
+<span class="nc" id="L106">                    logger.error(&quot;while reading output:&quot;, e);</span>
+<span class="fc" id="L107">                }</span>
+<span class="nc" id="L108">            } catch (IOException e) {</span>
+<span class="nc" id="L109">                logger.error(&quot;while opening log stream&quot;, e);</span>
+            } finally {
+<span class="fc" id="L111">                Thread.currentThread().setName(oldName + &quot; (&quot; + name + &quot;)&quot;);</span>
+            }
+<span class="fc" id="L113">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
